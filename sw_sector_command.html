@@ -311,8 +311,7 @@ const SUPA_URL='https://itvrfikhpzporrobecmq.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0dnJmaWtocHpwb3Jyb2JlY21xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4ODExNDQsImV4cCI6MjA5NDQ1NzE0NH0.7xuIyR-QSacg4-n73iBwPjiGETESXktqh9IkQfLSFFc';
 let supa=null;
 let saveTimeout=null;
-let isSaving=false;
-let lastSaveTime=0;
+let localVersion=0;  // increments each time we save locally
 
 // ============================================================
 // BASE DATA
@@ -1021,14 +1020,14 @@ async function initGS(){
 function saveGS(){
   if(!supa)return;
   if(saveTimeout)clearTimeout(saveTimeout);
+  localVersion++;
+  const myVersion=localVersion;
   saveTimeout=setTimeout(async()=>{
-    isSaving=true;
     try{
-      await supa.from('campaign_state').upsert({id:1,data:JSON.stringify(GS)},{onConflict:'id'});
-      lastSaveTime=Date.now();
-      console.log('Saved to Supabase');
+      const payload={id:1,data:JSON.stringify(GS),version:myVersion};
+      await supa.from('campaign_state').upsert(payload,{onConflict:'id'});
+      console.log('Saved v'+myVersion);
     }catch(e){console.error('Save failed',e);}
-    finally{isSaving=false;}
   },600);
 }
 
@@ -1064,13 +1063,13 @@ function advanceTurn(dir){
   updateCounts();
   renderEventLog();
   if(activeSec)renderSector(activeSec);
-  // Block polling for 4 seconds while save completes
-  isSaving=true;
-  lastSaveTime=Date.now();
+  // Save immediately with version tracking
+  localVersion++;
+  const myVer=localVersion;
   if(supa){
-    supa.from('campaign_state').upsert({id:1,data:JSON.stringify(GS)},{onConflict:'id'})
-      .then(()=>{console.log('Turn saved');lastSaveTime=Date.now();isSaving=false;})
-      .catch(e=>{console.error('Turn save failed',e);isSaving=false;});
+    supa.from('campaign_state').upsert({id:1,data:JSON.stringify(GS),version:myVer},{onConflict:'id'})
+      .then(()=>console.log('Turn saved v'+myVer))
+      .catch(e=>console.error('Turn save failed',e));
   }
 }
 
@@ -1149,7 +1148,6 @@ function adjPW(f,d){
   if(f==='e')GS.ePW=Math.max(0,Math.min(20,GS.ePW+d));
   else GS.rPW=Math.max(0,Math.min(20,GS.rPW+d));
   updatePW();
-  lastSaveTime=Date.now();
   saveGS();
 }
 function updatePW(){
@@ -1677,15 +1675,20 @@ function openAddForce(sid){
   // Poll every 3 seconds to sync changes from other players
   setInterval(async()=>{
     if(!supa)return;
-    // Skip poll if we're currently saving or saved in last 2 seconds
-    if(isSaving||Date.now()-lastSaveTime<2000)return;
+    // Never apply remote data if we have a pending local save
+    if(localVersion>0&&saveTimeout)return;
     try{
-      const {data}=await supa.from('campaign_state').select('data').eq('id',1).single();
+      const {data}=await supa.from('campaign_state').select('data,version').eq('id',1).single();
       if(!data||!data.data)return;
+      const remoteVersion=data.version||0;
+      // Only apply remote if remote version is NEWER than our local version
+      // This prevents reverting our own unsaved changes
+      if(remoteVersion<=localVersion)return;
       const remote=JSON.parse(data.data);
       const changed=remote.turn!==GS.turn||remote.ePW!==GS.ePW||remote.rPW!==GS.rPW||remote.dsStep!==GS.dsStep||JSON.stringify(remote.sectors)!==JSON.stringify(GS.sectors);
       if(changed){
         GS=remote;
+        localVersion=remoteVersion;
         updateTurnDisplay();
         updateCounts();
         updatePW();
@@ -1693,7 +1696,7 @@ function openAddForce(sid){
         buildNav();
         if(activeSec)renderSector(activeSec);
         renderEventLog();
-        console.log('Synced from remote');
+        console.log('Synced from remote v'+remoteVersion);
       }
     }catch(e){}
   },3000);
