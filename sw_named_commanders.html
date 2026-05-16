@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Named Commanders — Star Wars Grand Strategy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05080f;--panel:#080e1a;--panel2:#0c1422;--border:#1a2e45;--border2:#243d58;
+  --text:#b8cfe0;--dim:#4a6a82;--bright:#d8eeff;--gold:#c8a84b;--gold2:#e8c86b;
+  --empire:#3a78e8;--rebel:#e83838;--neutral:#607888;
+  --green:#28c868;--red:#e84848;--yellow:#e8c020;--orange:#e87820;
+  --r1:#e84848;--r2:#e87820;--r3:#e8c020;--r4:#28c868;--r5:#4a8fff;
+}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh;line-height:1.6}
+.hdr{background:var(--panel);border-bottom:2px solid var(--border2);padding:14px 28px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:800;color:var(--gold);letter-spacing:4px;text-transform:uppercase}
+.hdr-sub{font-size:8px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+.container{max-width:1150px;margin:0 auto;padding:28px 20px}
+
+/* TOC */
+.toc{background:var(--panel);border:1px solid var(--border);padding:16px 20px;margin-bottom:28px}
+.toc-title{font-family:'Orbitron',monospace;font-size:9px;color:var(--gold);letter-spacing:3px;margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px}
+.toc-a{font-size:9px;color:var(--empire);text-decoration:none;padding:2px 0;display:block;transition:color .12s}
+.toc-a:hover{color:var(--gold)}
+
+/* SECTIONS */
+.section{margin-bottom:36px}
+.sec-hdr{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--gold);letter-spacing:3px;text-transform:uppercase;border-bottom:2px solid var(--border2);padding-bottom:7px;margin-bottom:16px}
+.sec-intro{font-size:10px;color:var(--dim);margin-bottom:14px;line-height:1.7;max-width:820px}
+.sub-hdr{font-family:'Orbitron',monospace;font-size:9px;color:var(--bright);letter-spacing:2px;text-transform:uppercase;margin:20px 0 8px 0;padding:5px 10px;background:var(--panel2);border-left:3px solid var(--empire)}
+.sub-hdr.rebel{border-left-color:var(--rebel)}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:10px}
+th{background:var(--panel2);color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-size:7px;padding:7px 10px;text-align:left;border:1px solid var(--border)}
+td{padding:6px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.5}
+tr:hover td{background:rgba(255,255,255,0.012)}
+
+/* COMMANDER CARDS */
+.cmd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin:12px 0}
+.cmd-card{border:1px solid var(--border);background:var(--panel2);overflow:hidden}
+.cmd-card-hdr{padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--border)}
+.cmd-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;line-height:1.3}
+.cmd-title{font-size:8px;color:var(--dim);margin-top:2px;letter-spacing:1px}
+.cmd-rating{font-family:'Orbitron',monospace;font-size:22px;font-weight:800;line-height:1}
+.cmd-rating-label{font-size:7px;color:var(--dim);letter-spacing:1px;text-align:right;margin-top:2px}
+.cmd-body{padding:10px 14px}
+.cmd-row{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start}
+.cmd-key{font-size:7px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;min-width:75px;flex-shrink:0;padding-top:1px}
+.cmd-val{font-size:9px;color:var(--text);line-height:1.4;flex:1}
+.cmd-val.gold{color:var(--gold)}
+.cmd-val.green{color:var(--green)}
+.cmd-val.red{color:var(--red)}
+.cmd-val.yellow{color:var(--yellow)}
+.cmd-specialty{background:rgba(0,0,0,0.3);border:1px solid var(--border);padding:7px 10px;margin:7px 0;font-size:9px;border-left:3px solid}
+.cmd-status{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.status-badge{font-size:7px;padding:2px 7px;border:1px solid;letter-spacing:1px;cursor:pointer;transition:all .15s;font-family:'Share Tech Mono',monospace}
+.status-badge:hover{opacity:0.7}
+.sb-active{color:var(--green);border-color:var(--green);background:rgba(40,200,104,0.1)}
+.sb-wounded{color:var(--yellow);border-color:var(--yellow)}
+.sb-captured{color:var(--orange);border-color:var(--orange)}
+.sb-kia{color:var(--red);border-color:var(--red)}
+.sb-moving{color:var(--empire);border-color:var(--empire)}
+
+/* RATINGS */
+.r1{color:var(--r1)}.r2{color:var(--r2)}.r3{color:var(--r3)}.r4{color:var(--r4)}.r5{color:var(--r5)}
+
+/* DICE TABLE */
+.dice-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:12px 0}
+.dice-face{border:1px solid var(--border);padding:10px 8px;text-align:center;background:var(--panel2)}
+.dice-num{font-family:'Orbitron',monospace;font-size:18px;font-weight:800;color:var(--gold2);margin-bottom:4px}
+.dice-result{font-size:8px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.dice-desc{font-size:8px;color:var(--dim);line-height:1.4}
+
+/* ALERT */
+.alert{padding:9px 12px;margin:10px 0;font-size:9px;border-left:3px solid;line-height:1.6}
+.alert-warn{background:rgba(232,72,72,0.07);border-color:var(--red);color:#e88888}
+.alert-note{background:rgba(58,120,232,0.07);border-color:var(--empire);color:#88aaee}
+.alert-gold{background:rgba(200,168,75,0.07);border-color:var(--gold);color:var(--gold)}
+.alert-title{font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:8px;margin-bottom:3px}
+
+/* LOCATION TRACKER */
+.location-tracker{background:var(--panel);border:1px solid var(--border);padding:14px 16px;margin:12px 0}
+.lt-title{font-family:'Orbitron',monospace;font-size:9px;color:var(--gold);letter-spacing:2px;margin-bottom:10px}
+.lt-row{display:grid;grid-template-columns:180px 180px 180px 1fr;gap:8px;padding:5px 0;border-bottom:1px solid rgba(26,46,69,0.4);align-items:center;font-size:9px}
+.lt-name{color:var(--bright)}
+.lt-loc{color:var(--text)}
+.lt-turn{color:var(--dim)}
+.lt-status-cell{display:flex;gap:4px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">Named Commanders</div>
+    <div class="hdr-sub">Galactic Civil War — 2 BBY — Command & Control System</div>
+  </div>
+  <div style="font-size:9px;color:var(--dim);text-align:right">
+    <span style="color:var(--empire)">■ IMPERIAL</span> &nbsp;
+    <span style="color:var(--rebel)">■ REBEL</span> &nbsp;
+    <span style="color:var(--neutral)">■ INDEPENDENT</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">Contents</div>
+  <div class="toc-grid">
+    <a class="toc-a" href="#s1">1. How Commanders Work</a>
+    <a class="toc-a" href="#s2">2. Command Rating System</a>
+    <a class="toc-a" href="#s3">3. Movement Rules</a>
+    <a class="toc-a" href="#s4">4. Death / Wound / Capture</a>
+    <a class="toc-a" href="#s5">5. Imperial Commanders</a>
+    <a class="toc-a" href="#s6">6. Rebel Commanders</a>
+    <a class="toc-a" href="#s7">7. Independent Commanders</a>
+    <a class="toc-a" href="#s8">8. Specialty Effects</a>
+    <a class="toc-a" href="#s9">9. Political Will & Commanders</a>
+    <a class="toc-a" href="#s10">10. Location Tracker</a>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s1">
+<div class="sec-hdr">1. How Commanders Work</div>
+<div class="sec-intro">
+Named commanders are individuals with enough personal authority, skill, or reputation to meaningfully change the outcome of battles and campaign actions. They are not abstract bonuses — they are real people who can be in only one place at a time, can be killed, and whose presence or absence changes everything around them.
+<br><br>
+Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Planetary Governors collect taxes. You only interact with the commander system when you choose to deploy a named commander, when a named commander is threatened, or when a battle forces a casualty roll.
+</div>
+
+<table>
+  <tr><th>Rule</th><th>Detail</th></tr>
+  <tr><td style="color:var(--gold)">One location at a time</td><td>A commander can only be in one sector at once. They cannot affect two battles in the same turn.</td></tr>
+  <tr><td style="color:var(--gold)">Movement costs a turn</td><td>Moving a commander from one sector to another uses their entire turn. They cannot perform their specialty action the same turn they move.</td></tr>
+  <tr><td style="color:var(--gold)">Status Quo default</td><td>Commanders not given specific orders remain at their current location performing their baseline duties. You only act when changing what they do.</td></tr>
+  <tr><td style="color:var(--gold)">Specialty once per turn</td><td>Each commander can use their specialty effect once per turn while present in a sector.</td></tr>
+  <tr><td style="color:var(--gold)">Casualty roll after battle</td><td>Any named commander present during a battle rolls on the casualty table after the battle resolves. Higher command ratings have better survival odds.</td></tr>
+  <tr><td style="color:var(--gold)">Morale modifier</td><td>A named commander present shifts the force's morale state up one level (see Scripting Reference Section 8).</td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s2">
+<div class="sec-hdr">2. Command Rating System</div>
+<div class="sec-intro">Command Rating reflects a commander's overall military and political authority. It affects their survival odds on the casualty roll and the strength of their specialty effect.</div>
+
+<table>
+  <tr><th>Rating</th><th>Tier</th><th>Examples</th><th>Casualty Roll Modifier</th></tr>
+  <tr><td class="r5" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:800">5</td><td>Grand Moff / Grand Admiral / Dark Lord</td><td>Tarkin, Thrawn, Vader</td><td>+2 to survival roll</td></tr>
+  <tr><td class="r4" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:800">4</td><td>Admiral / General / Alliance Leader</td><td>Dodonna, Raddus, Romodi, Mon Mothma</td><td>+1 to survival roll</td></tr>
+  <tr><td class="r3" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:800">3</td><td>Sector Commander / Moff / Rebel Sector Commander</td><td>Konstantine, Pryce, Cham Syndulla, Hera</td><td>No modifier</td></tr>
+  <tr><td class="r2" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:800">2</td><td>Field Commander / Cell Leader</td><td>Rex, Sato, Sabine, Kallus</td><td>-1 to survival roll</td></tr>
+  <tr><td class="r1" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:800">1</td><td>Operative / Agent / Independent</td><td>Ezra, Zeb, Saw Gerrera</td><td>-2 to survival roll</td></tr>
+</table>
+
+<div class="alert alert-note">
+  <div class="alert-title">Rating vs Danger</div>
+  Higher rating does not mean safer. A Rating 5 commander who is present during a Total Loss battle still rolls on the casualty table — they just have better odds of surviving it. Vader at the front is still Vader at the front.
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s3">
+<div class="sec-hdr">3. Movement Rules</div>
+
+<table>
+  <tr><th>Situation</th><th>Rule</th></tr>
+  <tr><td style="color:var(--gold)">Standard move</td><td>Commander moves from current sector to any adjacent sector. Costs their full turn action — no specialty use that turn.</td></tr>
+  <tr><td style="color:var(--gold)">Long-distance move</td><td>Moving more than one sector away takes 2 turns. Commander is in transit and unavailable for both turns.</td></tr>
+  <tr><td style="color:var(--gold)">Emergency deployment</td><td>A Rating 5 commander (Tarkin, Thrawn, Vader) can move any distance in 1 turn by invoking Imperial authority — but this costs 1 Political Will. Represents the resource expenditure of emergency hyperspace priority.</td></tr>
+  <tr><td style="color:var(--gold)">Rebel mobility</td><td>Rebel commanders can move any distance in 1 turn using their clandestine transport networks — but the move must be declared secretly and revealed simultaneously with the Imperial turn.</td></tr>
+  <tr><td style="color:var(--gold)">Wounded commander</td><td>Cannot move for 2 turns. Remains at current location. Can still perform specialty at -1 effectiveness.</td></tr>
+  <tr><td style="color:var(--gold)">Commander in transit</td><td>Cannot use specialty. Cannot be targeted by assassination. Cannot affect morale of any force.</td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s4">
+<div class="sec-hdr">4. Death / Wound / Capture</div>
+<div class="sec-intro">After any battle in which a named commander was present, roll 1d6 and apply the modifier based on their Command Rating. The battle outcome also affects the roll.</div>
+
+<div class="sub-hdr">Battle Outcome Modifiers</div>
+<table>
+  <tr><th>Battle Result</th><th>Roll Modifier</th></tr>
+  <tr><td>Victory — Light losses (under 25%)</td><td>+2 to roll</td></tr>
+  <tr><td>Victory — Moderate losses (25-49%)</td><td>+1 to roll</td></tr>
+  <tr><td>Victory — Heavy losses (50-99%)</td><td>No modifier</td></tr>
+  <tr><td>Defeat — managed retreat</td><td>-1 to roll</td></tr>
+  <tr><td>Defeat — Heavy losses</td><td>-2 to roll</td></tr>
+  <tr><td>Total Loss (force destroyed)</td><td>-3 to roll</td></tr>
+</table>
+
+<div class="sub-hdr">Casualty Roll Results (1d6 + modifiers)</div>
+<div class="dice-grid">
+  <div class="dice-face">
+    <div class="dice-num">1</div>
+    <div class="dice-result" style="color:var(--red)">Killed</div>
+    <div class="dice-desc">Commander is dead. Removed permanently. Faction loses 1 Political Will.</div>
+  </div>
+  <div class="dice-face">
+    <div class="dice-num">2</div>
+    <div class="dice-result" style="color:var(--orange)">Captured</div>
+    <div class="dice-desc">Commander is captured by the enemy. Opponent gains 2 Political Will. Can be exchanged or rescued.</div>
+  </div>
+  <div class="dice-face">
+    <div class="dice-num">3</div>
+    <div class="dice-result" style="color:var(--yellow)">Wounded</div>
+    <div class="dice-desc">Commander is wounded. Out of action for 2 turns. Command Rating -1 while recovering.</div>
+  </div>
+  <div class="dice-face">
+    <div class="dice-num">4</div>
+    <div class="dice-result" style="color:var(--yellow)">Shaken</div>
+    <div class="dice-desc">Commander is shaken. Command Rating -1 for next battle only. Then returns to normal.</div>
+  </div>
+  <div class="dice-face">
+    <div class="dice-num">5</div>
+    <div class="dice-result" style="color:var(--green)">Unharmed</div>
+    <div class="dice-desc">Commander survives without injury. No effect.</div>
+  </div>
+  <div class="dice-face">
+    <div class="dice-num">6+</div>
+    <div class="dice-result" style="color:var(--r5)">Heroic</div>
+    <div class="dice-desc">Commander not only survives but performs notably. +1 Political Will for their faction.</div>
+  </div>
+</div>
+
+<div class="alert alert-warn">
+  <div class="alert-title">Canonical Deaths Override the Dice</div>
+  If a canonical death is triggered by a specific event (Battle of Atollon kills Sato, Konstantine's recklessness gets him destroyed) — that death happens regardless of the dice roll. The dice only apply to non-canonical battle outcomes.
+</div>
+
+<div class="sub-hdr">Captured Commanders</div>
+<table>
+  <tr><th>Situation</th><th>Rule</th></tr>
+  <tr><td>Rebel captures Imperial commander</td><td>Rebels can interrogate for 1 free Intelligence action. Can offer exchange or hold indefinitely. Empire loses specialty of that commander until freed.</td></tr>
+  <tr><td>Empire captures Rebel commander</td><td>Empire gains 1 free ISB sweep action. Commander is transported to Imperial detention. Rebels can attempt extraction mission (triggers Entry 005).</td></tr>
+  <tr><td>Prisoner exchange</td><td>Both factions can agree to exchange captured commanders — 1 for 1. Both commanders return to active duty next turn.</td></tr>
+  <tr><td>Execution</td><td>Either faction can execute a captured commander. Executing grants +1 Political Will but the opposing faction gains +2 Political Will from the outrage. Usually not worth it.</td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s5">
+<div class="sec-hdr">5. Imperial Commanders</div>
+
+<div class="sub-hdr">Top Level — Rating 5</div>
+<div class="cmd-grid">
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(58,120,232,0.08);border-bottom-color:#1a3a6a">
+      <div>
+        <div class="cmd-name" style="color:var(--empire)">Grand Moff Wilhuff Tarkin</div>
+        <div class="cmd-title">OVERSECTOR WEST COMMANDER — DEATH STAR OVERSEER</div>
+      </div>
+      <div style="text-align:right">
+        <div class="cmd-rating r5">5</div>
+        <div class="cmd-rating-label">COMMAND<br>RATING</div>
+      </div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Coruscant / Eriadu (rotating)</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--empire)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">TARKIN DOCTRINE</div>
+        When Tarkin is present in a sector, the Empire may conduct an Orbital Bombardment action without spending Political Will. Normally this costs 2 PW. Additionally, any contested sector with Tarkin present automatically has its garrison morale raised to High regardless of supply or casualties — fear of Tarkin's personal reputation holds the line.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">PW Cost</div><div class="cmd-val green">Actions cost 1 less PW while Tarkin commands</div></div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Overconfident — if Death Star is operational, Tarkin dismisses all intelligence of Rebel fleet strength. He will not evacuate even when outmatched.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(58,120,232,0.08);border-bottom-color:#1a3a6a">
+      <div>
+        <div class="cmd-name" style="color:var(--empire)">Grand Admiral Thrawn</div>
+        <div class="cmd-title">SEVENTH FLEET COMMANDER — REBEL HUNTER</div>
+      </div>
+      <div style="text-align:right">
+        <div class="cmd-rating r5">5</div>
+        <div class="cmd-rating-label">COMMAND<br>RATING</div>
+      </div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Lothal Sector — Seventh Fleet</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active — Triangulating Atollon</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--empire)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">TACTICAL GENIUS</div>
+        When Thrawn is present, the opposing force rolls on the casualty table as if they took one tier worse of losses than they actually did. Additionally, Thrawn's fleet in any battle has its effective tier raised by one — a Sector Squadron fights as a Battle Squadron under his command. Once per campaign, Thrawn may reveal a hidden Rebel base location without spending an Intelligence action — representing his analytical deduction.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">PW Cost</div><div class="cmd-val green">Deploying Thrawn costs 0 PW — Emperor personally endorses</div></div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Art obsession — if Rebels deploy a cultural or artistic element as a distraction (specific event card), Thrawn pauses one turn to analyze it. This is a canon quirk — use it cinematically.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(58,120,232,0.08);border-bottom-color:#1a3a6a">
+      <div>
+        <div class="cmd-name" style="color:var(--empire)">Darth Vader</div>
+        <div class="cmd-title">EMPEROR'S ENFORCER — DARK LORD OF THE SITH</div>
+      </div>
+      <div style="text-align:right">
+        <div class="cmd-rating r5">5</div>
+        <div class="cmd-rating-label">COMMAND<br>RATING</div>
+      </div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Coruscant — mobile deployment</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--empire)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">DARK SIDE ENFORCER</div>
+        When Vader is present in a sector, Rebel forces must pass a morale check before engaging — treat their morale as one tier lower for the first phase of any battle. Additionally, any Rebel commander present in the same battle must roll on the casualty table regardless of battle outcome (Vader specifically hunts Force-sensitives and leaders). Vader cannot be captured — a roll of 2 on his casualty table is treated as Wounded instead.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">PW Cost</div><div class="cmd-val green">Deploying Vader costs 0 PW</div></div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><td class="cmd-val red">If a Force-sensitive Rebel is present (Ezra, Kanan), Vader will pursue them personally — potentially separating from the main battle force and leaving the fleet without his command bonus.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-kia" style="opacity:0.3;cursor:not-allowed" title="Cannot be killed — treat as Wounded">KIA*</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="sub-hdr">Senior Level — Rating 4</div>
+<div class="cmd-grid">
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(58,120,232,0.06)">
+      <div>
+        <div class="cmd-name" style="color:var(--empire)">Director Orson Krennic</div>
+        <div class="cmd-title">ADVANCED WEAPONS RESEARCH — DEATH STAR PROJECT</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r4">4</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Geonosis / Scarif (rotating)</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--empire)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">WEAPONS ARCHITECT</div>
+        While Krennic is present, the Death Star Construction Track advances by 1 additional step per turn without spending Action Points. Krennic's presence at Scarif also upgrades its security — any Rebel intelligence raid against Scarif requires 2 successful prior intelligence actions instead of 1.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Political rivalry with Tarkin — if both are in the same sector, one of them loses their specialty effect that turn (player's choice of which). Their competition undermines Imperial efficiency.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(58,120,232,0.06)">
+      <div>
+        <div class="cmd-name" style="color:var(--empire)">ISB Director Wullf Yularen</div>
+        <div class="cmd-title">IMPERIAL SECURITY BUREAU — COUNTERINTELLIGENCE</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r4">4</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Coruscant — ISB Headquarters</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--empire)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">COUNTERINTELLIGENCE</div>
+        While Yularen is active, the Empire gains 1 free Intelligence action per turn — his ISB network is always running. Additionally, any Rebel Covert Cell Insertion action has a 50% chance of being detected (flip a coin on Rebel insertion — heads = ISB catches it before it establishes). Yularen's network can be disrupted — if Agent Kallus defects (Event Card R-03), Yularen loses his free Intelligence action for 3 turns.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Bureaucratic — Yularen works through process and report chains. He cannot take direct military action even if the situation calls for it.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="sub-hdr">Sector Level — Rating 3</div>
+<div class="cmd-grid">
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(58,120,232,0.05)">
+      <div>
+        <div class="cmd-name" style="color:var(--empire)">Admiral Kassius Konstantine</div>
+        <div class="cmd-title">LOTHAL SECTOR FLEET — ISD RELENTLESS</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r3">3</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Lothal orbit — ISD Relentless</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--empire)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">SECTOR BLOCKADE</div>
+        Konstantine's fleet maintains an effective blockade — any Rebel supply run through Lothal Sector automatically fails while he is present, no dice roll required.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Reckless aggression — if Konstantine rolls a 6 on any Initiative check, he breaks formation to personally pursue a fleeing Rebel ship. His fleet loses its blockade bonus that turn. This is canon — and it gets him killed at Atollon.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(58,120,232,0.05)">
+      <div>
+        <div class="cmd-name" style="color:var(--empire)">Governor Arihnda Pryce</div>
+        <div class="cmd-title">LOTHAL SECTOR GOVERNOR — MILITARY LIAISON</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r3">3</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Lothal — Capital City</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--empire)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">POLITICAL AUTHORITY</div>
+        Pryce can conduct a Crackdown action on Lothal without spending an Action Point once per turn. However she has no military expertise — any battle in Lothal Sector while she commands (without Thrawn or Konstantine present) has the Imperial force fighting at Shaken morale regardless of actual supply or casualties.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Politically ambitious — will sacrifice military effectiveness for personal advancement. If Krennic or Tarkin visits Lothal, Pryce may undermine them with the Emperor to protect her position.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(58,120,232,0.05)">
+      <div>
+        <div class="cmd-name" style="color:var(--empire)">Agent Alexsandr Kallus</div>
+        <div class="cmd-title">ISB AGENT — REBEL HUNTER (FULCRUM)</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r2">2</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Lothal Sector — active operations</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val yellow">⚠ Secretly sympathetic to Rebels</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--empire)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">ISB FIELD AGENT</div>
+        Kallus provides the Empire with 1 free Intelligence sweep per turn in his current sector. However — if Event Card R-03 (Agent Kallus Defects) is drawn, Kallus immediately switches faction. He becomes a Rebel commander (Fulcrum) with Rating 2 providing the Rebels with 2 free Intelligence actions per turn for 3 turns representing his knowledge dump.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Note</div><div class="cmd-val yellow">Track Kallus carefully. Thrawn is watching him. If Thrawn is in Lothal Sector the same turn Kallus defects, Thrawn may attempt to intercept (triggers special event).</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE (IMPERIAL)</span>
+        <span class="status-badge sb-moving">DEFECTED</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s6">
+<div class="sec-hdr">6. Rebel Commanders</div>
+
+<div class="sub-hdr rebel">Alliance Leadership — Rating 4-5</div>
+<div class="cmd-grid">
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(232,56,56,0.08);border-bottom-color:#6a1a1a">
+      <div>
+        <div class="cmd-name" style="color:var(--rebel)">Mon Mothma</div>
+        <div class="cmd-title">COMMANDER IN CHIEF — ALLIANCE HIGH COMMAND</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r4">4</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Atollon — Alliance High Command</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active — Declaration broadcast</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--rebel)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">DIPLOMAT & LEADER</div>
+        Mon Mothma generates +1 Political Will for the Alliance each turn she is active and not in transit. Any Diplomatic Mission action in a sector she visits personally automatically succeeds — no roll required. Her Declaration of the Rebel Alliance (if not yet drawn as Event Card) generates +2 PW when she broadcasts it — she can choose when to broadcast it as a campaign action.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Non-combatant — Mon Mothma cannot be assigned to a battle. If the sector she occupies is attacked, she must evacuate (1 AP) or be captured on a roll of 1-3.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(232,56,56,0.08);border-bottom-color:#6a1a1a">
+      <div>
+        <div class="cmd-name" style="color:var(--rebel)">Senator Bail Organa</div>
+        <div class="cmd-title">ALDERAAN — INTELLIGENCE & SENATE OPERATIONS</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r4">4</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Alderaan — Senate operations</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active — covert</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--rebel)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">INTELLIGENCE NETWORK</div>
+        Bail Organa provides 2 free Intelligence actions per turn representing his Senate contacts and covert network. Any sector adjacent to a Core World where Bail has operated in the last 3 turns has its Diplomatic Mission difficulty reduced — the sympathizer network is already primed. Bail's funding provides the Alliance with +1 Supply per turn while he is active.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Senate cover — if Bail is exposed as a Rebel agent (specific ISB event), Alderaan Sector immediately becomes Contested and Bail must flee. The Empire will use Alderaan as political leverage.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="sub-hdr rebel">Military Commanders — Rating 3-4</div>
+<div class="cmd-grid">
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(232,56,56,0.06)">
+      <div>
+        <div class="cmd-name" style="color:var(--rebel)">General Jan Dodonna</div>
+        <div class="cmd-title">MASSASSI GROUP — REBEL TACTICAL COMMAND</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r4">4</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Atollon — Massassi Group</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--rebel)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">BATTLE STRATEGIST</div>
+        When Dodonna commands a ground battle, the Rebel force may redeploy one unit between the first and second phase of a large battle (Entry 009/010). In Men of War this means you may relocate one tagged squad group to a new starting position between phases. Additionally, Dodonna's presence raises Rebel ground force morale by one tier for the entire battle.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Conservative — Dodonna will not commit to an attack unless victory probability is above 60%. He may refuse offensive orders if he calculates odds are against him.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(232,56,56,0.06)">
+      <div>
+        <div class="cmd-name" style="color:var(--rebel)">Commander Hera Syndulla</div>
+        <div class="cmd-title">PHOENIX SQUADRON — GHOST CREW LEADER</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r3">3</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Atollon — Phoenix Squadron</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--rebel)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">ACE COMMANDER</div>
+        Phoenix Squadron fleet fights at one tier higher when Hera commands — a Strike Force fights as a Task Force, a Task Force fights as a Fleet Element. In Men of War space battles this means the Rebel fleet starts with better positioning. Hera also reduces the cost of any Raid action by 1 AP — her personal expertise in hit-and-run makes operations cheaper.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Personal loyalty — if any Ghost crew member is captured or KIA, Hera will spend her next turn attempting rescue regardless of campaign priorities.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(232,56,56,0.06)">
+      <div>
+        <div class="cmd-name" style="color:var(--rebel)">Captain Rex</div>
+        <div class="cmd-title">CLONE WARS VETERAN — CHOPPER BASE DEFENSE</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r2">2</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Atollon — Chopper Base ground defense</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--rebel)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">CLONE WARS VETERAN</div>
+        Rex's decades of combat experience mean Rebel ground forces under his command ignore the first casualty result of any battle — the first loss tier (Light) is automatically negated. In Men of War this means the first lieutenant death trigger does not fire — Rex keeps the unit together through the initial shock. Additionally Rex provides a free fortification action at any base he commands.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Off the grid — Rex is not officially in the Alliance chain of command. Imperial records list him as dead. He cannot participate in any political or diplomatic action.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s7">
+<div class="sec-hdr">7. Independent Commanders</div>
+
+<div class="cmd-grid">
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(96,120,136,0.08)">
+      <div>
+        <div class="cmd-name" style="color:var(--neutral)">Saw Gerrera</div>
+        <div class="cmd-title">PARTISANS — INDEPENDENT EXTREMIST — JEDHA</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r1">1</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Jedha — Partisan operations</div></div>
+      <div class="cmd-row"><div class="cmd-key">Faction</div><div class="cmd-val yellow">Independent — loosely Rebel-aligned</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--neutral)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">EXTREMIST TACTICS</div>
+        Saw's Partisans hit hard — when they participate in a battle the Rebel force deals casualties as if one tier higher (a Raid deals Medium damage, a Medium assault deals Heavy). However Saw costs the Rebels 1 Political Will every time he participates in a battle, win or lose — his methods are too brutal for the Alliance's public image. Additionally the Rogue Roll applies whenever Saw is in a joint operation and Partisans reach Shaken morale (see Scripting Reference Section 10).
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Alliance Status</div><div class="cmd-val red">Mon Mothma publicly distances the Alliance from Saw's methods. Saw is not officially under Alliance command — he cooperates when it suits him.</div></div>
+      <div class="cmd-row"><div class="cmd-key">Note</div><div class="cmd-val yellow">Saw knows about the Geonosian genocide and is investigating the Death Star. He may share intelligence — or not — based on how the campaign has treated him.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-kia">KIA</span>
+        <span class="status-badge sb-moving">IN TRANSIT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmd-card">
+    <div class="cmd-card-hdr" style="background:rgba(96,120,136,0.08)">
+      <div>
+        <div class="cmd-name" style="color:var(--neutral)">General Cham Syndulla</div>
+        <div class="cmd-title">FREE RYLOTH MOVEMENT — LIBERATION COMMANDER</div>
+      </div>
+      <div style="text-align:right"><div class="cmd-rating r2">2</div><div class="cmd-rating-label">COMMAND<br>RATING</div></div>
+    </div>
+    <div class="cmd-body">
+      <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Ryloth highlands</div></div>
+      <div class="cmd-row"><div class="cmd-key">Faction</div><div class="cmd-val yellow">Independent — Rebel-allied on Ryloth only</div></div>
+      <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
+      <div class="cmd-specialty" style="border-left-color:var(--neutral)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">HOMEWORLD DEFENDER</div>
+        On Ryloth Cham's forces fight at full morale regardless of supply or casualties — they are fighting for their home. Free Ryloth Movement forces cannot be broken on Ryloth. Off Ryloth Cham's forces fight at normal morale and he loses his specialty bonus entirely — he will not leave his world willingly.
+      </div>
+      <div class="cmd-row"><div class="cmd-key">Alliance Status</div><div class="cmd-val yellow">Cooperates with Phoenix Squadron for Ryloth operations. Will not commit forces off-planet. Complicated relationship with daughter Hera.</div></div>
+      <div class="cmd-status">
+        <span class="status-badge sb-active">● ACTIVE</span>
+        <span class="status-badge sb-wounded">WOUNDED</span>
+        <span class="status-badge sb-captured">CAPTURED</span>
+        <span class="status-badge sb-kia">KIA</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s8">
+<div class="sec-hdr">8. Specialty Effects Summary</div>
+
+<table>
+  <tr><th>Commander</th><th>Specialty</th><th>Battle Effect</th><th>Campaign Effect</th><th>PW Cost</th></tr>
+  <tr><td style="color:var(--empire)">Tarkin</td><td>Tarkin Doctrine</td><td>Orbital Bombardment free. All forces treat morale as High.</td><td>All actions cost 1 less PW</td><td>0</td></tr>
+  <tr><td style="color:var(--empire)">Thrawn</td><td>Tactical Genius</td><td>Enemy casualty roll +1 worse tier. Fleet tier +1.</td><td>Once per campaign: free base location reveal</td><td>0</td></tr>
+  <tr><td style="color:var(--empire)">Vader</td><td>Dark Side Enforcer</td><td>Rebel morale -1 tier first phase. All Rebel commanders roll casualty.</td><td>Cannot be captured</td><td>0</td></tr>
+  <tr><td style="color:var(--empire)">Krennic</td><td>Weapons Architect</td><td>—</td><td>Death Star track +1 free per turn. Scarif requires 2 prior intel actions.</td><td>0</td></tr>
+  <tr><td style="color:var(--empire)">Yularen</td><td>Counterintelligence</td><td>—</td><td>+1 free Intel action per turn. 50% chance to catch Rebel cell insertion.</td><td>0</td></tr>
+  <tr><td style="color:var(--empire)">Konstantine</td><td>Sector Blockade</td><td>—</td><td>Rebel supply runs through his sector automatically fail.</td><td>0</td></tr>
+  <tr><td style="color:var(--empire)">Pryce</td><td>Political Authority</td><td>Without military backup: Imperial forces fight at Shaken.</td><td>Free Crackdown action on Lothal per turn.</td><td>0</td></tr>
+  <tr><td style="color:var(--rebel)">Mon Mothma</td><td>Diplomat & Leader</td><td>Non-combatant.</td><td>+1 PW per turn. Diplomatic Missions auto-succeed when she visits.</td><td>0</td></tr>
+  <tr><td style="color:var(--rebel)">Bail Organa</td><td>Intelligence Network</td><td>Non-combatant.</td><td>+2 free Intel actions. +1 Supply. Adjacent Core sectors easier to flip.</td><td>0</td></tr>
+  <tr><td style="color:var(--rebel)">Dodonna</td><td>Battle Strategist</td><td>Redeploy 1 unit between phases. Rebel morale +1 tier.</td><td>—</td><td>0</td></tr>
+  <tr><td style="color:var(--rebel)">Hera</td><td>Ace Commander</td><td>Fleet tier +1.</td><td>Raid actions cost 1 less AP.</td><td>0</td></tr>
+  <tr><td style="color:var(--rebel)">Rex</td><td>Clone Wars Veteran</td><td>First casualty result negated. First LT death trigger does not fire.</td><td>Free fortification at any base he commands.</td><td>0</td></tr>
+  <tr><td style="color:var(--neutral)">Saw Gerrera</td><td>Extremist Tactics</td><td>Rebel casualty tier +1 higher.</td><td>Costs 1 PW per battle. Rogue Roll applies when Shaken.</td><td>1 PW per battle</td></tr>
+  <tr><td style="color:var(--neutral)">Cham Syndulla</td><td>Homeworld Defender</td><td>Free Ryloth forces unbreakable on Ryloth.</td><td>Will not leave Ryloth.</td><td>0</td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s9">
+<div class="sec-hdr">9. Political Will & Commanders</div>
+<div class="sec-intro">Named commanders interact with Political Will in two ways — their death costs PW, and their specialties can reduce the PW cost of actions.</div>
+
+<table>
+  <tr><th>Event</th><th>PW Effect</th><th>Faction</th></tr>
+  <tr><td>Named commander killed</td><td>-1 PW</td><td>Their faction</td></tr>
+  <tr><td>Named commander captured by enemy</td><td>-1 PW (you) / +2 PW (them)</td><td>Both</td></tr>
+  <tr><td>Named commander heroic result (6+)</td><td>+1 PW</td><td>Their faction</td></tr>
+  <tr><td>Named commander executes prisoner</td><td>+1 PW (you) / +2 PW (them)</td><td>Both</td></tr>
+  <tr><td>Saw Gerrera participates in battle</td><td>-1 PW</td><td>Rebels</td></tr>
+  <tr><td>Saw Gerrera Rogue Roll — friendly fire</td><td>-2 PW</td><td>Rebels</td></tr>
+  <tr><td>Tarkin Doctrine action (bombardment)</td><td>Saves 2 PW vs normal cost</td><td>Empire</td></tr>
+  <tr><td>Mon Mothma active</td><td>+1 PW per turn</td><td>Rebels</td></tr>
+  <tr><td>Konstantine killed (canonical — Atollon)</td><td>-1 PW + Empire loses Lothal blockade</td><td>Empire</td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s10">
+<div class="sec-hdr">10. Location Tracker</div>
+<div class="sec-intro">Current locations of all named commanders at campaign start (Turn 1, 2 BBY). Update this table after each turn.</div>
+
+<div class="location-tracker">
+  <div class="lt-title">Commander Location Record — Turn 01 / 2 BBY Week 1</div>
+  <div class="lt-row" style="font-size:7px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border2)">
+    <div>Commander</div><div>Current Location</div><div>Status</div><div>Notes</div>
+  </div>
+
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--empire)">Grand Moff Tarkin</div>
+    <div class="lt-loc">Coruscant</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Rotating to Eriadu — Death Star oversight</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--empire)">Grand Admiral Thrawn</div>
+    <div class="lt-loc">Lothal Sector — ISD Chimaera</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Triangulating Atollon. Watching Kallus.</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--empire)">Darth Vader</div>
+    <div class="lt-loc">Coruscant</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Available for deployment anywhere in 1 turn</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--empire)">Director Krennic</div>
+    <div class="lt-loc">Geonosis</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Death Star construction acceleration</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--empire)">ISB Dir. Yularen</div>
+    <div class="lt-loc">Coruscant — ISB HQ</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Counterintelligence operations galaxy-wide</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--empire)">Admiral Konstantine</div>
+    <div class="lt-loc">Lothal orbit — ISD Relentless</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Sector blockade. Failing to stop Ghost Crew.</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--empire)">Governor Pryce</div>
+    <div class="lt-loc">Lothal Capital City</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Requesting Thrawn. Out of her depth.</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--empire)">Agent Kallus</div>
+    <div class="lt-loc">Lothal Sector</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">⚠ Secret sympathizer. Thrawn watching.</div>
+  </div>
+
+  <div class="lt-row" style="border-top:2px solid var(--border2);margin-top:4px"></div>
+
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--rebel)">Mon Mothma</div>
+    <div class="lt-loc">Atollon — Alliance HQ</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Recently fled Coruscant. Declaration pending.</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--rebel)">Bail Organa</div>
+    <div class="lt-loc">Alderaan</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Senate cover maintained. Funding Alliance.</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--rebel)">General Dodonna</div>
+    <div class="lt-loc">Atollon — Massassi Group</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Building ground assault capability</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--rebel)">Hera Syndulla</div>
+    <div class="lt-loc">Atollon — Phoenix Squadron</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Phoenix Leader. Fleet operations.</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--rebel)">Captain Rex</div>
+    <div class="lt-loc">Atollon — Chopper Base</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:9px">Ground defense. Off Imperial records.</div>
+  </div>
+
+  <div class="lt-row" style="border-top:2px solid var(--border2);margin-top:4px"></div>
+
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--neutral)">Saw Gerrera</div>
+    <div class="lt-loc">Jedha</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">INDEPENDENT</span></div>
+    <div class="lt-turn" style="font-size:9px">Investigating Geonosian genocide. Death Star rumors.</div>
+  </div>
+  <div class="lt-row">
+    <div class="lt-name" style="color:var(--neutral)">General Cham Syndulla</div>
+    <div class="lt-loc">Ryloth highlands</div>
+    <div><span class="status-badge sb-active" style="font-size:7px">INDEPENDENT</span></div>
+    <div class="lt-turn" style="font-size:9px">Free Ryloth Movement. Will not leave Ryloth.</div>
+  </div>
+
+</div>
+
+<div class="alert alert-gold">
+  <div class="alert-title">Updating This Tracker</div>
+  After each turn, update commander locations, change status badges to reflect wounds/capture/KIA, and note any active movements. This tracker is the authoritative record of where every named commander is in the galaxy at any given moment.
+</div>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>

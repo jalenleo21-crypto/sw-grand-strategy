@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GEM Editor Scripting Reference — Star Wars Campaign</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05080f;--panel:#080e1a;--panel2:#0c1422;--border:#1a2e45;--border2:#243d58;
+  --text:#b8cfe0;--dim:#4a6a82;--bright:#d8eeff;--gold:#c8a84b;--green:#28c868;
+  --red:#e84848;--yellow:#e8c020;--blue:#3a78e8;--orange:#e87820;
+}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;line-height:1.6;min-height:100vh}
+.hdr{background:var(--panel);border-bottom:2px solid var(--border2);padding:16px 32px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr h1{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--gold);letter-spacing:4px;text-transform:uppercase}
+.hdr-sub{font-size:9px;color:var(--dim);letter-spacing:3px}
+.container{max-width:1100px;margin:0 auto;padding:32px 24px}
+
+/* NAV */
+.toc{background:var(--panel);border:1px solid var(--border);padding:20px 24px;margin-bottom:32px}
+.toc-title{font-family:'Orbitron',monospace;font-size:10px;color:var(--gold);letter-spacing:3px;margin-bottom:12px;text-transform:uppercase}
+.toc-list{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.toc-item{font-size:10px;color:var(--blue);cursor:pointer;padding:2px 0;text-decoration:none;display:block;transition:color .15s}
+.toc-item:hover{color:var(--gold)}
+
+/* SECTIONS */
+.section{margin-bottom:40px}
+.section-hdr{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:3px;text-transform:uppercase;border-bottom:2px solid var(--border2);padding-bottom:8px;margin-bottom:20px}
+.section-intro{font-size:11px;color:var(--dim);margin-bottom:16px;line-height:1.7;max-width:800px}
+
+/* SUBSECTIONS */
+.sub-hdr{font-family:'Orbitron',monospace;font-size:10px;color:var(--bright);letter-spacing:2px;text-transform:uppercase;margin:24px 0 10px 0;padding:6px 10px;background:var(--panel2);border-left:3px solid var(--blue)}
+
+/* CODE BLOCKS */
+.code-block{background:#020508;border:1px solid var(--border2);padding:16px 20px;margin:12px 0;font-size:10px;line-height:1.9;overflow-x:auto;position:relative}
+.code-block .comment{color:#4a6a82;font-style:italic}
+.code-block .cmd{color:var(--gold)}
+.code-block .param{color:var(--green)}
+.code-block .val{color:var(--bright)}
+.code-block .tag-ex{color:var(--orange)}
+.code-block .warn{color:var(--red)}
+.code-block .note{color:var(--yellow)}
+.code-label{font-size:8px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:4px}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:10px}
+th{background:var(--panel2);color:var(--dim);text-transform:uppercase;letter-spacing:2px;font-size:8px;padding:8px 12px;text-align:left;border:1px solid var(--border)}
+td{padding:7px 12px;border:1px solid var(--border);vertical-align:top;line-height:1.5}
+tr:hover td{background:rgba(255,255,255,0.015)}
+.td-cmd{color:var(--gold);font-family:'Share Tech Mono',monospace}
+.td-val{color:var(--green)}
+.td-note{color:var(--dim);font-size:9px}
+.td-warn{color:var(--red);font-size:9px}
+
+/* ALERTS */
+.alert{padding:10px 14px;margin:12px 0;font-size:10px;border-left:3px solid;line-height:1.6}
+.alert-warn{background:rgba(232,72,72,0.08);border-color:var(--red);color:#e88888}
+.alert-note{background:rgba(58,120,232,0.08);border-color:var(--blue);color:#88aaee}
+.alert-confirm{background:rgba(40,200,104,0.08);border-color:var(--green);color:#88ddaa}
+.alert-title{font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:9px;margin-bottom:4px}
+
+/* MORALE STATES */
+.morale-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:12px 0}
+.morale-card{border:1px solid var(--border);padding:10px 12px;background:var(--panel2)}
+.morale-state{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;margin-bottom:6px}
+.morale-cond{font-size:9px;color:var(--dim);margin-bottom:4px;line-height:1.5}
+.morale-effect{font-size:9px;color:var(--text);border-top:1px solid var(--border);padding-top:4px;margin-top:4px}
+.ms-high{color:var(--green)}
+.ms-steady{color:#88ddaa}
+.ms-shaken{color:var(--yellow)}
+.ms-battered{color:var(--orange)}
+.ms-broken{color:var(--red)}
+
+.pill{display:inline-block;padding:1px 6px;font-size:8px;letter-spacing:1px;border:1px solid;margin:0 2px}
+.p-conf{color:var(--green);border-color:var(--green)}
+.p-unc{color:var(--yellow);border-color:var(--yellow)}
+.p-pend{color:var(--dim);border-color:var(--dim)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="h1" style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:4px">GEM EDITOR SCRIPTING REFERENCE</div>
+    <div class="hdr-sub">Star Wars Grand Strategy Campaign — Men of War: Assault Squad 2 + Galaxy at War Mod</div>
+  </div>
+  <div style="font-size:9px;color:var(--dim);text-align:right">
+    All commands verified against community sources<br>
+    <span style="color:var(--green)">✓ CONFIRMED</span> &nbsp;
+    <span style="color:var(--yellow)">~ APPROXIMATE</span> &nbsp;
+    <span style="color:var(--dim)">? UNVERIFIED</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">Contents</div>
+  <div class="toc-list">
+    <a class="toc-item" href="#s1">1. Editor Quick Reference</a>
+    <a class="toc-item" href="#s2">2. Core Commands Reference</a>
+    <a class="toc-item" href="#s3">3. Tag System & Groups</a>
+    <a class="toc-item" href="#s4">4. Entities Condition</a>
+    <a class="toc-item" href="#s5">5. Actor State Parameters</a>
+    <a class="toc-item" href="#s6">6. Actor to Waypoint</a>
+    <a class="toc-item" href="#s7">7. Cinematic Setup</a>
+    <a class="toc-item" href="#s8">8. Morale System</a>
+    <a class="toc-item" href="#s9">9. Morale Break Triggers</a>
+    <a class="toc-item" href="#s10">10. Saw Gerrera Rogue Trigger</a>
+    <a class="toc-item" href="#s11">11. Commander Count Per Battle</a>
+    <a class="toc-item" href="#s12">12. Known Issues & Warnings</a>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s1">
+<div class="section-hdr">1. Editor Quick Reference</div>
+<div class="section-intro">Essential keyboard shortcuts for working in the GEM Editor. ALT+G crashes the editor — never press it.</div>
+
+<table>
+  <tr><th>Key</th><th>Action</th><th>Mode</th></tr>
+  <tr><td class="td-cmd">F1</td><td>Game interface / play mode</td><td>Any</td></tr>
+  <tr><td class="td-cmd">F2</td><td>Map editor (terrain, entity placement)</td><td>Any</td></tr>
+  <tr><td class="td-cmd">F3</td><td>Mission editor (triggers, waypoints, scripting)</td><td>Any</td></tr>
+  <tr><td class="td-cmd">F6</td><td>Environment / sky settings</td><td>F3</td></tr>
+  <tr><td class="td-cmd">F9</td><td>Mission properties (variables, helpers)</td><td>F3</td></tr>
+  <tr><td class="td-cmd">CTRL+T</td><td>Open tag panel for selected unit</td><td>F3</td></tr>
+  <tr><td class="td-cmd">U</td><td>Tags, function calls, inventory panel</td><td>F3</td></tr>
+  <tr><td class="td-cmd">ALT+R</td><td>Call function / animation on selected unit</td><td>F3</td></tr>
+  <tr><td class="td-cmd">Backspace</td><td>Toggle UI off (for filming)</td><td>F1</td></tr>
+  <tr><td class="td-cmd">Numpad 0-9</td><td>Switch between player sides</td><td>F1/F3</td></tr>
+  <tr><td class="td-cmd" style="color:var(--red)">ALT+G</td><td class="td-warn">CRASHES EDITOR — DO NOT PRESS</td><td>Any</td></tr>
+</table>
+
+<div class="alert alert-note">
+  <div class="alert-title">Saving</div>
+  Save map changes in F2 mode. Save mission/trigger changes in F3 mode (saves as 0.mi file). Both must be saved separately. Your mod folder must be active for saves to persist.
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s2">
+<div class="section-hdr">2. Core Commands Reference</div>
+
+<table>
+  <tr><th>Command</th><th>Purpose</th><th>Status</th></tr>
+  <tr><td class="td-cmd">actor_state</td><td>Change AI behavior, movement mode, combat parameters for tagged units</td><td><span class="pill p-conf">CONFIRMED</span></td></tr>
+  <tr><td class="td-cmd">actor_to_waypoint</td><td>Send tagged units to a specific waypoint</td><td><span class="pill p-conf">CONFIRMED</span></td></tr>
+  <tr><td class="td-cmd">entities</td><td>Condition — check count/state of tagged units</td><td><span class="pill p-conf">CONFIRMED</span></td></tr>
+  <tr><td class="td-cmd">delay</td><td>Wait X seconds before next command fires</td><td><span class="pill p-conf">CONFIRMED</span></td></tr>
+  <tr><td class="td-cmd">Trigger off</td><td>Prevent trigger from firing again after first execution</td><td><span class="pill p-conf">CONFIRMED</span></td></tr>
+  <tr><td class="td-cmd">Event (Set/Reset)</td><td>Progress markers used to chain triggers in sequence</td><td><span class="pill p-conf">CONFIRMED</span></td></tr>
+  <tr><td class="td-cmd">near</td><td>Condition — detect units entering a zone</td><td><span class="pill p-conf">CONFIRMED</span></td></tr>
+  <tr><td class="td-cmd">spawn</td><td>Spawn new units at a location</td><td><span class="pill p-conf">CONFIRMED</span></td></tr>
+  <tr><td class="td-cmd">scene / music</td><td>Play music or ambient sounds</td><td><span class="pill p-conf">CONFIRMED</span></td></tr>
+  <tr><td class="td-cmd">effect</td><td>Trigger visual effect (explosion, etc.) on tagged entity</td><td><span class="pill p-conf">CONFIRMED</span></td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s3">
+<div class="section-hdr">3. Tag System & Groups</div>
+<div class="section-intro">Tags are assigned to units in F3 mode using CTRL+T. Tags are the primary way to select units in triggers. A unit can have multiple tags. Tags float above units as green text when assigned.</div>
+
+<div class="sub-hdr">Assigning Tags</div>
+<div class="code-block">
+<span class="comment">// In F3 mode:</span><br>
+<span class="val">1. Select unit(s)</span><br>
+<span class="val">2. Press CTRL+T</span><br>
+<span class="val">3. Type tag name → press Add</span><br>
+<span class="val">4. Green tag text appears above unit</span><br><br>
+<span class="comment">// A unit can hold multiple tags simultaneously</span><br>
+<span class="comment">// Tags survive unit death for detection purposes</span><br>
+<span class="comment">// BUT: blown-up units may lose tags — use zone+state checks as backup</span>
+</div>
+
+<div class="sub-hdr">Standard Tag Naming Convention — This Campaign</div>
+<div class="code-block">
+<span class="comment">// IMPERIAL SIDE</span><br>
+<span class="tag-ex">IMP_CPY_CMD</span>       <span class="comment">← Company Commander / Captain (1 man)</span><br>
+<span class="tag-ex">IMP_PLT1_LT</span>       <span class="comment">← 1st Platoon Lieutenant (1 man)</span><br>
+<span class="tag-ex">IMP_PLT1_SQD_A</span>    <span class="comment">← 1st Platoon, Squad Alpha (9 men)</span><br>
+<span class="tag-ex">IMP_PLT1_SQD_B</span>    <span class="comment">← 1st Platoon, Squad Bravo (9 men)</span><br>
+<span class="tag-ex">IMP_PLT2_LT</span>       <span class="comment">← 2nd Platoon Lieutenant (1 man)</span><br>
+<span class="tag-ex">IMP_PLT2_SQD_A</span>    <span class="comment">← 2nd Platoon, Squad Alpha (9 men)</span><br>
+<span class="tag-ex">IMP_PLT2_SQD_B</span>    <span class="comment">← 2nd Platoon, Squad Bravo (9 men)</span><br>
+<span class="tag-ex">IMP_CPY_FALLBACK</span>   <span class="comment">← Waypoint: company fallback point</span><br>
+<span class="tag-ex">IMP_PLT1_FALLBACK</span>  <span class="comment">← Waypoint: platoon 1 fallback point</span><br><br>
+<span class="comment">// REBEL SIDE</span><br>
+<span class="tag-ex">REB_CMD</span>            <span class="comment">← Rebel cell leader / SpecForce captain (1 man)</span><br>
+<span class="tag-ex">REB_TEAM_A</span>         <span class="comment">← Strike team Alpha</span><br>
+<span class="tag-ex">REB_TEAM_B</span>         <span class="comment">← Strike team Bravo</span><br>
+<span class="tag-ex">REB_EXTRACT</span>        <span class="comment">← Waypoint: extraction point</span><br>
+<span class="tag-ex">REB_FALLBACK</span>       <span class="comment">← Waypoint: fallback point</span><br><br>
+<span class="comment">// SAW GERRERA SPECIAL</span><br>
+<span class="tag-ex">SAW_PARTISANS</span>      <span class="comment">← Saw's men as a group</span><br>
+<span class="tag-ex">SAW_EXTRACT</span>        <span class="comment">← Waypoint: Saw's extraction point (separate from Rebel extract)</span>
+</div>
+
+<div class="alert alert-note">
+  <div class="alert-title">Waypoints are not units</div>
+  FALLBACK and EXTRACT tags refer to waypoints placed in F3 → Waypoints, not tagged units. Place the waypoint on the map first, then reference it by name in actor_to_waypoint commands.
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s4">
+<div class="section-hdr">4. Entities Condition</div>
+<div class="section-intro">The entities condition checks the count or state of tagged units. Used to detect deaths, alive counts, and trigger thresholds. This is the primary condition for morale break triggers.</div>
+
+<div class="sub-hdr">Basic Death Detection</div>
+<div class="code-block">
+<span class="comment">// Fires when the tagged unit is confirmed dead</span><br>
+<span class="cmd">entities</span><br>
+&nbsp;&nbsp;<span class="param">source:</span> <span class="val">standard</span><br>
+&nbsp;&nbsp;<span class="param">tag:</span> <span class="tag-ex">IMP_PLT1_LT</span><br>
+&nbsp;&nbsp;<span class="param">state:</span> <span class="val">dead</span><br>
+&nbsp;&nbsp;<span class="param">count:</span> <span class="val">>= 1</span>
+</div>
+
+<div class="sub-hdr">Advanced — Check Alive Count (for Saw Rogue trigger)</div>
+<div class="code-block">
+<span class="comment">// Fires when fewer than 4 of Saw's men are still alive</span><br>
+<span class="cmd">entities</span><br>
+&nbsp;&nbsp;<span class="param">source:</span> <span class="val">advanced</span>   <span class="comment">← right-click source → select advanced</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> group<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="param">select:</span> <span class="tag-ex">SAW_PARTISANS</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="param">include:</span> <span class="val">prop: human</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="param">exclude:</span> <span class="val">state: dead</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="param">exclude:</span> <span class="val">state: inactive</span><br>
+&nbsp;&nbsp;<span class="param">count:</span> <span class="val"><= 4</span>   <span class="comment">← adjust to ~30% of Saw's starting headcount</span>
+</div>
+
+<div class="alert alert-warn">
+  <div class="alert-title">Blown-up units bug</div>
+  Units killed by explosions may disappear completely, removing their tag. This means a dead count of >= 1 may not fire if the unit was blown up. Use the alive count approach (exclude dead, check count falls below threshold) as a more reliable alternative for critical triggers.
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s5">
+<div class="section-hdr">5. Actor State Parameters</div>
+<div class="section-intro">actor_state changes AI behavior for tagged units mid-mission. You can overwrite a previous actor_state at any time. Only include parameters you want to change — unspecified parameters retain their current values.</div>
+
+<table>
+  <tr><th>Parameter</th><th>Values</th><th>Effect</th><th>Status</th></tr>
+  <tr>
+    <td class="td-cmd">control</td>
+    <td class="td-val">AI / player</td>
+    <td>Who controls this unit — always set to AI for scripted behavior</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">move_mode</td>
+    <td class="td-val">free / hold / assault</td>
+    <td><b>free</b> = seeks cover, moves tactically. <b>hold</b> = stays in position. <b>assault</b> = advances aggressively</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">no_retreat</td>
+    <td class="td-val">on / off</td>
+    <td><b>on</b> = unit will NOT fall back regardless of odds. <b>off</b> = AI makes its own retreat decisions based on ratios</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">advance_ratio</td>
+    <td class="td-val">number (e.g. 0.1 to 5)</td>
+    <td>AI advances if its allies outnumber enemies by this ratio. 0.1 = attack even heavily outnumbered. 5 = only advance if 5:1 advantage</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">retreat_ratio</td>
+    <td class="td-val">number (e.g. 0.5 to 5)</td>
+    <td>AI retreats if enemies outnumber allies by this ratio. 0.5 = retreat even when barely outnumbered. 5 = hold until outnumbered 5:1</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">fire_mod</td>
+    <td class="td-val">Open / hold_fire / return</td>
+    <td><b>Open</b> = shoot freely. <b>hold_fire</b> = do not shoot. <b>return</b> = only return fire</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">speed</td>
+    <td class="td-val">Bow / Assault / Walk / Crouch</td>
+    <td>Movement speed. <b>Bow</b> is fastest (sprint). <b>Assault</b> is combat run. <b>Crouch</b> is stealth movement</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">no_advance</td>
+    <td class="td-val">on / off</td>
+    <td>When on, unit will not advance toward enemies. Stays at current position and fires</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+</table>
+
+<div class="sub-hdr">Example — Set Units to Hold and Not Retreat</div>
+<div class="code-block">
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">hold</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">on</span><br>
+&nbsp;&nbsp;<span class="param">fire_mod:</span> <span class="val">Open</span><br>
+&nbsp;&nbsp;<span class="param">advance_ratio:</span> <span class="val">5</span>     <span class="comment">← only advance if heavily outnumbering enemy</span>
+</div>
+
+<div class="sub-hdr">Example — Set Units to Fall Back Under Pressure</div>
+<div class="code-block">
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">free</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">off</span><br>
+&nbsp;&nbsp;<span class="param">retreat_ratio:</span> <span class="val">0.5</span>   <span class="comment">← retreat even when barely outnumbered</span>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s6">
+<div class="section-hdr">6. Actor to Waypoint</div>
+<div class="section-intro">Sends tagged units to move toward a specific waypoint. Used to direct retreating units to fallback positions.</div>
+
+<table>
+  <tr><th>Parameter</th><th>Values</th><th>Effect</th><th>Status</th></tr>
+  <tr>
+    <td class="td-cmd">selector</td>
+    <td class="td-val">tag [TAG_NAME]</td>
+    <td>Which units to send</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">waypoint</td>
+    <td class="td-val">[WAYPOINT_NAME]</td>
+    <td>Destination waypoint</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">drop_orders</td>
+    <td class="td-val">true / false</td>
+    <td>When true, units abandon current orders and immediately move to waypoint</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">sensor</td>
+    <td class="td-val">senseless</td>
+    <td>Units ignore enemies and move directly to waypoint without stopping to fight</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+  <tr>
+    <td class="td-cmd">approach</td>
+    <td class="td-val">teleport / walk</td>
+    <td>How units reach waypoint. Walk = normal movement. Teleport = instant</td>
+    <td><span class="pill p-conf">CONFIRMED</span></td>
+  </tr>
+</table>
+
+<div class="sub-hdr">Example — Route Units to Fallback (senseless movement)</div>
+<div class="code-block">
+<span class="cmd">actor_to_waypoint</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">waypoint:</span> <span class="tag-ex">IMP_PLT1_FALLBACK</span><br>
+&nbsp;&nbsp;<span class="param">drop_orders:</span> <span class="val">true</span><br>
+&nbsp;&nbsp;<span class="param">sensor:</span> <span class="val">senseless</span>   <span class="comment">← move without stopping to engage</span>
+</div>
+
+<div class="alert alert-note">
+  <div class="alert-title">sensor: senseless for retreat cinematics</div>
+  Using senseless on retreating units means they run past enemies without engaging — this looks cinematic and realistic. Soldiers in full retreat don't stop to fight back.
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s7">
+<div class="section-hdr">7. Cinematic Setup</div>
+<div class="section-intro">How to configure the editor for filming battles with no UI.</div>
+
+<div class="sub-hdr">Sky / Environment Backdrop</div>
+<div class="code-block">
+<span class="comment">// F3 mode → Nature tab → Sky Dome</span><br>
+<span class="val">Dome1</span> + <span class="val">Dome2</span>  <span class="comment">← two layered sky textures for space/planetary backdrops</span><br><br>
+<span class="warn">If Nature tab shows no sky options when running from AotR mod folder:</span><br>
+<span class="comment">// Copy the Skydomes folder from base game to AotR data directory:</span><br>
+<span class="val">Star Wars Empire at War\corruption\Data\Art\Skydomes\</span><br>
+<span class="comment">// → paste into:</span><br>
+<span class="val">Star Wars Empire at War\corruption\Mods\AotR\Data\Art\Skydomes\</span>
+</div>
+
+<div class="sub-hdr">Filming Controls</div>
+<div class="code-block">
+<span class="param">Backspace</span>     <span class="comment">← toggle UI off for clean filming</span><br>
+<span class="param">F1</span>            <span class="comment">← switch to play mode to watch battle</span><br>
+<span class="param">Free camera</span>   <span class="comment">← move mouse during playback for cinematic angles</span><br>
+<span class="param">Space</span>         <span class="comment">← cycle between camera angles in cinematic mode</span>
+</div>
+
+<div class="sub-hdr">Adding Background Props</div>
+<div class="code-block">
+<span class="comment">// F3 → Objects → SPACEDROP or SPACE_PROP categories</span><br>
+<span class="comment">// For background planets: place planet prop, set Vertical to -2000</span><br>
+<span class="comment">// This pushes it behind the battle so it appears in background</span>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s8">
+<div class="section-hdr">8. Morale System</div>
+<div class="section-intro">Morale is not a tracked number. It is a state determined by three campaign-layer conditions that are checked BEFORE the battle is set up in the editor. The morale state determines which trigger set you build into the mission.</div>
+
+<div class="sub-hdr">The Three Morale Conditions</div>
+
+<table>
+  <tr><th>Condition</th><th>Check</th><th>Source</th></tr>
+  <tr>
+    <td><b>Supply Status</b></td>
+    <td>Nominal / Reduced / Critical — already tracked in Sector Command document</td>
+    <td>Sector Command document → planet supply field</td>
+  </tr>
+  <tr>
+    <td><b>Casualty Level</b></td>
+    <td>Current headcount vs original headcount</td>
+    <td>Sector Command document → force headcount field</td>
+  </tr>
+  <tr>
+    <td><b>Commander Presence</b></td>
+    <td>Is a named commander assigned to this force this turn?</td>
+    <td>Campaign layer — commander location tracking</td>
+  </tr>
+</table>
+
+<div class="sub-hdr">Morale States</div>
+<div class="morale-grid">
+  <div class="morale-card">
+    <div class="morale-state ms-high">HIGH</div>
+    <div class="morale-cond">Supply: Nominal<br>Strength: above 75%<br>Commander: present</div>
+    <div class="morale-effect">Full force deployed. Use STEADY triggers. AI is aggressive. No retreat on LT death.</div>
+  </div>
+  <div class="morale-card">
+    <div class="morale-state ms-steady">STEADY</div>
+    <div class="morale-cond">Supply: Nominal<br>Strength: above 75%<br>Commander: absent</div>
+    <div class="morale-effect">Full force deployed. Use STEADY triggers. Squads hold on LT death but stop advancing.</div>
+  </div>
+  <div class="morale-card">
+    <div class="morale-state ms-shaken">SHAKEN</div>
+    <div class="morale-cond">Supply: Reduced<br>OR Strength: 50–75%</div>
+    <div class="morale-effect">Reduced force deployed. Use BROKEN triggers. Squads rout on LT death.</div>
+  </div>
+  <div class="morale-card">
+    <div class="morale-state ms-battered">BATTERED</div>
+    <div class="morale-cond">Supply: Critical<br>OR Strength: below 50%</div>
+    <div class="morale-effect">Heavily reduced force. Defensive only. Rout on any commander death.</div>
+  </div>
+  <div class="morale-card">
+    <div class="morale-state ms-broken">BROKEN</div>
+    <div class="morale-cond">Strength: below 25%<br>OR Critical supply + no commander</div>
+    <div class="morale-effect">Cannot attack. Auto-retreats when engaged. Use extreme BROKEN triggers only.</div>
+  </div>
+</div>
+
+<div class="sub-hdr">Commander Effect on Morale</div>
+<div class="code-block">
+<span class="comment">// A named commander present shifts morale threshold UP one level:</span><br>
+<span class="val">Shaken force + named commander = treated as Steady for trigger purposes</span><br>
+<span class="val">Battered force + named commander = treated as Shaken for trigger purposes</span><br><br>
+<span class="comment">// No commander shifts threshold DOWN one level:</span><br>
+<span class="val">Steady force + no commander = treated as Shaken</span><br>
+<span class="val">Shaken force + no commander = treated as Battered</span>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s9">
+<div class="section-hdr">9. Morale Break Triggers</div>
+<div class="section-intro">
+Build ONLY the trigger set that matches the force's morale state before the battle. Do not include both sets in the same mission — pick one based on the campaign state.
+<br><br>
+Each trigger fires only once (Trigger off). Delays are intentional — staggered timing makes retreats look like panic spreading rather than scripted simultaneous movement.
+</div>
+
+<div class="sub-hdr">TRIGGER 1 — Lieutenant Killed (High / Steady Morale)</div>
+<div class="code-label">When to use: Supply Nominal + Strength above 75%. Squads are disciplined — they hold when the LT dies but stop advancing.</div>
+<div class="code-block">
+<span class="cmd">TRIGGER NAME:</span> <span class="tag-ex">PLT1_LT_KIA_STEADY</span><br><br>
+<span class="comment">// CONDITION</span><br>
+<span class="cmd">entities</span><br>
+&nbsp;&nbsp;<span class="param">source:</span> <span class="val">standard</span><br>
+&nbsp;&nbsp;<span class="param">tag:</span> <span class="tag-ex">IMP_PLT1_LT</span><br>
+&nbsp;&nbsp;<span class="param">state:</span> <span class="val">dead</span><br>
+&nbsp;&nbsp;<span class="param">count:</span> <span class="val">>= 1</span><br><br>
+<span class="comment">// COMMANDS</span><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">hold</span>        <span class="comment">← stop advancing, hold position</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">on</span>         <span class="comment">← do not fall back</span><br>
+&nbsp;&nbsp;<span class="param">advance_ratio:</span> <span class="val">5</span>      <span class="comment">← only advance if heavily outnumbering enemy</span><br><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_B</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">hold</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">on</span><br>
+&nbsp;&nbsp;<span class="param">advance_ratio:</span> <span class="val">5</span><br><br>
+<span class="cmd">Trigger off:</span> <span class="tag-ex">PLT1_LT_KIA_STEADY</span><br><br>
+<span class="note">// RESULT: Squads stop advancing. Take cover. Fire from position.</span><br>
+<span class="note">// Looks like soldiers who lost their officer and are waiting for orders.</span><br>
+<span class="note">// Repeat this trigger structure for PLT2_LT, PLT3_LT etc.</span>
+</div>
+
+<div class="sub-hdr">TRIGGER 2 — Lieutenant Killed (Shaken / Battered Morale)</div>
+<div class="code-label">When to use: Supply Reduced OR Strength below 75%. Force is already under pressure — losing the LT breaks them.</div>
+<div class="code-block">
+<span class="cmd">TRIGGER NAME:</span> <span class="tag-ex">PLT1_LT_KIA_BROKEN</span><br><br>
+<span class="comment">// CONDITION</span><br>
+<span class="cmd">entities</span><br>
+&nbsp;&nbsp;<span class="param">source:</span> <span class="val">standard</span><br>
+&nbsp;&nbsp;<span class="param">tag:</span> <span class="tag-ex">IMP_PLT1_LT</span><br>
+&nbsp;&nbsp;<span class="param">state:</span> <span class="val">dead</span><br>
+&nbsp;&nbsp;<span class="param">count:</span> <span class="val">>= 1</span><br><br>
+<span class="comment">// COMMANDS</span><br>
+<span class="cmd">delay:</span> <span class="val">2</span>    <span class="comment">← brief pause before panic sets in</span><br><br>
+<span class="comment">// Squad A — immediately routes to fallback</span><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">free</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">off</span><br>
+&nbsp;&nbsp;<span class="param">retreat_ratio:</span> <span class="val">0.5</span>    <span class="comment">← retreat even if barely outnumbered</span><br><br>
+<span class="cmd">actor_to_waypoint</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">waypoint:</span> <span class="tag-ex">IMP_PLT1_FALLBACK</span><br>
+&nbsp;&nbsp;<span class="param">drop_orders:</span> <span class="val">true</span><br>
+&nbsp;&nbsp;<span class="param">sensor:</span> <span class="val">senseless</span>    <span class="comment">← run past enemies without stopping</span><br><br>
+<span class="cmd">delay:</span> <span class="val">4</span>    <span class="comment">← Squad B holds 4 more seconds before also breaking</span><br><br>
+<span class="comment">// Squad B — routes after delay</span><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_B</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">free</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">off</span><br>
+&nbsp;&nbsp;<span class="param">retreat_ratio:</span> <span class="val">0.5</span><br><br>
+<span class="cmd">actor_to_waypoint</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_B</span><br>
+&nbsp;&nbsp;<span class="param">waypoint:</span> <span class="tag-ex">IMP_PLT1_FALLBACK</span><br>
+&nbsp;&nbsp;<span class="param">drop_orders:</span> <span class="val">true</span><br><br>
+<span class="cmd">Trigger off:</span> <span class="tag-ex">PLT1_LT_KIA_BROKEN</span><br><br>
+<span class="note">// RESULT: Squad A runs immediately. Squad B holds 4 seconds then breaks.</span><br>
+<span class="note">// Staggered timing makes panic look organic — not scripted simultaneous rout.</span>
+</div>
+
+<div class="sub-hdr">TRIGGER 3 — Company Commander Killed (Partial Collapse)</div>
+<div class="code-label">When to use: Any morale state. Losing the Captain hurts everyone but doesn't fully collapse the force. Some platoons hold, some break.</div>
+<div class="code-block">
+<span class="cmd">TRIGGER NAME:</span> <span class="tag-ex">CPY_CMD_KIA</span><br><br>
+<span class="comment">// CONDITION</span><br>
+<span class="cmd">entities</span><br>
+&nbsp;&nbsp;<span class="param">tag:</span> <span class="tag-ex">IMP_CPY_CMD</span><br>
+&nbsp;&nbsp;<span class="param">state:</span> <span class="val">dead</span><br>
+&nbsp;&nbsp;<span class="param">count:</span> <span class="val">>= 1</span><br><br>
+<span class="comment">// COMMANDS</span><br>
+<span class="cmd">delay:</span> <span class="val">3</span><br><br>
+<span class="comment">// PLATOON 1 — breaks immediately (closest to action / worst position)</span><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">free</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">off</span><br>
+&nbsp;&nbsp;<span class="param">retreat_ratio:</span> <span class="val">0.5</span><br><br>
+<span class="cmd">actor_to_waypoint</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT1_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">waypoint:</span> <span class="tag-ex">IMP_CPY_FALLBACK</span><br>
+&nbsp;&nbsp;<span class="param">drop_orders:</span> <span class="val">true</span><br>
+&nbsp;&nbsp;<span class="param">sensor:</span> <span class="val">senseless</span><br><br>
+<span class="comment">// PLATOON 2 — holds position (veterans / better cover)</span><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT2_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">hold</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">on</span><br>
+&nbsp;&nbsp;<span class="param">advance_ratio:</span> <span class="val">5</span><br><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT2_SQD_B</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">hold</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">on</span><br>
+&nbsp;&nbsp;<span class="param">advance_ratio:</span> <span class="val">5</span><br><br>
+<span class="comment">// PLATOON 3 — holds 8 more seconds then also breaks</span><br>
+<span class="cmd">delay:</span> <span class="val">8</span><br><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT3_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">free</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">off</span><br>
+&nbsp;&nbsp;<span class="param">retreat_ratio:</span> <span class="val">0.5</span><br><br>
+<span class="cmd">actor_to_waypoint</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_PLT3_SQD_A</span><br>
+&nbsp;&nbsp;<span class="param">waypoint:</span> <span class="tag-ex">IMP_CPY_FALLBACK</span><br>
+&nbsp;&nbsp;<span class="param">drop_orders:</span> <span class="val">true</span><br><br>
+<span class="cmd">Trigger off:</span> <span class="tag-ex">CPY_CMD_KIA</span><br><br>
+<span class="note">// RESULT: One platoon routes immediately. One holds throughout.</span><br>
+<span class="note">// One holds 8 seconds then breaks. Realistic command breakdown.</span><br>
+<span class="note">// NOT a full collapse — partial failure exactly like real leadership loss.</span>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s10">
+<div class="section-hdr">10. Saw Gerrera Rogue Trigger</div>
+<div class="section-intro">
+Fires when Saw's Partisans are in a joint operation AND have taken heavy casualties. The result is determined by a dice roll BEFORE the battle is set up — the result determines how Saw's player assignment is configured in F2.
+</div>
+
+<div class="sub-hdr">Pre-Battle Dice Roll (Campaign Layer)</div>
+<div class="code-block">
+<span class="comment">// Roll 1d6 BEFORE building the Men of War scenario</span><br>
+<span class="comment">// This determines how you assign Saw's player number in F2:</span><br><br>
+<span class="val">Roll 1-2:</span>  <span class="warn">FRIENDLY FIRE</span><br>
+&nbsp;&nbsp;<span class="comment">// Assign SAW_PARTISANS to Player 2 (separate from Rebel Player 1)</span><br>
+&nbsp;&nbsp;<span class="comment">// AI treats all other factions as enemies — Saw's men fight everyone</span><br>
+&nbsp;&nbsp;<span class="comment">// Both allied Rebels AND Imperials take casualties from Saw's men</span><br><br>
+<span class="val">Roll 3-4:</span>  <span class="note">WITHDRAWAL</span><br>
+&nbsp;&nbsp;<span class="comment">// Keep Saw as Player 1 (same team as Rebels)</span><br>
+&nbsp;&nbsp;<span class="comment">// Trigger below fires — Saw's men extract and leave allies alone</span><br><br>
+<span class="val">Roll 5-6:</span>  <span class="td-val">HOLDS</span><br>
+&nbsp;&nbsp;<span class="comment">// No special trigger — Saw fights normally with allied Rebels</span>
+</div>
+
+<div class="sub-hdr">TRIGGER — Saw's Withdrawal (Roll 3-4 result only)</div>
+<div class="code-block">
+<span class="cmd">TRIGGER NAME:</span> <span class="tag-ex">SAW_WITHDRAWAL</span><br><br>
+<span class="comment">// CONDITION — fires when Saw's force has taken ~70% casualties</span><br>
+<span class="cmd">entities</span><br>
+&nbsp;&nbsp;<span class="param">source:</span> <span class="val">advanced</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> group<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="param">select:</span> <span class="tag-ex">SAW_PARTISANS</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="param">include:</span> <span class="val">prop: human</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="param">exclude:</span> <span class="val">state: dead</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="param">exclude:</span> <span class="val">state: inactive</span><br>
+&nbsp;&nbsp;<span class="param">count:</span> <span class="val"><= [30% of starting Saw headcount]</span><br><br>
+<span class="comment">// COMMANDS — Saw's men extract, leaving allies to fight alone</span><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">SAW_PARTISANS</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">free</span><br>
+&nbsp;&nbsp;<span class="param">fire_mod:</span> <span class="val">hold_fire</span>    <span class="comment">← stop shooting, just run</span><br><br>
+<span class="cmd">actor_to_waypoint</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">SAW_PARTISANS</span><br>
+&nbsp;&nbsp;<span class="param">waypoint:</span> <span class="tag-ex">SAW_EXTRACT</span>    <span class="comment">← Saw's own separate extraction point</span><br>
+&nbsp;&nbsp;<span class="param">drop_orders:</span> <span class="val">true</span><br>
+&nbsp;&nbsp;<span class="param">sensor:</span> <span class="val">senseless</span>    <span class="comment">← don't stop — just extract</span><br><br>
+<span class="cmd">Trigger off:</span> <span class="tag-ex">SAW_WITHDRAWAL</span><br><br>
+<span class="note">// RESULT: Saw's men stop firing and extract to their waypoint.</span><br>
+<span class="note">// The Rebel allied cell is now fighting without Partisan support.</span><br>
+<span class="note">// Cinematically: Saw's men simply leave. Allies have to deal with it.</span>
+</div>
+
+<div class="alert alert-warn">
+  <div class="alert-title">Friendly Fire Setup (Roll 1-2)</div>
+  For the friendly fire result, no trigger script is needed. Simply assign SAW_PARTISANS units to Player 2 in F2 mode before loading the mission. The engine's faction system handles the rest — Player 2 is enemy to both Player 0 (Imperials) and Player 1 (Rebels). This is the cleanest implementation and requires no scripting.
+</div>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s11">
+<div class="section-hdr">11. Commander Count Per Battle</div>
+<div class="section-intro">How many lieutenants, captains, and commanders to place and tag based on the Force Scaling Guide entry. Scale = number of commanders present who need death triggers.</div>
+
+<table>
+  <tr><th>Entry</th><th>Scale</th><th>Imperial Commanders</th><th>Rebel Commanders</th><th>Trigger Sets</th></tr>
+  <tr>
+    <td>001 — Rebel Raid</td>
+    <td>Squad / Platoon</td>
+    <td>1 Sergeant (PLT_SGT tag)</td>
+    <td>No formal commander</td>
+    <td>STEADY only — Sgt death = squad hesitates briefly</td>
+  </tr>
+  <tr>
+    <td>002 — Imperial Assault</td>
+    <td>Company</td>
+    <td>1 Captain (CPY_CMD) + 1 Lt (PLT1_LT)</td>
+    <td>1 Rebel team leader</td>
+    <td>Both CPY_CMD_KIA and PLT1_LT_KIA triggers</td>
+  </tr>
+  <tr>
+    <td>003 — Ambush</td>
+    <td>Platoon</td>
+    <td>1 Lieutenant (PLT1_LT)</td>
+    <td>1 Rebel team leader</td>
+    <td>PLT1_LT_KIA only</td>
+  </tr>
+  <tr>
+    <td>004 — Manhunt</td>
+    <td>Platoon vs squad</td>
+    <td>1 Lt + 1 ISB Agent (special tag)</td>
+    <td>No commander — target only</td>
+    <td>PLT1_LT_KIA + ISB Agent death = mission fail trigger</td>
+  </tr>
+  <tr>
+    <td>005 — Extraction</td>
+    <td>Small</td>
+    <td>1 Garrison Sgt</td>
+    <td>1 Rebel team leader</td>
+    <td>STEADY only — small scale</td>
+  </tr>
+  <tr>
+    <td>006 — Convoy</td>
+    <td>Company</td>
+    <td>1 Captain + 2 Lieutenants</td>
+    <td>1 Rebel team leader</td>
+    <td>CPY_CMD_KIA + PLT1_LT_KIA + PLT2_LT_KIA</td>
+  </tr>
+  <tr>
+    <td>007 — Base Defense</td>
+    <td>Battalion</td>
+    <td>1 Major + 3 Lieutenants</td>
+    <td>1 SpecForce Captain + 2 team leaders</td>
+    <td>Full trigger sets both sides</td>
+  </tr>
+  <tr>
+    <td>008 — Siege</td>
+    <td>Battalion</td>
+    <td>1 Major + 3 Lieutenants</td>
+    <td>1 SpecForce Captain + 2 team leaders</td>
+    <td>Full trigger sets both sides</td>
+  </tr>
+  <tr>
+    <td>009 — Planetary Invasion</td>
+    <td>Regiment / 3 phases</td>
+    <td>1 Colonel + 2 Captains + 6 Lieutenants across phases</td>
+    <td>1 General + 3 Captains + 4 team leaders</td>
+    <td>Full trigger sets per phase — CPY_CMD_KIA cascades across phases</td>
+  </tr>
+  <tr>
+    <td>010 — Counteroffensive</td>
+    <td>Regiment / 3 phases</td>
+    <td>1 Colonel + 2 Captains + 6 Lieutenants</td>
+    <td>1 Rebel General + 3 SpecForce Captains + 4 leaders</td>
+    <td>Full trigger sets per phase</td>
+  </tr>
+  <tr>
+    <td>011 — Last Stand</td>
+    <td>Both sides full</td>
+    <td>Full chain: Sergeants through Colonel</td>
+    <td>Full chain: team leaders through commanding general</td>
+    <td>All trigger sets active — maximum morale scripting</td>
+  </tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<div class="section" id="s12">
+<div class="section-hdr">12. Known Issues & Warnings</div>
+
+<table>
+  <tr><th>Issue</th><th>Cause</th><th>Workaround</th></tr>
+  <tr>
+    <td class="td-warn">Unit vanishes when killed by explosion</td>
+    <td>Explosion kills remove the entity entirely including its tag</td>
+    <td>Use alive count check (exclude dead, count falls below threshold) instead of dead count check for explosion-prone commanders</td>
+  </tr>
+  <tr>
+    <td class="td-warn">Units stop after firefights and won't continue</td>
+    <td>AI enters idle state after engaging</td>
+    <td>Add <span class="td-cmd">ai_move: disable</span> in actor_state, or re-issue actor_to_waypoint after the engagement zone</td>
+  </tr>
+  <tr>
+    <td class="td-warn">Nature tab empty in editor — no sky domes</td>
+    <td>Running editor from AotR mod folder which lacks base game sky assets</td>
+    <td>Copy Skydomes folder from base game Data\Art\ into AotR mod Data\Art\ directory</td>
+  </tr>
+  <tr>
+    <td class="td-warn">ALT+G crashes editor instantly</td>
+    <td>Known editor bug — unknown cause</td>
+    <td>Never press ALT+G. There is no fix. The editor will close without saving.</td>
+  </tr>
+  <tr>
+    <td class="td-warn">Triggers fire repeatedly</td>
+    <td>Trigger not turned off after first execution</td>
+    <td>Always add <span class="td-cmd">Trigger off: [TRIGGER_NAME]</span> as the last command in any trigger that should only fire once</td>
+  </tr>
+  <tr>
+    <td class="td-warn">Units assigned wrong player fight wrong enemies</td>
+    <td>Player numbers not set correctly in F2 before mission load</td>
+    <td>Player 0 = Imperial. Player 1 = Rebel. Player 2 = Saw's Partisans (rogue roll only). Confirm in F2 before play.</td>
+  </tr>
+  <tr>
+    <td class="td-warn">Retreat trigger fires immediately at battle start</td>
+    <td>Pre-existing casualties from campaign already below threshold</td>
+    <td>Add an Event condition gate — set a start event after a delay so the threshold can't trigger before the battle is established</td>
+  </tr>
+</table>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>

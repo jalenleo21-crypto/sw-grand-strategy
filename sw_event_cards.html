@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Event Cards — Star Wars Grand Strategy 2 BBY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05080f;--panel:#080e1a;--panel2:#0c1422;--border:#1a2e45;--border2:#243d58;
+  --text:#b8cfe0;--dim:#4a6a82;--bright:#d8eeff;--gold:#c8a84b;--gold2:#e8c86b;
+  --empire:#3a78e8;--rebel:#e83838;--neutral:#607888;--wild:#9848c8;
+  --green:#28c868;--red:#e84848;--yellow:#e8c020;--orange:#e87820;
+  --I:#1a2e5a;--R:#5a1a1a;--G:#1a2e2e;--W:#2e1a5a;
+}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh;line-height:1.6}
+.hdr{background:var(--panel);border-bottom:2px solid var(--border2);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hdr-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:800;color:var(--gold);letter-spacing:4px;text-transform:uppercase}
+.hdr-sub{font-size:8px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+.container{max-width:1200px;margin:0 auto;padding:28px 20px}
+
+/* RULES */
+.rules{background:var(--panel);border:1px solid var(--border);padding:16px 20px;margin-bottom:28px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rules-title{font-family:'Orbitron',monospace;font-size:9px;color:var(--gold);letter-spacing:3px;margin-bottom:8px;grid-column:1/-1}
+.rule-block{font-size:9px;color:var(--dim);line-height:1.7}
+.rule-block strong{color:var(--text);display:block;margin-bottom:3px;font-size:8px;letter-spacing:2px;text-transform:uppercase}
+
+/* SECTION HEADERS */
+.deck-hdr{display:flex;align-items:center;gap:12px;margin:28px 0 14px 0;padding-bottom:8px;border-bottom:2px solid var(--border2)}
+.deck-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.deck-count{font-size:9px;color:var(--dim);letter-spacing:2px}
+.deck-I .deck-title{color:var(--empire)}
+.deck-R .deck-title{color:var(--rebel)}
+.deck-G .deck-title{color:#28c8a8}
+.deck-W .deck-title{color:var(--wild)}
+
+/* CARD GRID */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-bottom:8px}
+
+/* CARD */
+.card{border:1px solid var(--border);overflow:hidden;position:relative}
+.card-hdr{padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--border)}
+.card-id{font-family:'Orbitron',monospace;font-size:9px;font-weight:700;opacity:0.7;margin-bottom:3px;letter-spacing:2px}
+.card-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;line-height:1.2}
+.card-body{padding:10px 14px}
+.card-lore{font-size:9px;color:var(--dim);margin-bottom:8px;line-height:1.6;font-style:italic}
+.card-effect-label{font-size:7px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:4px}
+.card-effect{font-size:9px;color:var(--text);line-height:1.6}
+.card-note{font-size:8px;color:var(--dim);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);line-height:1.5}
+.card-tags{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.tag{font-size:7px;padding:1px 6px;border:1px solid;letter-spacing:1px}
+.tag-pw{color:var(--gold);border-color:var(--gold)}
+.tag-supply{color:var(--green);border-color:var(--green)}
+.tag-military{color:var(--empire);border-color:var(--empire)}
+.tag-intel{color:#28c8a8;border-color:#28c8a8}
+.tag-political{color:var(--yellow);border-color:var(--yellow)}
+.tag-special{color:var(--wild);border-color:var(--wild)}
+
+/* CARD TYPE COLORS */
+.card-I{background:var(--panel2);border-color:#1a3a6a}
+.card-I .card-hdr{background:rgba(58,120,232,0.1)}
+.card-I .card-id{color:var(--empire)}
+.card-I .card-name{color:var(--empire)}
+
+.card-R{background:var(--panel2);border-color:#6a1a1a}
+.card-R .card-hdr{background:rgba(232,56,56,0.1)}
+.card-R .card-id{color:var(--rebel)}
+.card-R .card-name{color:var(--rebel)}
+
+.card-G{background:var(--panel2);border-color:#1a3a3a}
+.card-G .card-hdr{background:rgba(40,200,168,0.08)}
+.card-G .card-id{color:#28c8a8}
+.card-G .card-name{color:#28c8a8}
+
+.card-W{background:var(--panel2);border-color:#3a1a6a}
+.card-W .card-hdr{background:rgba(152,72,200,0.1)}
+.card-W .card-id{color:var(--wild)}
+.card-W .card-name{color:var(--wild)}
+
+.mandatory{position:absolute;top:8px;right:8px;font-size:7px;padding:1px 6px;background:rgba(232,72,72,0.2);border:1px solid var(--red);color:var(--red);letter-spacing:1px}
+
+/* EFFECT HIGHLIGHTS */
+.eff-pos{color:var(--green)}
+.eff-neg{color:var(--red)}
+.eff-pw{color:var(--gold)}
+.eff-sup{color:var(--green)}
+.eff-neutral{color:var(--yellow)}
+
+.alert{padding:9px 12px;margin:10px 0 20px 0;font-size:9px;border-left:3px solid var(--gold);background:rgba(200,168,75,0.07);color:var(--gold);line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">Event Cards — 40 Card Deck</div>
+    <div class="hdr-sub">Star Wars Grand Strategy — Galactic Civil War — 2 BBY</div>
+  </div>
+  <div style="font-size:9px;color:var(--dim);text-align:right">
+    <span style="color:var(--empire)">■ IMPERIAL (10)</span> &nbsp;
+    <span style="color:var(--rebel)">■ REBEL (10)</span> &nbsp;
+    <span style="color:#28c8a8">■ GALAXY-WIDE (10)</span> &nbsp;
+    <span style="color:var(--wild)">■ WILD CARDS (10)</span>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="rules">
+  <div class="rules-title">How Event Cards Work</div>
+  <div class="rule-block">
+    <strong>When to Draw</strong>
+    At the start of Phase 2 of every turn, draw one Event Card. Events are resolved immediately before either player takes actions. Once drawn, a card is removed from the deck permanently — each event happens only once per campaign.
+  </div>
+  <div class="rule-block">
+    <strong>Resources</strong>
+    Cards reference two resources: <span style="color:var(--gold)">Political Will (PW)</span> — the faction's ability to sustain the war. <span style="color:var(--green)">Supply</span> — the material capacity to field and reinforce forces. Supply affects force readiness and morale state. PW at zero ends the campaign.
+  </div>
+  <div class="rule-block">
+    <strong>Ground Forces vs Fleet</strong>
+    When a card affects military strength it specifies either Ground Forces or Fleet Strength, not a generic pool. Ground Force losses mean specific units lose headcount. Fleet losses mean specific ship classes are reduced.
+  </div>
+  <div class="rule-block">
+    <strong>Mandatory Cards</strong>
+    Cards marked <span style="color:var(--red)">MANDATORY</span> trigger regardless of when they are drawn — their events happen immediately and supersede normal turn order.
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- IMPERIAL EVENTS -->
+<!-- ================================================================ -->
+<div class="deck-hdr deck-I">
+  <div class="deck-title">Imperial Events</div>
+  <div class="deck-count">10 CARDS — I-01 THROUGH I-10</div>
+</div>
+
+<div class="card-grid">
+
+<div class="card card-I">
+  <div class="card-hdr">
+    <div><div class="card-id">I-01</div><div class="card-name">Thrawn Promoted</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Grand Admiral Thrawn has crushed the insurgency on Batonn. The Emperor personally promotes him and deploys him against the Rebel Alliance.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Empire gains <span class="eff-pos">1 free Intelligence Operation</span> this turn and next. If Atollon Sector is still Rebel-controlled, the Empire may immediately attempt to locate the base there without spending an Action Point. Thrawn's Command Rating activates immediately if not already on the board.</div>
+    <div class="card-note">This is the exact moment Thrawn enters the Galactic Civil War. His promotion directly leads to the Battle of Atollon.</div>
+    <div class="card-tags"><span class="tag tag-intel">INTELLIGENCE</span><span class="tag tag-military">MILITARY</span></div>
+  </div>
+</div>
+
+<div class="card card-I">
+  <div class="card-hdr">
+    <div><div class="card-id">I-02</div><div class="card-name">Seventh Fleet Mobilizes</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Thrawn's Seventh Fleet — nine Star Destroyers and supporting vessels — is fully operational and deployed against the Rebellion.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Empire gains <span class="eff-pos">+2 Fleet Supply</span> — two additional Gozanti cruisers and one Arquitens join the Seventh Fleet's complement immediately. One Imperial sector of the Empire's choice gains the defensive bonus of an ISD in orbit for two turns without spending AP.</div>
+    <div class="card-tags"><span class="tag tag-military">FLEET</span><span class="tag tag-supply">SUPPLY</span></div>
+  </div>
+</div>
+
+<div class="card card-I">
+  <div class="card-hdr">
+    <div><div class="card-id">I-03</div><div class="card-name">Death Star Construction Accelerates</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Director Krennic pushes the Geonosian workforce harder. Construction timelines move up dramatically.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Advance the <span class="eff-pos">Death Star Construction Track by one step</span> without spending Action Points. If Krennic is currently active, advance by two steps instead.</div>
+    <div class="card-tags"><span class="tag tag-special">DEATH STAR</span></div>
+  </div>
+</div>
+
+<div class="card card-I">
+  <div class="card-hdr">
+    <div><div class="card-id">I-04</div><div class="card-name">ISB Crackdown</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">ISB Director Yularen orders a galaxy-wide sweep. Rebel sympathizers on Imperial worlds are rounded up across multiple sectors simultaneously.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Every Rebel <span class="eff-neg">Covert Cell</span> currently placed in an Imperial-controlled sector is removed. Rebels lose <span class="eff-pw">1 Political Will</span> for each cell removed this way. Cells in Rebel or Contested sectors are unaffected.</div>
+    <div class="card-tags"><span class="tag tag-intel">INTELLIGENCE</span><span class="tag tag-pw">POLITICAL WILL</span></div>
+  </div>
+</div>
+
+<div class="card card-I">
+  <div class="card-hdr">
+    <div><div class="card-id">I-05</div><div class="card-name">Moff Consolidates Power</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">A regional Moff tightens his grip on his sector, redirecting local resources to Imperial military use at the expense of civilian goodwill.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Empire chooses one sector they control. That sector's ground forces gain <span class="eff-pos">+1 Supply tier</span> this turn only — a one-time reinforcement push. However the local population's resentment increases — Rebels get <span class="eff-pos">+1 bonus</span> on any Diplomatic Mission attempted in that sector for the rest of the campaign.</div>
+    <div class="card-tags"><span class="tag tag-supply">SUPPLY</span><span class="tag tag-political">POLITICAL</span></div>
+  </div>
+</div>
+
+<div class="card card-I">
+  <div class="card-hdr">
+    <div><div class="card-id">I-06</div><div class="card-name">Imperial Academy Graduates</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">A new class of officers and soldiers graduates from the Imperial Academies across the galaxy. Fresh blood for the war machine.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Empire may immediately replenish <span class="eff-pos">one Ground Force</span> that has suffered casualties — restore it to one tier above its current headcount, up to Full Strength. Represents fresh graduates filling depleted units.</div>
+    <div class="card-tags"><span class="tag tag-military">GROUND FORCES</span><span class="tag tag-supply">SUPPLY</span></div>
+  </div>
+</div>
+
+<div class="card card-I">
+  <div class="card-hdr">
+    <div><div class="card-id">I-07</div><div class="card-name">Tarkin Doctrine Enforced</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Grand Moff Tarkin orders a demonstration of Imperial force — an orbital bombardment of a restless civilian population center.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Empire chooses one <span class="eff-neutral">Contested sector</span>. That sector immediately becomes <span class="eff-pos">Imperial Controlled</span> as the population is terrorized into submission. However Empire loses <span class="eff-pw eff-neg">2 Political Will</span> — the galaxy watches in horror. If Tarkin is active his specialty negates 1 of the 2 PW cost.</div>
+    <div class="card-tags"><span class="tag tag-military">MILITARY</span><span class="tag tag-pw">POLITICAL WILL</span></div>
+  </div>
+</div>
+
+<div class="card card-I">
+  <div class="card-hdr">
+    <div><div class="card-id">I-08</div><div class="card-name">Inquisitor Deployed</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">The Emperor dispatches an Inquisitor to hunt Force-sensitives connected to the Rebel Alliance. The Inquisitorius moves through the galaxy like a shadow.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">If any Rebel commander with Force-sensitivity is on the board (Ezra Bridger, Kanan Jarrus), they must reveal their current sector. Empire gains a free Intelligence Operation against that sector. If no Force-sensitive commanders exist, the Inquisitor hunts for leads — gain 1 free Intelligence action in any Outer Rim sector.</div>
+    <div class="card-tags"><span class="tag tag-intel">INTELLIGENCE</span><span class="tag tag-special">FORCE</span></div>
+  </div>
+</div>
+
+<div class="card card-I">
+  <div class="card-hdr">
+    <div><div class="card-id">I-09</div><div class="card-name">Kuat Drive Yards Production Surge</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Kuat Drive Yards completes a new run of Star Destroyers ahead of schedule. The Imperial Navy grows stronger.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">If the Empire controls Kuat Sector: <span class="eff-pos">add 1 ISD-I to any fleet formation</span> of the Empire's choice immediately. Also gain <span class="eff-pos">+2 Ground Force Supply</span> from the weapons produced at KDY surface facilities. If Rebels have raided Kuat this turn: no effect.</div>
+    <div class="card-note">If Rebels control Kuat Sector when this card is drawn, the Empire loses 2 Political Will — they cannot access their own shipyard.</div>
+    <div class="card-tags"><span class="tag tag-military">FLEET</span><span class="tag tag-supply">SUPPLY</span></div>
+  </div>
+</div>
+
+<div class="card card-I">
+  <div class="card-hdr">
+    <div><div class="card-id">I-10</div><div class="card-name">Imperial Propaganda Campaign</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">HoloNet broadcasts are saturated with Imperial messaging. Public support for the Rebel cause weakens across Core and Inner Rim worlds.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Rebels lose <span class="eff-pw eff-neg">1 Political Will</span>. Any Diplomatic Mission the Rebels attempt this turn automatically fails — the propaganda has poisoned the well. Additionally, one Rebel Covert Cell in a Core or Inner Rim sector is discovered and removed.</div>
+    <div class="card-tags"><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-political">POLITICAL</span></div>
+  </div>
+</div>
+
+</div><!-- /card-grid imperial -->
+
+<!-- ================================================================ -->
+<!-- REBEL EVENTS -->
+<!-- ================================================================ -->
+<div class="deck-hdr deck-R">
+  <div class="deck-title">Rebel Events</div>
+  <div class="deck-count">10 CARDS — R-01 THROUGH R-10</div>
+</div>
+
+<div class="card-grid">
+
+<div class="card card-R">
+  <div class="card-hdr">
+    <div><div class="card-id">R-01</div><div class="card-name">The Ghorman Massacre</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Imperial forces land a cruiser on peaceful protesters on Ghorman, crushing hundreds. Mon Mothma denounces Palpatine publicly and flees Coruscant, declaring for the Rebellion.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Rebels gain <span class="eff-pw eff-pos">+3 Political Will</span> immediately. The Sern Sector becomes <span class="eff-neutral">Contested</span> as the Ghorman population rises up. Empire loses <span class="eff-pw eff-neg">2 Political Will</span> — the atrocity is broadcast galaxy-wide. Mon Mothma's Declaration may now be used as a free action.</div>
+    <div class="card-note">This is the defining radicalization event of 2 BBY. Mon Mothma's public declaration is the spark that formally ignites the war.</div>
+    <div class="card-tags"><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-political">POLITICAL</span></div>
+  </div>
+</div>
+
+<div class="card card-R">
+  <div class="card-hdr">
+    <div><div class="card-id">R-02</div><div class="card-name">Declaration of the Rebel Alliance</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Mon Mothma broadcasts the Declaration of the Rebel Alliance on all channels. Dozens of rebel ships emerge from hyperspace above Dantooine answering the call.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Rebels gain <span class="eff-pw eff-pos">+2 Political Will</span>. One Neutral sector of the Rebels' choice becomes <span class="eff-neutral">Contested</span> as local resistance cells activate. <span class="eff-pos">One Rebel cell</span> is immediately established in that sector at no AP cost. If Mon Mothma is active her +1 PW/turn bonus doubles to +2 for 3 turns.</div>
+    <div class="card-tags"><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-political">POLITICAL</span><span class="tag tag-military">GROUND FORCES</span></div>
+  </div>
+</div>
+
+<div class="card card-R">
+  <div class="card-hdr">
+    <div><div class="card-id">R-03</div><div class="card-name">Agent Kallus Defects</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">ISB Agent Alexsandr Kallus, secretly operating as Fulcrum, defects to the Rebel Alliance. His institutional knowledge is invaluable.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Rebels gain <span class="eff-pos">2 free Intelligence actions</span> this turn from Kallus's knowledge dump. Empire loses <span class="eff-pw eff-neg">1 Political Will</span> — a senior ISB agent has turned. Kallus switches to the Rebel commander roster (Rating 2, Fulcrum specialty). Yularen's free Intelligence action is suspended for 3 turns as he investigates the breach.</div>
+    <div class="card-note">If Thrawn is currently in Lothal Sector, he may immediately attempt to intercept Kallus — special event trigger.</div>
+    <div class="card-tags"><span class="tag tag-intel">INTELLIGENCE</span><span class="tag tag-pw">POLITICAL WILL</span></div>
+  </div>
+</div>
+
+<div class="card card-R">
+  <div class="card-hdr">
+    <div><div class="card-id">R-04</div><div class="card-name">Phoenix Cell Strikes</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Phoenix Squadron conducts a daring raid on Reklam Station, acquiring five Y-wing assault starfighters from Imperial salvage.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect"><span class="eff-pos">Add 5 Y-Wing Bombers</span> to Phoenix Squadron's fleet complement immediately — update the fleet card in the Sector Command document. Rebels' next fleet movement action costs 0 AP as the new ships join formation. If Hera Syndulla is active, she also gains a free Raid action this turn.</div>
+    <div class="card-tags"><span class="tag tag-military">FLEET</span><span class="tag tag-supply">SUPPLY</span></div>
+  </div>
+</div>
+
+<div class="card card-R">
+  <div class="card-hdr">
+    <div><div class="card-id">R-05</div><div class="card-name">Rebel Sympathizers in the Senate</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Several Imperial Senators quietly redirect funds and resources toward the Rebel cause. Their identities remain unknown even to each other.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Rebels gain <span class="eff-pos">+1 Ground Force Supply</span> — one depleted unit is replenished one tier — and <span class="eff-pos">+1 Fleet Supply</span> — one damaged ship class is restored. Empire cannot identify the source this turn — no Intelligence action can reveal it. If Bail Organa is active, double both supply gains.</div>
+    <div class="card-tags"><span class="tag tag-supply">SUPPLY</span><span class="tag tag-military">GROUND FORCES</span><span class="tag tag-military">FLEET</span></div>
+  </div>
+</div>
+
+<div class="card card-R">
+  <div class="card-hdr">
+    <div><div class="card-id">R-06</div><div class="card-name">Saw Gerrera's Partisans Strike</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Saw Gerrera's extremist Partisans conduct a brutal operation against an Imperial installation. Results are undeniable but controversial.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">One Imperial sector of the Rebels' choice loses its <span class="eff-neg">Ground Force Supply for two turns</span> — the installation is destroyed. However Rebels lose <span class="eff-pw eff-neg">1 Political Will</span> as Mon Mothma publicly distances the Alliance from Saw's methods. If Saw is in a Shaken morale state, also trigger the Rogue Roll.</div>
+    <div class="card-tags"><span class="tag tag-military">GROUND FORCES</span><span class="tag tag-pw">POLITICAL WILL</span></div>
+  </div>
+</div>
+
+<div class="card card-R">
+  <div class="card-hdr">
+    <div><div class="card-id">R-07</div><div class="card-name">Wookiee Uprising on Kashyyyk</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Enslaved Wookiees revolt against their Imperial overseers. The uprising is brutal and costly but disrupts operations severely.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">If Empire controls Kashyyyk: the Kashyyyk Occupation Army's <span class="eff-neg">Ground Force Supply is suspended for two turns</span> — they are fighting the uprising, not performing their normal duties. Rebels gain <span class="eff-pw eff-pos">1 Political Will</span>. If Rebels control Kashyyyk: <span class="eff-pos">Wookiee warriors join the Alliance</span> — add 1 SpecForce Company to the Rebel forces in that sector.</div>
+    <div class="card-tags"><span class="tag tag-military">GROUND FORCES</span><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-supply">SUPPLY</span></div>
+  </div>
+</div>
+
+<div class="card card-R">
+  <div class="card-hdr">
+    <div><div class="card-id">R-08</div><div class="card-name">Fulcrum Network Expands</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Ahsoka Tano's Fulcrum intelligence network successfully recruits new agents across multiple sectors simultaneously.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Rebels gain <span class="eff-pos">1 free Intelligence action per turn for the next three turns</span> — the network is humming. Additionally, one covert cell currently at risk of discovery (in an Imperial sector with active ISB) is given safe cover and cannot be found this turn.</div>
+    <div class="card-tags"><span class="tag tag-intel">INTELLIGENCE</span></div>
+  </div>
+</div>
+
+<div class="card card-R">
+  <div class="card-hdr">
+    <div><div class="card-id">R-09</div><div class="card-name">Defector from the Imperial Navy</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">A veteran Imperial officer defects to the Rebels, bringing tactical knowledge and a vessel with them.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect"><span class="eff-pos">Add one CR90 Corvette</span> to the Rebel fleet in any sector — the defector's ship. The defector's knowledge means the Rebels' next fleet battle is fought at full complement regardless of any prior losses. Empire loses <span class="eff-pw eff-neg">1 Political Will</span> from the public defection.</div>
+    <div class="card-tags"><span class="tag tag-military">FLEET</span><span class="tag tag-pw">POLITICAL WILL</span></div>
+  </div>
+</div>
+
+<div class="card card-R">
+  <div class="card-hdr">
+    <div><div class="card-id">R-10</div><div class="card-name">Rebel Supply Run Succeeds</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">A daring smuggler convoy breaks through an Imperial blockade, delivering critical supplies to a besieged Rebel position.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">One Rebel sector currently under <span class="eff-pos">blockade has it immediately lifted</span>. Restore that sector's Ground Force Supply to Nominal. <span class="eff-pos">One depleted ground unit</span> in that sector is replenished one tier as the supplies arrive.</div>
+    <div class="card-tags"><span class="tag tag-supply">SUPPLY</span><span class="tag tag-military">GROUND FORCES</span></div>
+  </div>
+</div>
+
+</div><!-- /card-grid rebel -->
+
+<!-- ================================================================ -->
+<!-- GALAXY-WIDE EVENTS -->
+<!-- ================================================================ -->
+<div class="deck-hdr deck-G">
+  <div class="deck-title">Galaxy-Wide Events</div>
+  <div class="deck-count">10 CARDS — G-01 THROUGH G-10</div>
+</div>
+
+<div class="card-grid">
+
+<div class="card card-G">
+  <div class="card-hdr">
+    <div><div class="card-id">G-01</div><div class="card-name">The Imperial Senate Debates</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Tension rises in the Imperial Senate as several senators push back against military overreach. Palpatine watches with cold patience.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Both sides gain <span class="eff-pw eff-pos">+1 Political Will</span> as the galaxy watches the political theater — hope on both sides. Neither side may conduct Planetary Assault actions this turn — the Senate debate draws too much scrutiny for open military aggression.</div>
+    <div class="card-tags"><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-political">POLITICAL</span></div>
+  </div>
+</div>
+
+<div class="card card-G">
+  <div class="card-hdr">
+    <div><div class="card-id">G-02</div><div class="card-name">Hutt Space Shifts</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">The Hutt Clans renegotiate their arrangement with the Empire following a dispute over spice shipments. Both sides sense an opportunity.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Hutt Space becomes available to both sides for diplomatic overtures this turn only. Both players may spend 1 AP on Hutt Negotiation without normal prerequisites. Success grants: <span class="eff-pos">+1 Ground Force Supply</span> (smuggler supply routes), bounty hunter contract access, or Nar Shaddaa intelligence (1 free Intel action).</div>
+    <div class="card-tags"><span class="tag tag-political">DIPLOMATIC</span><span class="tag tag-supply">SUPPLY</span></div>
+  </div>
+</div>
+
+<div class="card card-G">
+  <div class="card-hdr">
+    <div><div class="card-id">G-03</div><div class="card-name">Geonosian Genocide Discovered</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Evidence surfaces that the Empire exterminated the entire Geonosian population to silence witnesses to Death Star construction. Saw Gerrera's investigation has borne fruit.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Empire loses <span class="eff-pw eff-neg">2 Political Will</span>. Rebels gain <span class="eff-pw eff-pos">1 Political Will</span>. Arkanis Sector becomes <span class="eff-neutral">Contested</span> as word spreads and resistance activates. The Death Star's existence becomes common knowledge to both players — the Rebel player now knows the Death Star Construction Track count.</div>
+    <div class="card-tags"><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-special">DEATH STAR</span></div>
+  </div>
+</div>
+
+<div class="card card-G">
+  <div class="card-hdr">
+    <div><div class="card-id">G-04</div><div class="card-name">Hyperspace Route Disrupted</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">A catastrophic accident or deliberate sabotage closes a major hyperspace lane. Traffic backs up across the affected regions.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Both players lose <span class="eff-neg">1 AP next turn</span> as fleet movements become more difficult. All fleet movement costs <span class="eff-neg">+1 AP</span> until the lane reopens — roll 1d6 at the start of each subsequent turn: on a 4+ the lane reopens. One supply line passing through the affected region is suspended for 1 turn.</div>
+    <div class="card-tags"><span class="tag tag-military">FLEET</span><span class="tag tag-supply">SUPPLY</span></div>
+  </div>
+</div>
+
+<div class="card card-G">
+  <div class="card-hdr">
+    <div><div class="card-id">G-05</div><div class="card-name">Planetary Plague</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">A virulent disease spreads through a Mid Rim sector, straining Imperial medical resources and civilian morale across the region.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Randomly determine a Mid Rim sector. That sector's <span class="eff-neg">Ground Force Supply is suspended for three turns</span> as resources are diverted to containment. Neither side can conduct ground operations there this turn — forces are busy with quarantine. The garrison's morale drops to Shaken for the duration.</div>
+    <div class="card-tags"><span class="tag tag-supply">SUPPLY</span><span class="tag tag-military">GROUND FORCES</span></div>
+  </div>
+</div>
+
+<div class="card card-G">
+  <div class="card-hdr">
+    <div><div class="card-id">G-06</div><div class="card-name">Imperial Moff Defects</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">A regional Moff, disgusted by Imperial atrocities he has been ordered to commit, secretly opens communication with the Rebel Alliance.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Empire loses <span class="eff-pw eff-neg">1 Political Will</span>. Rebels gain a <span class="eff-pos">free Diplomatic Mission</span> in that Moff's sector this turn — automatic success. The sector's status shifts toward Contested. The defecting Moff's garrison is now of uncertain loyalty — treat it as Shaken morale until a new governor is appointed.</div>
+    <div class="card-tags"><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-political">DIPLOMATIC</span></div>
+  </div>
+</div>
+
+<div class="card card-G">
+  <div class="card-hdr">
+    <div><div class="card-id">G-07</div><div class="card-name">Corporate Sector Neutrality Wavers</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">The Corporate Sector Authority begins quiet negotiations with both sides as Imperial demands increase beyond what they agreed to.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Either side may spend 1 AP on a Diplomatic Mission in Bajic Sector this turn without prerequisites. The first side to succeed gains Corporate Sector supply access: <span class="eff-pos">+1 Ground Force Supply per turn</span> and <span class="eff-pos">+1 Fleet Supply per turn</span> while Corporate cooperation lasts (until a specific event disrupts it).</div>
+    <div class="card-tags"><span class="tag tag-supply">SUPPLY</span><span class="tag tag-political">DIPLOMATIC</span></div>
+  </div>
+</div>
+
+<div class="card card-G">
+  <div class="card-hdr">
+    <div><div class="card-id">G-08</div><div class="card-name">Bounty Hunters Take the Field</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Multiple high-profile bounty hunters are contracted simultaneously — targets include Rebel commanders and Imperial defectors alike.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Both sides must each reveal one named commander currently in the field. The opponent may spend 1 AP to attempt a targeted elimination — this triggers a small-scale battle (Entry 004 or 005 depending on who hunts whom). If the targeted commander is captured or killed the normal casualty table applies.</div>
+    <div class="card-tags"><span class="tag tag-special">COMMANDERS</span><span class="tag tag-military">MILITARY</span></div>
+  </div>
+</div>
+
+<div class="card card-G">
+  <div class="card-hdr">
+    <div><div class="card-id">G-09</div><div class="card-name">Death Star Rumored</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Whispers of a planet-killing superweapon reach the outer systems. Panic and determination rise in equal measure across the galaxy.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Empire loses <span class="eff-pw eff-neg">1 Political Will</span> as the rumor destabilizes civilian confidence. Rebels gain <span class="eff-pw eff-pos">1 Political Will</span> as the rumor galvanizes resistance. The <span class="eff-neutral">Death Star Construction Track is now visible to both players</span> — the Rebels know exactly how many steps remain. Rebel Intelligence actions against Geonosis and Scarif cost 0 AP this turn.</div>
+    <div class="card-tags"><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-special">DEATH STAR</span></div>
+  </div>
+</div>
+
+<div class="card card-G">
+  <div class="card-hdr">
+    <div><div class="card-id">G-10</div><div class="card-name">The Force Stirs</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Something moves in the Force. Force-sensitive individuals across the galaxy feel a disturbance — an omen of great events to come.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect"><span class="eff-neutral">Narrative only.</span> No mechanical effect. Both players must describe one thing their faction feels or fears about the future before the turn continues. If either faction has a Force-sensitive commander active, that commander gains a vague premonition — the GM may hint at one coming event without specifying which.</div>
+    <div class="card-note">This card exists for atmosphere and storytelling. Take the moment. The galaxy is alive.</div>
+    <div class="card-tags"><span class="tag tag-special">NARRATIVE</span><span class="tag tag-special">FORCE</span></div>
+  </div>
+</div>
+
+</div><!-- /card-grid galaxy -->
+
+<!-- ================================================================ -->
+<!-- WILD CARDS -->
+<!-- ================================================================ -->
+<div class="deck-hdr deck-W">
+  <div class="deck-title">Wild Cards</div>
+  <div class="deck-count">10 CARDS — W-01 THROUGH W-10</div>
+</div>
+
+<div class="alert">Wild Cards are unpredictable campaign-altering events. Cards marked MANDATORY trigger immediately and override normal turn structure.</div>
+
+<div class="card-grid">
+
+<div class="card card-W" style="position:relative">
+  <span class="mandatory">MANDATORY</span>
+  <div class="card-hdr">
+    <div><div class="card-id">W-01</div><div class="card-name">Battle of Atollon</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Grand Admiral Thrawn has located Chopper Base. The Seventh Fleet blockades Atollon. Phoenix Squadron and General Dodonna's Massassi Group are trapped.</div>
+    <div class="card-effect-label">Effect — MANDATORY TRIGGER</div>
+    <div class="card-effect">This card triggers immediately regardless of turn. Atollon Sector is immediately besieged. The session stops — this is a mandatory <span class="eff-neutral">Entry 011 — Last Stand</span> battle. <br><br>
+    <span class="eff-neg">If Rebels lose:</span> Atollon falls. Rebels lose <span class="eff-pw eff-neg">3 Political Will</span> but survivors escape (canon). Force Scaling changes for next engagement reflect depleted Phoenix Squadron.<br><br>
+    <span class="eff-pos">If Rebels somehow win:</span> Empire loses <span class="eff-pw eff-neg">2 Political Will</span>. Thrawn's fleet takes Heavy losses. A historic non-canon outcome — consequences must be determined narratively.</div>
+    <div class="card-note">Can only trigger if Thrawn is active AND Atollon is still Rebel-controlled. If either condition is false this card has no effect and is discarded.</div>
+    <div class="card-tags"><span class="tag tag-special">MANDATORY</span><span class="tag tag-military">LAST STAND</span><span class="tag tag-pw">POLITICAL WILL</span></div>
+  </div>
+</div>
+
+<div class="card card-W">
+  <div class="card-hdr">
+    <div><div class="card-id">W-02</div><div class="card-name">Maul Dies on Tatooine</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">The rogue Sith Lord Maul is killed by Obi-Wan Kenobi on Tatooine. An era ends in silence in the desert.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect"><span class="eff-neutral">Narrative primarily</span> — Maul's death removes a wildcard power from the galaxy. If either faction had been using Maul or his Crimson Dawn network as an asset, that asset is immediately removed from play. Tatooine (Arkanis Sector) becomes slightly less chaotic — remove one criminal element complication from that sector.</div>
+    <div class="card-note">Maul's death at 2 BBY is one of the most significant Force-related events of this era.</div>
+    <div class="card-tags"><span class="tag tag-special">NARRATIVE</span><span class="tag tag-special">FORCE</span></div>
+  </div>
+</div>
+
+<div class="card card-W">
+  <div class="card-hdr">
+    <div><div class="card-id">W-03</div><div class="card-name">Imperial Interdictor Deployed</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">The Empire deploys an Interdictor-class Star Destroyer to a contested region, its gravity well projectors trapping anything in the system.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Empire chooses one sector. All <span class="eff-neg">Rebel fleet assets in that sector cannot move for two turns</span> — gravity wells prevent hyperspace jump. Rebels must either fight their way out (triggering a space battle) or lose those assets. The Interdictor adds 1 Interdictor to the Seventh Fleet's complement permanently.</div>
+    <div class="card-tags"><span class="tag tag-military">FLEET</span><span class="tag tag-special">INTERDICTOR</span></div>
+  </div>
+</div>
+
+<div class="card card-W">
+  <div class="card-hdr">
+    <div><div class="card-id">W-04</div><div class="card-name">Mon Mothma Goes Underground</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Mon Mothma is being hunted by the ISB and must flee from sector to sector, unable to maintain a fixed location for her political work.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Rebels <span class="eff-neg">cannot conduct Diplomatic Mission actions for two turns</span> — Mon Mothma's political network is disrupted as she goes dark. However Rebels gain <span class="eff-pw eff-pos">+2 Political Will</span> — her flight galvanizes resistance cells. Empire automatically spends <span class="eff-neg">1 AP per turn for two turns</span> as ISB devotes resources to hunting her.</div>
+    <div class="card-tags"><span class="tag tag-political">DIPLOMATIC</span><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-special">COMMANDERS</span></div>
+  </div>
+</div>
+
+<div class="card card-W">
+  <div class="card-hdr">
+    <div><div class="card-id">W-05</div><div class="card-name">Saw Gerrera Censured</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">The Rebel Alliance officially censures Saw Gerrera's Partisans for excessive violence against civilians. The internal split becomes public.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Rebels lose <span class="eff-pw eff-neg">1 Political Will</span> from the public fracture. Saw's Partisans act independently this turn — the Rebels gain one <span class="eff-pos">free Sabotage action</span> not counting against their AP (Saw acts without authorization — his target's Ground Force Supply is suspended 1 turn). Saw's morale state immediately drops to Shaken — the censure demoralizes his men.</div>
+    <div class="card-tags"><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-special">COMMANDERS</span><span class="tag tag-military">GROUND FORCES</span></div>
+  </div>
+</div>
+
+<div class="card card-W">
+  <div class="card-hdr">
+    <div><div class="card-id">W-06</div><div class="card-name">Imperial Double Agent Exposed</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">An agent operating inside one faction is discovered. The galaxy's intelligence war claims another casualty.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Roll 1d6. <span class="eff-neg">Odd:</span> A Rebel agent embedded in an Imperial sector is exposed. Remove one Covert Cell from an Imperial sector. One Rebel ground unit in that sector loses 1 Supply tier as the safe house network collapses. <span class="eff-neg">Even:</span> An Imperial informant feeding data to ISB is discovered and eliminated. Empire loses 1 free Intelligence action next turn and Yularen's ISB sweep has a 50% chance of failing this turn.</div>
+    <div class="card-tags"><span class="tag tag-intel">INTELLIGENCE</span><span class="tag tag-supply">SUPPLY</span></div>
+  </div>
+</div>
+
+<div class="card card-W">
+  <div class="card-hdr">
+    <div><div class="card-id">W-07</div><div class="card-name">Supply Convoy Intercepted</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">A major supply convoy has been hit. Ships burning, cargo scattered across a hyperspace lane. One side's logistics take a serious hit.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">The player who draws this card suffers: one Ground Force unit drops <span class="eff-neg">one Supply tier</span> and one Fleet formation loses <span class="eff-neg">one support vessel</span> (remove the smallest ship class from its complement). The other side gains <span class="eff-pos">+1 Ground Force Supply</span> from captured materials. This triggers Entry 006 — Rebel Convoy Interdiction as an optional bonus battle if both players agree to film it.</div>
+    <div class="card-tags"><span class="tag tag-supply">SUPPLY</span><span class="tag tag-military">GROUND FORCES</span><span class="tag tag-military">FLEET</span></div>
+  </div>
+</div>
+
+<div class="card card-W">
+  <div class="card-hdr">
+    <div><div class="card-id">W-08</div><div class="card-name">Natural Disaster</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">A catastrophic event — volcanic eruption, asteroid impact, tidal surge — devastates a strategically important world without warning.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Randomly determine a sector (roll or draw randomly from the sector list). That sector's <span class="eff-neg">Ground Force Supply is permanently suspended</span> — the infrastructure is destroyed and cannot be rebuilt this campaign. Both sides must spend 1 AP next turn responding to the humanitarian crisis or each lose <span class="eff-pw eff-neg">1 Political Will</span> for being seen as indifferent to suffering.</div>
+    <div class="card-tags"><span class="tag tag-supply">SUPPLY</span><span class="tag tag-pw">POLITICAL WILL</span></div>
+  </div>
+</div>
+
+<div class="card card-W">
+  <div class="card-hdr">
+    <div><div class="card-id">W-09</div><div class="card-name">Jedi Survivor Emerges</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">A surviving Jedi makes contact with the Rebel Alliance. Their presence changes the calculus of the war and the attention of the Empire.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">Rebels gain <span class="eff-pw eff-pos">+2 Political Will</span> — hope is renewed. Empire immediately spends 1 AP deploying an Inquisitor to hunt the Jedi. If the Inquisitor catches them (Empire wins a targeted Entry 004 battle): Rebels lose the 2 PW gained. If the Jedi escapes: they become a permanent Rebel asset worth <span class="eff-pos">+1 Political Will per turn</span> until end of campaign.</div>
+    <div class="card-tags"><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-special">FORCE</span><span class="tag tag-special">COMMANDERS</span></div>
+  </div>
+</div>
+
+<div class="card card-W">
+  <div class="card-hdr">
+    <div><div class="card-id">W-10</div><div class="card-name">The Emperor Acts Personally</div></div>
+  </div>
+  <div class="card-body">
+    <div class="card-lore">Emperor Palpatine himself intervenes in galactic affairs with a move so brazen no one saw it coming. The galaxy holds its breath.</div>
+    <div class="card-effect-label">Effect</div>
+    <div class="card-effect">The Imperial player must <span class="eff-neg">reveal their next two intended actions</span> to their opponent before the turn begins — Palpatine's move is so overt it cannot be hidden. However both those actions cost <span class="eff-pos">0 AP</span> — when the Emperor acts personally, the galaxy bends. Rebels gain <span class="eff-pw eff-pos">1 Political Will</span> from the sheer audacity of Imperial overreach galvanizing resistance cells.</div>
+    <div class="card-tags"><span class="tag tag-pw">POLITICAL WILL</span><span class="tag tag-special">EMPEROR</span></div>
+  </div>
+</div>
+
+</div><!-- /card-grid wild -->
+
+</div><!-- /container -->
+</body>
+</html>
