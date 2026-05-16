@@ -15,20 +15,20 @@
 }
 body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh;line-height:1.6}
 .hdr{background:var(--panel);border-bottom:2px solid var(--border2);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.hdr-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:800;color:var(--gold);letter-spacing:4px;text-transform:uppercase}
-.hdr-sub{font-size:8px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+.hdr-title{font-family:'Orbitron',monospace;font-size:18px;font-weight:800;color:var(--gold);letter-spacing:4px;text-transform:uppercase}
+.hdr-sub{font-size:11px;color:var(--dim);letter-spacing:3px;margin-top:2px}
 .container{max-width:1200px;margin:0 auto;padding:28px 20px}
 
 /* RULES */
 .rules{background:var(--panel);border:1px solid var(--border);padding:16px 20px;margin-bottom:28px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.rules-title{font-family:'Orbitron',monospace;font-size:9px;color:var(--gold);letter-spacing:3px;margin-bottom:8px;grid-column:1/-1}
-.rule-block{font-size:9px;color:var(--dim);line-height:1.7}
-.rule-block strong{color:var(--text);display:block;margin-bottom:3px;font-size:8px;letter-spacing:2px;text-transform:uppercase}
+.rules-title{font-family:'Orbitron',monospace;font-size:12px;color:var(--gold);letter-spacing:3px;margin-bottom:8px;grid-column:1/-1}
+.rule-block{font-size:12px;color:var(--dim);line-height:1.7}
+.rule-block strong{color:var(--text);display:block;margin-bottom:3px;font-size:11px;letter-spacing:2px;text-transform:uppercase}
 
 /* SECTION HEADERS */
 .deck-hdr{display:flex;align-items:center;gap:12px;margin:28px 0 14px 0;padding-bottom:8px;border-bottom:2px solid var(--border2)}
-.deck-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
-.deck-count{font-size:9px;color:var(--dim);letter-spacing:2px}
+.deck-title{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.deck-count{font-size:12px;color:var(--dim);letter-spacing:2px}
 .deck-I .deck-title{color:var(--empire)}
 .deck-R .deck-title{color:var(--rebel)}
 .deck-G .deck-title{color:#28c8a8}
@@ -40,15 +40,15 @@ body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monosp
 /* CARD */
 .card{border:1px solid var(--border);overflow:hidden;position:relative}
 .card-hdr{padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--border)}
-.card-id{font-family:'Orbitron',monospace;font-size:9px;font-weight:700;opacity:0.7;margin-bottom:3px;letter-spacing:2px}
-.card-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;line-height:1.2}
+.card-id{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;opacity:0.7;margin-bottom:3px;letter-spacing:2px}
+.card-name{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;line-height:1.2}
 .card-body{padding:10px 14px}
-.card-lore{font-size:9px;color:var(--dim);margin-bottom:8px;line-height:1.6;font-style:italic}
-.card-effect-label{font-size:7px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:4px}
-.card-effect{font-size:9px;color:var(--text);line-height:1.6}
-.card-note{font-size:8px;color:var(--dim);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);line-height:1.5}
+.card-lore{font-size:12px;color:var(--dim);margin-bottom:8px;line-height:1.6;font-style:italic}
+.card-effect-label{font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:4px}
+.card-effect{font-size:12px;color:var(--text);line-height:1.6}
+.card-note{font-size:11px;color:var(--dim);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);line-height:1.5}
 .card-tags{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
-.tag{font-size:7px;padding:1px 6px;border:1px solid;letter-spacing:1px}
+.tag{font-size:11px;padding:1px 6px;border:1px solid;letter-spacing:1px}
 .tag-pw{color:var(--gold);border-color:var(--gold)}
 .tag-supply{color:var(--green);border-color:var(--green)}
 .tag-military{color:var(--empire);border-color:var(--empire)}
@@ -77,7 +77,7 @@ body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monosp
 .card-W .card-id{color:var(--wild)}
 .card-W .card-name{color:var(--wild)}
 
-.mandatory{position:absolute;top:8px;right:8px;font-size:7px;padding:1px 6px;background:rgba(232,72,72,0.2);border:1px solid var(--red);color:var(--red);letter-spacing:1px}
+.mandatory{position:absolute;top:8px;right:8px;font-size:11px;padding:1px 6px;background:rgba(232,72,72,0.2);border:1px solid var(--red);color:var(--red);letter-spacing:1px}
 
 /* EFFECT HIGHLIGHTS */
 .eff-pos{color:var(--green)}
@@ -86,7 +86,7 @@ body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monosp
 .eff-sup{color:var(--green)}
 .eff-neutral{color:var(--yellow)}
 
-.alert{padding:9px 12px;margin:10px 0 20px 0;font-size:9px;border-left:3px solid var(--gold);background:rgba(200,168,75,0.07);color:var(--gold);line-height:1.6}
+.alert{padding:9px 12px;margin:10px 0 20px 0;font-size:12px;border-left:3px solid var(--gold);background:rgba(200,168,75,0.07);color:var(--gold);line-height:1.6}
 </style>
 </head>
 <body>
@@ -96,7 +96,7 @@ body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monosp
     <div class="hdr-title">Event Cards — 40 Card Deck</div>
     <div class="hdr-sub">Star Wars Grand Strategy — Galactic Civil War — 2 BBY</div>
   </div>
-  <div style="font-size:9px;color:var(--dim);text-align:right">
+  <div style="font-size:12px;color:var(--dim);text-align:right">
     <span style="color:var(--empire)">■ IMPERIAL (10)</span> &nbsp;
     <span style="color:var(--rebel)">■ REBEL (10)</span> &nbsp;
     <span style="color:#28c8a8">■ GALAXY-WIDE (10)</span> &nbsp;

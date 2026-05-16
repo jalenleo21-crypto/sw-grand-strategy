@@ -15,27 +15,27 @@
 }
 body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh;line-height:1.6}
 .hdr{background:var(--panel);border-bottom:2px solid var(--border2);padding:14px 28px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
-.hdr-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:800;color:var(--gold);letter-spacing:4px;text-transform:uppercase}
-.hdr-sub{font-size:8px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+.hdr-title{font-family:'Orbitron',monospace;font-size:18px;font-weight:800;color:var(--gold);letter-spacing:4px;text-transform:uppercase}
+.hdr-sub{font-size:11px;color:var(--dim);letter-spacing:3px;margin-top:2px}
 .container{max-width:1150px;margin:0 auto;padding:28px 20px}
 
 /* TOC */
 .toc{background:var(--panel);border:1px solid var(--border);padding:16px 20px;margin-bottom:28px}
-.toc-title{font-family:'Orbitron',monospace;font-size:9px;color:var(--gold);letter-spacing:3px;margin-bottom:10px}
+.toc-title{font-family:'Orbitron',monospace;font-size:12px;color:var(--gold);letter-spacing:3px;margin-bottom:10px}
 .toc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px}
-.toc-a{font-size:9px;color:var(--empire);text-decoration:none;padding:2px 0;display:block;transition:color .12s}
+.toc-a{font-size:12px;color:var(--empire);text-decoration:none;padding:2px 0;display:block;transition:color .12s}
 .toc-a:hover{color:var(--gold)}
 
 /* SECTIONS */
 .section{margin-bottom:36px}
-.sec-hdr{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--gold);letter-spacing:3px;text-transform:uppercase;border-bottom:2px solid var(--border2);padding-bottom:7px;margin-bottom:16px}
-.sec-intro{font-size:10px;color:var(--dim);margin-bottom:14px;line-height:1.7;max-width:820px}
-.sub-hdr{font-family:'Orbitron',monospace;font-size:9px;color:var(--bright);letter-spacing:2px;text-transform:uppercase;margin:20px 0 8px 0;padding:5px 10px;background:var(--panel2);border-left:3px solid var(--empire)}
+.sec-hdr{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--gold);letter-spacing:3px;text-transform:uppercase;border-bottom:2px solid var(--border2);padding-bottom:7px;margin-bottom:16px}
+.sec-intro{font-size:14px;color:var(--dim);margin-bottom:14px;line-height:1.7;max-width:820px}
+.sub-hdr{font-family:'Orbitron',monospace;font-size:12px;color:var(--bright);letter-spacing:2px;text-transform:uppercase;margin:20px 0 8px 0;padding:5px 10px;background:var(--panel2);border-left:3px solid var(--empire)}
 .sub-hdr.rebel{border-left-color:var(--rebel)}
 
 /* TABLES */
-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:10px}
-th{background:var(--panel2);color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-size:7px;padding:7px 10px;text-align:left;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+th{background:var(--panel2);color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-size:11px;padding:7px 10px;text-align:left;border:1px solid var(--border)}
 td{padding:6px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.5}
 tr:hover td{background:rgba(255,255,255,0.012)}
 
@@ -43,21 +43,21 @@ tr:hover td{background:rgba(255,255,255,0.012)}
 .cmd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin:12px 0}
 .cmd-card{border:1px solid var(--border);background:var(--panel2);overflow:hidden}
 .cmd-card-hdr{padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--border)}
-.cmd-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;line-height:1.3}
-.cmd-title{font-size:8px;color:var(--dim);margin-top:2px;letter-spacing:1px}
+.cmd-name{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;line-height:1.3}
+.cmd-title{font-size:11px;color:var(--dim);margin-top:2px;letter-spacing:1px}
 .cmd-rating{font-family:'Orbitron',monospace;font-size:22px;font-weight:800;line-height:1}
-.cmd-rating-label{font-size:7px;color:var(--dim);letter-spacing:1px;text-align:right;margin-top:2px}
+.cmd-rating-label{font-size:11px;color:var(--dim);letter-spacing:1px;text-align:right;margin-top:2px}
 .cmd-body{padding:10px 14px}
 .cmd-row{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start}
-.cmd-key{font-size:7px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;min-width:75px;flex-shrink:0;padding-top:1px}
-.cmd-val{font-size:9px;color:var(--text);line-height:1.4;flex:1}
+.cmd-key{font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;min-width:75px;flex-shrink:0;padding-top:1px}
+.cmd-val{font-size:12px;color:var(--text);line-height:1.4;flex:1}
 .cmd-val.gold{color:var(--gold)}
 .cmd-val.green{color:var(--green)}
 .cmd-val.red{color:var(--red)}
 .cmd-val.yellow{color:var(--yellow)}
-.cmd-specialty{background:rgba(0,0,0,0.3);border:1px solid var(--border);padding:7px 10px;margin:7px 0;font-size:9px;border-left:3px solid}
+.cmd-specialty{background:rgba(0,0,0,0.3);border:1px solid var(--border);padding:7px 10px;margin:7px 0;font-size:12px;border-left:3px solid}
 .cmd-status{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-.status-badge{font-size:7px;padding:2px 7px;border:1px solid;letter-spacing:1px;cursor:pointer;transition:all .15s;font-family:'Share Tech Mono',monospace}
+.status-badge{font-size:11px;padding:2px 7px;border:1px solid;letter-spacing:1px;cursor:pointer;transition:all .15s;font-family:'Share Tech Mono',monospace}
 .status-badge:hover{opacity:0.7}
 .sb-active{color:var(--green);border-color:var(--green);background:rgba(40,200,104,0.1)}
 .sb-wounded{color:var(--yellow);border-color:var(--yellow)}
@@ -71,21 +71,21 @@ tr:hover td{background:rgba(255,255,255,0.012)}
 /* DICE TABLE */
 .dice-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:12px 0}
 .dice-face{border:1px solid var(--border);padding:10px 8px;text-align:center;background:var(--panel2)}
-.dice-num{font-family:'Orbitron',monospace;font-size:18px;font-weight:800;color:var(--gold2);margin-bottom:4px}
-.dice-result{font-size:8px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
-.dice-desc{font-size:8px;color:var(--dim);line-height:1.4}
+.dice-num{font-family:'Orbitron',monospace;font-size:24px;font-weight:800;color:var(--gold2);margin-bottom:4px}
+.dice-result{font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.dice-desc{font-size:11px;color:var(--dim);line-height:1.4}
 
 /* ALERT */
-.alert{padding:9px 12px;margin:10px 0;font-size:9px;border-left:3px solid;line-height:1.6}
+.alert{padding:9px 12px;margin:10px 0;font-size:12px;border-left:3px solid;line-height:1.6}
 .alert-warn{background:rgba(232,72,72,0.07);border-color:var(--red);color:#e88888}
 .alert-note{background:rgba(58,120,232,0.07);border-color:var(--empire);color:#88aaee}
 .alert-gold{background:rgba(200,168,75,0.07);border-color:var(--gold);color:var(--gold)}
-.alert-title{font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:8px;margin-bottom:3px}
+.alert-title{font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:11px;margin-bottom:3px}
 
 /* LOCATION TRACKER */
 .location-tracker{background:var(--panel);border:1px solid var(--border);padding:14px 16px;margin:12px 0}
-.lt-title{font-family:'Orbitron',monospace;font-size:9px;color:var(--gold);letter-spacing:2px;margin-bottom:10px}
-.lt-row{display:grid;grid-template-columns:180px 180px 180px 1fr;gap:8px;padding:5px 0;border-bottom:1px solid rgba(26,46,69,0.4);align-items:center;font-size:9px}
+.lt-title{font-family:'Orbitron',monospace;font-size:12px;color:var(--gold);letter-spacing:2px;margin-bottom:10px}
+.lt-row{display:grid;grid-template-columns:180px 180px 180px 1fr;gap:8px;padding:5px 0;border-bottom:1px solid rgba(26,46,69,0.4);align-items:center;font-size:12px}
 .lt-name{color:var(--bright)}
 .lt-loc{color:var(--text)}
 .lt-turn{color:var(--dim)}
@@ -99,7 +99,7 @@ tr:hover td{background:rgba(255,255,255,0.012)}
     <div class="hdr-title">Named Commanders</div>
     <div class="hdr-sub">Galactic Civil War — 2 BBY — Command & Control System</div>
   </div>
-  <div style="font-size:9px;color:var(--dim);text-align:right">
+  <div style="font-size:12px;color:var(--dim);text-align:right">
     <span style="color:var(--empire)">■ IMPERIAL</span> &nbsp;
     <span style="color:var(--rebel)">■ REBEL</span> &nbsp;
     <span style="color:var(--neutral)">■ INDEPENDENT</span>
@@ -152,11 +152,11 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 
 <table>
   <tr><th>Rating</th><th>Tier</th><th>Examples</th><th>Casualty Roll Modifier</th></tr>
-  <tr><td class="r5" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:800">5</td><td>Grand Moff / Grand Admiral / Dark Lord</td><td>Tarkin, Thrawn, Vader</td><td>+2 to survival roll</td></tr>
-  <tr><td class="r4" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:800">4</td><td>Admiral / General / Alliance Leader</td><td>Dodonna, Raddus, Romodi, Mon Mothma</td><td>+1 to survival roll</td></tr>
-  <tr><td class="r3" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:800">3</td><td>Sector Commander / Moff / Rebel Sector Commander</td><td>Konstantine, Pryce, Cham Syndulla, Hera</td><td>No modifier</td></tr>
-  <tr><td class="r2" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:800">2</td><td>Field Commander / Cell Leader</td><td>Rex, Sato, Sabine, Kallus</td><td>-1 to survival roll</td></tr>
-  <tr><td class="r1" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:800">1</td><td>Operative / Agent / Independent</td><td>Ezra, Zeb, Saw Gerrera</td><td>-2 to survival roll</td></tr>
+  <tr><td class="r5" style="font-family:'Orbitron',monospace;font-size:19px;font-weight:800">5</td><td>Grand Moff / Grand Admiral / Dark Lord</td><td>Tarkin, Thrawn, Vader</td><td>+2 to survival roll</td></tr>
+  <tr><td class="r4" style="font-family:'Orbitron',monospace;font-size:19px;font-weight:800">4</td><td>Admiral / General / Alliance Leader</td><td>Dodonna, Raddus, Romodi, Mon Mothma</td><td>+1 to survival roll</td></tr>
+  <tr><td class="r3" style="font-family:'Orbitron',monospace;font-size:19px;font-weight:800">3</td><td>Sector Commander / Moff / Rebel Sector Commander</td><td>Konstantine, Pryce, Cham Syndulla, Hera</td><td>No modifier</td></tr>
+  <tr><td class="r2" style="font-family:'Orbitron',monospace;font-size:19px;font-weight:800">2</td><td>Field Commander / Cell Leader</td><td>Rex, Sato, Sabine, Kallus</td><td>-1 to survival roll</td></tr>
+  <tr><td class="r1" style="font-family:'Orbitron',monospace;font-size:19px;font-weight:800">1</td><td>Operative / Agent / Independent</td><td>Ezra, Zeb, Saw Gerrera</td><td>-2 to survival roll</td></tr>
 </table>
 
 <div class="alert alert-note">
@@ -267,7 +267,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Coruscant / Eriadu (rotating)</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--empire)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">TARKIN DOCTRINE</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">TARKIN DOCTRINE</div>
         When Tarkin is present in a sector, the Empire may conduct an Orbital Bombardment action without spending Political Will. Normally this costs 2 PW. Additionally, any contested sector with Tarkin present automatically has its garrison morale raised to High regardless of supply or casualties — fear of Tarkin's personal reputation holds the line.
       </div>
       <div class="cmd-row"><div class="cmd-key">PW Cost</div><div class="cmd-val green">Actions cost 1 less PW while Tarkin commands</div></div>
@@ -297,7 +297,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Lothal Sector — Seventh Fleet</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active — Triangulating Atollon</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--empire)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">TACTICAL GENIUS</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">TACTICAL GENIUS</div>
         When Thrawn is present, the opposing force rolls on the casualty table as if they took one tier worse of losses than they actually did. Additionally, Thrawn's fleet in any battle has its effective tier raised by one — a Sector Squadron fights as a Battle Squadron under his command. Once per campaign, Thrawn may reveal a hidden Rebel base location without spending an Intelligence action — representing his analytical deduction.
       </div>
       <div class="cmd-row"><div class="cmd-key">PW Cost</div><div class="cmd-val green">Deploying Thrawn costs 0 PW — Emperor personally endorses</div></div>
@@ -327,7 +327,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Coruscant — mobile deployment</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--empire)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">DARK SIDE ENFORCER</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">DARK SIDE ENFORCER</div>
         When Vader is present in a sector, Rebel forces must pass a morale check before engaging — treat their morale as one tier lower for the first phase of any battle. Additionally, any Rebel commander present in the same battle must roll on the casualty table regardless of battle outcome (Vader specifically hunts Force-sensitives and leaders). Vader cannot be captured — a roll of 2 on his casualty table is treated as Wounded instead.
       </div>
       <div class="cmd-row"><div class="cmd-key">PW Cost</div><div class="cmd-val green">Deploying Vader costs 0 PW</div></div>
@@ -358,7 +358,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Geonosis / Scarif (rotating)</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--empire)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">WEAPONS ARCHITECT</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">WEAPONS ARCHITECT</div>
         While Krennic is present, the Death Star Construction Track advances by 1 additional step per turn without spending Action Points. Krennic's presence at Scarif also upgrades its security — any Rebel intelligence raid against Scarif requires 2 successful prior intelligence actions instead of 1.
       </div>
       <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Political rivalry with Tarkin — if both are in the same sector, one of them loses their specialty effect that turn (player's choice of which). Their competition undermines Imperial efficiency.</div></div>
@@ -384,7 +384,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Coruscant — ISB Headquarters</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--empire)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">COUNTERINTELLIGENCE</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">COUNTERINTELLIGENCE</div>
         While Yularen is active, the Empire gains 1 free Intelligence action per turn — his ISB network is always running. Additionally, any Rebel Covert Cell Insertion action has a 50% chance of being detected (flip a coin on Rebel insertion — heads = ISB catches it before it establishes). Yularen's network can be disrupted — if Agent Kallus defects (Event Card R-03), Yularen loses his free Intelligence action for 3 turns.
       </div>
       <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Bureaucratic — Yularen works through process and report chains. He cannot take direct military action even if the situation calls for it.</div></div>
@@ -415,7 +415,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Lothal orbit — ISD Relentless</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--empire)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">SECTOR BLOCKADE</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">SECTOR BLOCKADE</div>
         Konstantine's fleet maintains an effective blockade — any Rebel supply run through Lothal Sector automatically fails while he is present, no dice roll required.
       </div>
       <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Reckless aggression — if Konstantine rolls a 6 on any Initiative check, he breaks formation to personally pursue a fleeing Rebel ship. His fleet loses its blockade bonus that turn. This is canon — and it gets him killed at Atollon.</div></div>
@@ -441,7 +441,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Lothal — Capital City</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--empire)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">POLITICAL AUTHORITY</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">POLITICAL AUTHORITY</div>
         Pryce can conduct a Crackdown action on Lothal without spending an Action Point once per turn. However she has no military expertise — any battle in Lothal Sector while she commands (without Thrawn or Konstantine present) has the Imperial force fighting at Shaken morale regardless of actual supply or casualties.
       </div>
       <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Politically ambitious — will sacrifice military effectiveness for personal advancement. If Krennic or Tarkin visits Lothal, Pryce may undermine them with the Emperor to protect her position.</div></div>
@@ -467,7 +467,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Lothal Sector — active operations</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val yellow">⚠ Secretly sympathetic to Rebels</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--empire)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">ISB FIELD AGENT</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">ISB FIELD AGENT</div>
         Kallus provides the Empire with 1 free Intelligence sweep per turn in his current sector. However — if Event Card R-03 (Agent Kallus Defects) is drawn, Kallus immediately switches faction. He becomes a Rebel commander (Fulcrum) with Rating 2 providing the Rebels with 2 free Intelligence actions per turn for 3 turns representing his knowledge dump.
       </div>
       <div class="cmd-row"><div class="cmd-key">Note</div><div class="cmd-val yellow">Track Kallus carefully. Thrawn is watching him. If Thrawn is in Lothal Sector the same turn Kallus defects, Thrawn may attempt to intercept (triggers special event).</div></div>
@@ -500,7 +500,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Atollon — Alliance High Command</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active — Declaration broadcast</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--rebel)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">DIPLOMAT & LEADER</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">DIPLOMAT & LEADER</div>
         Mon Mothma generates +1 Political Will for the Alliance each turn she is active and not in transit. Any Diplomatic Mission action in a sector she visits personally automatically succeeds — no roll required. Her Declaration of the Rebel Alliance (if not yet drawn as Event Card) generates +2 PW when she broadcasts it — she can choose when to broadcast it as a campaign action.
       </div>
       <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Non-combatant — Mon Mothma cannot be assigned to a battle. If the sector she occupies is attacked, she must evacuate (1 AP) or be captured on a roll of 1-3.</div></div>
@@ -526,7 +526,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Alderaan — Senate operations</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active — covert</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--rebel)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">INTELLIGENCE NETWORK</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">INTELLIGENCE NETWORK</div>
         Bail Organa provides 2 free Intelligence actions per turn representing his Senate contacts and covert network. Any sector adjacent to a Core World where Bail has operated in the last 3 turns has its Diplomatic Mission difficulty reduced — the sympathizer network is already primed. Bail's funding provides the Alliance with +1 Supply per turn while he is active.
       </div>
       <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Senate cover — if Bail is exposed as a Rebel agent (specific ISB event), Alderaan Sector immediately becomes Contested and Bail must flee. The Empire will use Alderaan as political leverage.</div></div>
@@ -557,7 +557,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Atollon — Massassi Group</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--rebel)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">BATTLE STRATEGIST</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">BATTLE STRATEGIST</div>
         When Dodonna commands a ground battle, the Rebel force may redeploy one unit between the first and second phase of a large battle (Entry 009/010). In Men of War this means you may relocate one tagged squad group to a new starting position between phases. Additionally, Dodonna's presence raises Rebel ground force morale by one tier for the entire battle.
       </div>
       <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Conservative — Dodonna will not commit to an attack unless victory probability is above 60%. He may refuse offensive orders if he calculates odds are against him.</div></div>
@@ -583,7 +583,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Atollon — Phoenix Squadron</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--rebel)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">ACE COMMANDER</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">ACE COMMANDER</div>
         Phoenix Squadron fleet fights at one tier higher when Hera commands — a Strike Force fights as a Task Force, a Task Force fights as a Fleet Element. In Men of War space battles this means the Rebel fleet starts with better positioning. Hera also reduces the cost of any Raid action by 1 AP — her personal expertise in hit-and-run makes operations cheaper.
       </div>
       <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Personal loyalty — if any Ghost crew member is captured or KIA, Hera will spend her next turn attempting rescue regardless of campaign priorities.</div></div>
@@ -609,7 +609,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Location</div><div class="cmd-val gold">Atollon — Chopper Base ground defense</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--rebel)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">CLONE WARS VETERAN</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">CLONE WARS VETERAN</div>
         Rex's decades of combat experience mean Rebel ground forces under his command ignore the first casualty result of any battle — the first loss tier (Light) is automatically negated. In Men of War this means the first lieutenant death trigger does not fire — Rex keeps the unit together through the initial shock. Additionally Rex provides a free fortification action at any base he commands.
       </div>
       <div class="cmd-row"><div class="cmd-key">Weakness</div><div class="cmd-val red">Off the grid — Rex is not officially in the Alliance chain of command. Imperial records list him as dead. He cannot participate in any political or diplomatic action.</div></div>
@@ -645,7 +645,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Faction</div><div class="cmd-val yellow">Independent — loosely Rebel-aligned</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--neutral)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">EXTREMIST TACTICS</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">EXTREMIST TACTICS</div>
         Saw's Partisans hit hard — when they participate in a battle the Rebel force deals casualties as if one tier higher (a Raid deals Medium damage, a Medium assault deals Heavy). However Saw costs the Rebels 1 Political Will every time he participates in a battle, win or lose — his methods are too brutal for the Alliance's public image. Additionally the Rogue Roll applies whenever Saw is in a joint operation and Partisans reach Shaken morale (see Scripting Reference Section 10).
       </div>
       <div class="cmd-row"><div class="cmd-key">Alliance Status</div><div class="cmd-val red">Mon Mothma publicly distances the Alliance from Saw's methods. Saw is not officially under Alliance command — he cooperates when it suits him.</div></div>
@@ -672,7 +672,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
       <div class="cmd-row"><div class="cmd-key">Faction</div><div class="cmd-val yellow">Independent — Rebel-allied on Ryloth only</div></div>
       <div class="cmd-row"><div class="cmd-key">Status</div><div class="cmd-val green">Active</div></div>
       <div class="cmd-specialty" style="border-left-color:var(--neutral)">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">HOMEWORLD DEFENDER</div>
+        <div style="font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:4px">HOMEWORLD DEFENDER</div>
         On Ryloth Cham's forces fight at full morale regardless of supply or casualties — they are fighting for their home. Free Ryloth Movement forces cannot be broken on Ryloth. Off Ryloth Cham's forces fight at normal morale and he loses his specialty bonus entirely — he will not leave his world willingly.
       </div>
       <div class="cmd-row"><div class="cmd-key">Alliance Status</div><div class="cmd-val yellow">Cooperates with Phoenix Squadron for Ryloth operations. Will not commit forces off-planet. Complicated relationship with daughter Hera.</div></div>
@@ -737,57 +737,57 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 
 <div class="location-tracker">
   <div class="lt-title">Commander Location Record — Turn 01 / 2 BBY Week 1</div>
-  <div class="lt-row" style="font-size:7px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border2)">
+  <div class="lt-row" style="font-size:11px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border2)">
     <div>Commander</div><div>Current Location</div><div>Status</div><div>Notes</div>
   </div>
 
   <div class="lt-row">
     <div class="lt-name" style="color:var(--empire)">Grand Moff Tarkin</div>
     <div class="lt-loc">Coruscant</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Rotating to Eriadu — Death Star oversight</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Rotating to Eriadu — Death Star oversight</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--empire)">Grand Admiral Thrawn</div>
     <div class="lt-loc">Lothal Sector — ISD Chimaera</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Triangulating Atollon. Watching Kallus.</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Triangulating Atollon. Watching Kallus.</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--empire)">Darth Vader</div>
     <div class="lt-loc">Coruscant</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Available for deployment anywhere in 1 turn</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Available for deployment anywhere in 1 turn</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--empire)">Director Krennic</div>
     <div class="lt-loc">Geonosis</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Death Star construction acceleration</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Death Star construction acceleration</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--empire)">ISB Dir. Yularen</div>
     <div class="lt-loc">Coruscant — ISB HQ</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Counterintelligence operations galaxy-wide</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Counterintelligence operations galaxy-wide</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--empire)">Admiral Konstantine</div>
     <div class="lt-loc">Lothal orbit — ISD Relentless</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Sector blockade. Failing to stop Ghost Crew.</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Sector blockade. Failing to stop Ghost Crew.</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--empire)">Governor Pryce</div>
     <div class="lt-loc">Lothal Capital City</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Requesting Thrawn. Out of her depth.</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Requesting Thrawn. Out of her depth.</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--empire)">Agent Kallus</div>
     <div class="lt-loc">Lothal Sector</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">⚠ Secret sympathizer. Thrawn watching.</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">⚠ Secret sympathizer. Thrawn watching.</div>
   </div>
 
   <div class="lt-row" style="border-top:2px solid var(--border2);margin-top:4px"></div>
@@ -795,32 +795,32 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
   <div class="lt-row">
     <div class="lt-name" style="color:var(--rebel)">Mon Mothma</div>
     <div class="lt-loc">Atollon — Alliance HQ</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Recently fled Coruscant. Declaration pending.</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Recently fled Coruscant. Declaration pending.</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--rebel)">Bail Organa</div>
     <div class="lt-loc">Alderaan</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Senate cover maintained. Funding Alliance.</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Senate cover maintained. Funding Alliance.</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--rebel)">General Dodonna</div>
     <div class="lt-loc">Atollon — Massassi Group</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Building ground assault capability</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Building ground assault capability</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--rebel)">Hera Syndulla</div>
     <div class="lt-loc">Atollon — Phoenix Squadron</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Phoenix Leader. Fleet operations.</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Phoenix Leader. Fleet operations.</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--rebel)">Captain Rex</div>
     <div class="lt-loc">Atollon — Chopper Base</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">ACTIVE</span></div>
-    <div class="lt-turn" style="font-size:9px">Ground defense. Off Imperial records.</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">ACTIVE</span></div>
+    <div class="lt-turn" style="font-size:12px">Ground defense. Off Imperial records.</div>
   </div>
 
   <div class="lt-row" style="border-top:2px solid var(--border2);margin-top:4px"></div>
@@ -828,14 +828,14 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
   <div class="lt-row">
     <div class="lt-name" style="color:var(--neutral)">Saw Gerrera</div>
     <div class="lt-loc">Jedha</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">INDEPENDENT</span></div>
-    <div class="lt-turn" style="font-size:9px">Investigating Geonosian genocide. Death Star rumors.</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">INDEPENDENT</span></div>
+    <div class="lt-turn" style="font-size:12px">Investigating Geonosian genocide. Death Star rumors.</div>
   </div>
   <div class="lt-row">
     <div class="lt-name" style="color:var(--neutral)">General Cham Syndulla</div>
     <div class="lt-loc">Ryloth highlands</div>
-    <div><span class="status-badge sb-active" style="font-size:7px">INDEPENDENT</span></div>
-    <div class="lt-turn" style="font-size:9px">Free Ryloth Movement. Will not leave Ryloth.</div>
+    <div><span class="status-badge sb-active" style="font-size:11px">INDEPENDENT</span></div>
+    <div class="lt-turn" style="font-size:12px">Free Ryloth Movement. Will not leave Ryloth.</div>
   </div>
 
 </div>
