@@ -184,6 +184,7 @@ textarea.fi{resize:vertical;min-height:55px}
 .rleg{display:flex;align-items:center;gap:5px;margin-bottom:3px;font-size:8px}
 .rsq{width:9px;height:9px;flex-shrink:0}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -274,6 +275,14 @@ textarea.fi{resize:vertical;min-height:55px}
 </div>
 
 <script>
+// ============================================================
+// SUPABASE CONFIG
+// ============================================================
+const SUPA_URL='https://itvrfikhpzporrobecmq.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0dnJmaWtocHpwb3Jyb2JlY21xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4ODExNDQsImV4cCI6MjA5NDQ1NzE0NH0.7xuIyR-QSacg4-n73iBwPjiGETESXktqh9IkQfLSFFc';
+const supa=supabase.createClient(SUPA_URL,SUPA_KEY);
+let saveTimeout=null;
+
 // ============================================================
 // BASE DATA
 // ============================================================
@@ -948,9 +957,11 @@ const SECTORS=[
 // ============================================================
 let GS={turn:1,ePW:15,rPW:20,dsStep:0,sectors:{},eventLog:[]};
 
-function initGS(){
-  const saved=localStorage.getItem('sw_gcs_v10');
-  if(saved){try{GS=JSON.parse(saved);return;}catch(e){}}
+async function initGS(){
+  try{
+    const {data}=await supa.from('campaign_state').select('data').eq('id',1).single();
+    if(data&&data.data){GS=JSON.parse(data.data);console.log('Loaded from Supabase');return;}
+  }catch(e){console.log('Starting fresh');}
   SECTORS.forEach(sec=>{
     GS.sectors[sec.id]={
       ctrl:sec.ctrl,supply_st:sec.supply_st,
@@ -970,7 +981,15 @@ function initGS(){
   saveGS();
 }
 
-function saveGS(){localStorage.setItem('sw_gcs_v10',JSON.stringify(GS));}
+function saveGS(){
+  if(saveTimeout)clearTimeout(saveTimeout);
+  saveTimeout=setTimeout(async()=>{
+    try{
+      await supa.from('campaign_state').upsert({id:1,data:JSON.stringify(GS)},{onConflict:'id'});
+      console.log('Saved');
+    }catch(e){console.error('Save failed',e);}
+  },800);
+}
 
 // ============================================================
 // TURN
@@ -1498,15 +1517,37 @@ function openAddForce(sid){
 // ============================================================
 // INIT
 // ============================================================
-initGS();
-updateTurnDisplay();
-updatePW();
-buildDS();
-buildAllCards();
-buildNav();
-updateCounts();
-document.getElementById('btnNext').addEventListener('click',()=>advanceTurn(1));
-document.getElementById('btnPrev').addEventListener('click',()=>advanceTurn(-1));
+(async()=>{
+  await initGS();
+  updateTurnDisplay();
+  updatePW();
+  buildDS();
+  buildAllCards();
+  buildNav();
+  updateCounts();
+  document.getElementById('btnNext').addEventListener('click',()=>advanceTurn(1));
+  document.getElementById('btnPrev').addEventListener('click',()=>advanceTurn(-1));
+
+  // Poll every 5 seconds to sync changes from other players
+  setInterval(async()=>{
+    try{
+      const {data}=await supa.from('campaign_state').select('data').eq('id',1).single();
+      if(!data||!data.data)return;
+      const remote=JSON.parse(data.data);
+      const changed=remote.turn!==GS.turn||remote.ePW!==GS.ePW||remote.rPW!==GS.rPW||remote.dsStep!==GS.dsStep||JSON.stringify(remote.sectors)!==JSON.stringify(GS.sectors);
+      if(changed){
+        GS=remote;
+        updateTurnDisplay();
+        updateCounts();
+        updatePW();
+        buildDS();
+        buildNav();
+        if(activeSec)renderSector(activeSec);
+        console.log('Synced from remote');
+      }
+    }catch(e){}
+  },5000);
+})();
 </script>
 </body>
 </html>
