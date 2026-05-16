@@ -280,7 +280,7 @@ textarea.fi{resize:vertical;min-height:55px}
 // ============================================================
 const SUPA_URL='https://itvrfikhpzporrobecmq.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0dnJmaWtocHpwb3Jyb2JlY21xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4ODExNDQsImV4cCI6MjA5NDQ1NzE0NH0.7xuIyR-QSacg4-n73iBwPjiGETESXktqh9IkQfLSFFc';
-const supa=supabase.createClient(SUPA_URL,SUPA_KEY);
+let supa=null;
 let saveTimeout=null;
 
 // ============================================================
@@ -958,10 +958,16 @@ const SECTORS=[
 let GS={turn:1,ePW:15,rPW:20,dsStep:0,sectors:{},eventLog:[]};
 
 async function initGS(){
+  // Init Supabase client (safely - CDN must be loaded first)
   try{
-    const {data}=await supa.from('campaign_state').select('data').eq('id',1).single();
-    if(data&&data.data){GS=JSON.parse(data.data);console.log('Loaded from Supabase');return;}
-  }catch(e){console.log('Starting fresh');}
+    supa=supabase.createClient(SUPA_URL,SUPA_KEY);
+    const {data,error}=await supa.from('campaign_state').select('data').eq('id',1).single();
+    if(!error&&data&&data.data){
+      GS=JSON.parse(data.data);
+      console.log('Loaded from Supabase');
+      return;
+    }
+  }catch(e){console.log('Supabase unavailable, using defaults:',e);}
   SECTORS.forEach(sec=>{
     GS.sectors[sec.id]={
       ctrl:sec.ctrl,supply_st:sec.supply_st,
@@ -982,11 +988,12 @@ async function initGS(){
 }
 
 function saveGS(){
+  if(!supa)return;
   if(saveTimeout)clearTimeout(saveTimeout);
   saveTimeout=setTimeout(async()=>{
     try{
       await supa.from('campaign_state').upsert({id:1,data:JSON.stringify(GS)},{onConflict:'id'});
-      console.log('Saved');
+      console.log('Saved to Supabase');
     }catch(e){console.error('Save failed',e);}
   },800);
 }
@@ -1530,6 +1537,7 @@ function openAddForce(sid){
 
   // Poll every 5 seconds to sync changes from other players
   setInterval(async()=>{
+    if(!supa)return;
     try{
       const {data}=await supa.from('campaign_state').select('data').eq('id',1).single();
       if(!data||!data.data)return;
