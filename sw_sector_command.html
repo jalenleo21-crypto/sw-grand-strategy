@@ -1064,11 +1064,13 @@ function advanceTurn(dir){
   updateCounts();
   renderEventLog();
   if(activeSec)renderSector(activeSec);
-  // Save immediately (no debounce) so polling doesn't revert the turn
+  // Block polling for 4 seconds while save completes
+  isSaving=true;
+  lastSaveTime=Date.now();
   if(supa){
     supa.from('campaign_state').upsert({id:1,data:JSON.stringify(GS)},{onConflict:'id'})
-      .then(()=>console.log('Turn saved'))
-      .catch(e=>console.error('Turn save failed',e));
+      .then(()=>{console.log('Turn saved');lastSaveTime=Date.now();isSaving=false;})
+      .catch(e=>{console.error('Turn save failed',e);isSaving=false;});
   }
 }
 
@@ -1146,7 +1148,9 @@ function toggleEvt(btn){
 function adjPW(f,d){
   if(f==='e')GS.ePW=Math.max(0,Math.min(20,GS.ePW+d));
   else GS.rPW=Math.max(0,Math.min(20,GS.rPW+d));
-  updatePW();saveGS();
+  updatePW();
+  lastSaveTime=Date.now();
+  saveGS();
 }
 function updatePW(){
   document.getElementById('ePWBar').style.width=(GS.ePW/20*100)+'%';
