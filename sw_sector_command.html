@@ -186,6 +186,23 @@ textarea.fi{resize:vertical;min-height:55px}
 
 .rleg{display:flex;align-items:center;gap:5px;margin-bottom:3px;font-size:11px}
 .rsq{width:9px;height:9px;flex-shrink:0}
+
+.evthist{margin-bottom:20px}
+.evthist-row{margin-bottom:6px;border:1px solid var(--border)}
+.evthist-btn{width:100%;padding:7px 12px;background:var(--panel2);border:none;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;letter-spacing:1px;transition:background .15s}
+.evthist-btn:hover{background:rgba(200,168,75,0.08)}
+.evthist-btn .arr{font-size:11px;color:var(--dim);transition:transform .2s}
+.evthist-btn.open .arr{transform:rotate(90deg)}
+.evthist-entries{display:none}
+.evthist-entries.open{display:block}
+.evthist-entry{padding:6px 12px;font-size:11px;color:var(--dim);border-bottom:1px solid rgba(26,46,69,0.4);line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.evthist-entry:last-child{border-bottom:none}
+.evthist-entry.empire{border-left:3px solid var(--empire);padding-left:9px}
+.evthist-entry.rebel{border-left:3px solid var(--rebel);padding-left:9px}
+.evthist-entry.neutral{border-left:3px solid var(--neutral);padding-left:9px}
+.evthist-empty{padding:10px 12px;font-size:11px;color:var(--dim);font-style:italic}
+.reset-btn{width:100%;padding:7px;background:transparent;border:1px solid var(--red);color:var(--red);font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;transition:background .15s;margin-top:8px}
+.reset-btn:hover{background:rgba(232,72,72,0.1)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -204,6 +221,10 @@ textarea.fi{resize:vertical;min-height:55px}
       <div class="turn-btns">
         <button class="tbtn" id="btnPrev">◀ PREV</button>
         <button class="tbtn" id="btnNext">NEXT ▶</button>
+      </div>
+      <div style="display:flex;gap:5px;margin-top:6px">
+        <button class="tbtn" style="flex:1;font-size:9px;color:var(--dim);border-color:var(--dim)" onclick="openEvtHistory()">📋 HISTORY</button>
+        <button class="tbtn" style="flex:1;font-size:9px;color:var(--red);border-color:var(--red)" onclick="resetCampaign()">⚠ RESET</button>
       </div>
     </div>
     <div class="pw-block">
@@ -253,10 +274,15 @@ textarea.fi{resize:vertical;min-height:55px}
     Advance turns to generate events in contested sectors.<br>
     Click EDIT on any force, planet, or sector to update after a battle.</p>
   </div>
-  <div id="eventLogWrap" style="display:none">
-    <div class="event-log">
-      <div class="event-log-title">Turn Event Log</div>
-      <div id="eventLog"></div>
+  <!-- Event History Modal -->
+  <div id="evtModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;align-items:center;justify-content:center">
+    <div style="background:var(--panel);border:1px solid var(--border2);width:700px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--panel2);flex-shrink:0">
+        <span style="font-family:'Orbitron',monospace;font-size:12px;color:var(--gold);letter-spacing:2px">EVENT HISTORY</span>
+        <button onclick="document.getElementById('evtModal').style.display='none'" style="background:transparent;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button>
+      </div>
+      <div id="eventLog" style="overflow-y:auto;flex:1;padding:8px"></div>
+      <div class="evthist-empty" id="evtEmpty" style="padding:16px;text-align:center">No events yet. Advance a turn to generate events.</div>
     </div>
   </div>
   <div id="sectorCards"></div>
@@ -285,6 +311,8 @@ const SUPA_URL='https://itvrfikhpzporrobecmq.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0dnJmaWtocHpwb3Jyb2JlY21xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4ODExNDQsImV4cCI6MjA5NDQ1NzE0NH0.7xuIyR-QSacg4-n73iBwPjiGETESXktqh9IkQfLSFFc';
 let supa=null;
 let saveTimeout=null;
+let isSaving=false;
+let lastSaveTime=0;
 
 // ============================================================
 // BASE DATA
@@ -994,11 +1022,14 @@ function saveGS(){
   if(!supa)return;
   if(saveTimeout)clearTimeout(saveTimeout);
   saveTimeout=setTimeout(async()=>{
+    isSaving=true;
     try{
       await supa.from('campaign_state').upsert({id:1,data:JSON.stringify(GS)},{onConflict:'id'});
+      lastSaveTime=Date.now();
       console.log('Saved to Supabase');
     }catch(e){console.error('Save failed',e);}
-  },800);
+    finally{isSaving=false;}
+  },600);
 }
 
 // ============================================================
@@ -1031,8 +1062,14 @@ function advanceTurn(dir){
   if(dir>0)generateEvents();
   updateTurnDisplay();
   updateCounts();
-  saveGS();
+  renderEventLog();
   if(activeSec)renderSector(activeSec);
+  // Save immediately (no debounce) so polling doesn't revert the turn
+  if(supa){
+    supa.from('campaign_state').upsert({id:1,data:JSON.stringify(GS)},{onConflict:'id'})
+      .then(()=>console.log('Turn saved'))
+      .catch(e=>console.error('Turn save failed',e));
+  }
 }
 
 function generateEvents(){
@@ -1055,10 +1092,52 @@ function generateEvents(){
 
 function renderEventLog(){
   const el=document.getElementById('eventLog');
-  const recent=GS.eventLog.filter(e=>e.turn===GS.turn);
-  if(!recent.length){document.getElementById('eventLogWrap').style.display='none';return;}
-  el.innerHTML=recent.map(e=>`<div class="event-entry ${e.faction}"><span>[T${String(e.turn).padStart(2,'0')} — ${e.sector.toUpperCase()}]</span> ${e.text}</div>`).join('');
-  document.getElementById('eventLogWrap').style.display='block';
+  const empty=document.getElementById('evtEmpty');
+  if(!GS.eventLog||!GS.eventLog.length){
+    el.innerHTML='';
+    if(empty)empty.style.display='block';
+    return;
+  }
+  if(empty)empty.style.display='none';
+  // Group events by turn
+  const byTurn={};
+  GS.eventLog.forEach(e=>{
+    if(!byTurn[e.turn])byTurn[e.turn]=[];
+    byTurn[e.turn].push(e);
+  });
+  // Build collapsible rows, most recent first
+  const turns=Object.keys(byTurn).map(Number).sort((a,b)=>b-a);
+  el.innerHTML=turns.map(t=>{
+    const week=((t-1)%52)+1;
+    const yearOff=Math.floor((t-1)/52);
+    const label=`${2-yearOff} BBY — Week ${week}`;
+    const entries=byTurn[t].map(e=>
+      `<div class="evthist-entry ${e.faction}">
+        <span style="flex-shrink:0;color:var(--dim)">[${e.sector.toUpperCase()}]</span>
+        <span style="color:var(--text)">${e.text}</span>
+      </div>`
+    ).join('');
+    const isLatest=t===GS.turn;
+    return `<div class="evthist-row">
+      <button class="evthist-btn${isLatest?' open':''}" onclick="toggleEvt(this)">
+        <span>Turn ${String(t).padStart(2,'0')} — ${label}</span>
+        <span class="arr">▶</span>
+      </button>
+      <div class="evthist-entries${isLatest?' open':''}">
+        ${entries}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openEvtHistory(){
+  renderEventLog();
+  document.getElementById('evtModal').style.display='flex';
+}
+
+function toggleEvt(btn){
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
 }
 
 // ============================================================
@@ -1480,6 +1559,56 @@ function openTransferForce(sid, idx){
 }
 
 // ============================================================
+// RESET CAMPAIGN
+// ============================================================
+async function resetCampaign(){
+  if(!confirm('RESET CAMPAIGN?\n\nThis will wipe ALL progress — sectors, forces, turn count, Political Will, event history — back to default starting state for ALL players.\n\nThis cannot be undone. Are you sure?')) return;
+  if(!confirm('FINAL WARNING\n\nAll campaign data will be permanently deleted from the server. Every player will see the reset simultaneously.\n\nPress OK to confirm reset.')) return;
+
+  // Reset GS to defaults
+  GS={turn:1,ePW:15,rPW:20,dsStep:0,sectors:{},eventLog:[]};
+
+  // Re-initialize sectors from base data
+  SECTORS.forEach(sec=>{
+    GS.sectors[sec.id]={
+      ctrl:sec.ctrl,supply_st:sec.supply_st,
+      commander:sec.commander,cmd_role:sec.cmd_role,
+      supply_from:sec.supply_from,supply_to:sec.supply_to,
+      strat:sec.strat,custom_notes:'',
+      planets:{},forces:[]
+    };
+    sec.planets.forEach(p=>{
+      GS.sectors[sec.id].planets[p.name]={ctrl:p.ctrl,gov:p.gov,force:p.force,sup:p.sup,notes:p.notes};
+    });
+    sec.forces.forEach(f=>{
+      GS.sectors[sec.id].forces.push({...f});
+    });
+  });
+
+  // Save reset to Supabase immediately — all players will sync within 5 seconds
+  if(supa){
+    try{
+      await supa.from('campaign_state').upsert({id:1,data:JSON.stringify(GS)},{onConflict:'id'});
+      console.log('Campaign reset saved to Supabase');
+    }catch(e){console.error('Reset save failed',e);}
+  }
+
+  // Re-render everything
+  updateTurnDisplay();
+  updatePW();
+  buildDS();
+  buildAllCards();
+  buildNav();
+  updateCounts();
+  renderEventLog();
+  if(activeSec){activeSec=null;}
+  document.getElementById('welcomeMsg').style.display='block';
+  document.querySelectorAll('.sector-card').forEach(c=>c.classList.remove('visible'));
+  document.querySelectorAll('.nav-sector').forEach(e=>e.classList.remove('active'));
+  alert('Campaign reset complete. All players will sync within 5 seconds.');
+}
+
+// ============================================================
 // ADD NEW FORCE
 // ============================================================
 function openAddForce(sid){
@@ -1537,10 +1666,15 @@ function openAddForce(sid){
   updateCounts();
   document.getElementById('btnNext').addEventListener('click',()=>advanceTurn(1));
   document.getElementById('btnPrev').addEventListener('click',()=>advanceTurn(-1));
+  document.getElementById('evtModal').addEventListener('click',function(e){
+    if(e.target===this)this.style.display='none';
+  });
 
-  // Poll every 5 seconds to sync changes from other players
+  // Poll every 3 seconds to sync changes from other players
   setInterval(async()=>{
     if(!supa)return;
+    // Skip poll if we're currently saving or saved in last 2 seconds
+    if(isSaving||Date.now()-lastSaveTime<2000)return;
     try{
       const {data}=await supa.from('campaign_state').select('data').eq('id',1).single();
       if(!data||!data.data)return;
@@ -1558,7 +1692,7 @@ function openAddForce(sid){
         console.log('Synced from remote');
       }
     }catch(e){}
-  },5000);
+  },3000);
 })();
 </script>
 </body>
