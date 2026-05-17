@@ -179,6 +179,11 @@ textarea.fi{resize:vertical;min-height:55px}
 
 .rleg{display:flex;align-items:center;gap:5px;margin-bottom:3px;font-size:11px}
 .rsq{width:9px;height:9px;flex-shrink:0}
+
+.adj-bar{padding:6px 16px;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.15);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.adj-label-txt{font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;flex-shrink:0}
+.adj-link{font-size:11px;color:var(--gold);cursor:pointer;padding:2px 8px;border:1px solid var(--border2);background:transparent;transition:all .15s;letter-spacing:1px;text-decoration:none;display:inline-block}
+.adj-link:hover{border-color:var(--gold);background:rgba(200,168,75,0.08);color:var(--gold2)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -946,6 +951,38 @@ const SECTORS=[
    ]},
 ];
 
+const ADJACENCY={
+  'coruscant_sec':['corellian_sec','kuat_sec','bormea_sec','duro_sec','darpa_sec'],
+  'corellian_sec':['coruscant_sec','duro_sec','tapani_sec','bormea_sec','kessel_sec'],
+  'kuat_sec':['coruscant_sec','bormea_sec','tapani_sec','darpa_sec'],
+  'bormea_sec':['coruscant_sec','kuat_sec','corellian_sec','darpa_sec'],
+  'duro_sec':['coruscant_sec','corellian_sec','tapani_sec','bajic_sec'],
+  'tapani_sec':['corellian_sec','kuat_sec','duro_sec','sesswenna_sec','sern_sec'],
+  'darpa_sec':['coruscant_sec','kuat_sec','bormea_sec','bajic_sec','sern_sec'],
+  'sesswenna_sec':['tapani_sec','sern_sec','ryloth_sec','chommel_sec'],
+  'sern_sec':['sesswenna_sec','tapani_sec','darpa_sec','chommel_sec','bajic_sec'],
+  'chommel_sec':['sesswenna_sec','sern_sec','halla_sec','doldur_sec'],
+  'lothal_sec':['atollon_sec','ryloth_sec','halla_sec','mandalore_sec','kessel_sec'],
+  'bajic_sec':['duro_sec','darpa_sec','sern_sec','doldur_sec','bothan_sec'],
+  'doldur_sec':['chommel_sec','bajic_sec','halla_sec','bothan_sec'],
+  'bothan_sec':['bajic_sec','doldur_sec','halla_sec','kashyyyk_sec','gordian_sec'],
+  'halla_sec':['bothan_sec','chommel_sec','doldur_sec','lothal_sec','ryloth_sec'],
+  'ryloth_sec':['sesswenna_sec','arkanis_sec','lothal_sec','halla_sec','hutt_sec'],
+  'kashyyyk_sec':['sullust_sec','bothan_sec','halla_sec','kessel_sec','hutt_sec'],
+  'atollon_sec':['lothal_sec','ryloth_sec','mandalore_sec','atrivis_sec','gordian_sec'],
+  'arkanis_sec':['ryloth_sec','sullust_sec','hutt_sec','gordian_sec'],
+  'gordian_sec':['bothan_sec','arkanis_sec','moddell_sec','quelli_sec','atollon_sec'],
+  'sullust_sec':['arkanis_sec','kashyyyk_sec','moddell_sec','atrivis_sec'],
+  'moddell_sec':['gordian_sec','sullust_sec','quelli_sec','lahara_sec'],
+  'kessel_sec':['corellian_sec','lothal_sec','kashyyyk_sec','mandalore_sec'],
+  'atrivis_sec':['atollon_sec','sullust_sec','raioballo_sec','quelli_sec'],
+  'raioballo_sec':['atrivis_sec','mandalore_sec','quelli_sec','lahara_sec'],
+  'mandalore_sec':['lothal_sec','atollon_sec','raioballo_sec','kessel_sec','quelli_sec'],
+  'quelli_sec':['gordian_sec','atrivis_sec','raioballo_sec','moddell_sec','mandalore_sec'],
+  'lahara_sec':['moddell_sec','raioballo_sec','quelli_sec'],
+  'hutt_sec':['ryloth_sec','kashyyyk_sec','arkanis_sec','kessel_sec']
+};
+
 // ============================================================
 // GAME STATE
 // ============================================================
@@ -1054,6 +1091,20 @@ function updateCounts(){
 // ============================================================
 let activeSec=null;
 
+function selectSector(id){
+  const sec=SECTORS.find(s=>s.id===id);
+  if(!sec)return;
+  // Highlight in nav
+  document.querySelectorAll('.nav-sector').forEach(e=>e.classList.remove('active'));
+  const navEl=document.querySelector(`.nav-sector[data-id="${id}"]`);
+  if(navEl){navEl.classList.add('active');navEl.scrollIntoView({block:'nearest'});}
+  // Show sector card
+  document.querySelectorAll('.sector-card').forEach(c=>c.classList.remove('visible'));
+  const card=document.getElementById('card_'+id);
+  if(card){card.classList.add('visible');card.scrollIntoView({behavior:'smooth',block:'start'});}
+  activeSec=id;
+}
+
 function buildNav(){
   let h='';
   REGIONS.forEach(reg=>{
@@ -1131,6 +1182,14 @@ function renderSector(id){
     </div>
   </div>
 
+  <div class="adj-bar">
+    <span class="adj-label-txt">ADJACENT SECTORS:</span>
+    ${(ADJACENCY[sec.id]||[]).map(adjId=>{
+      const adjSec=SECTORS.find(s=>s.id===adjId);
+      if(!adjSec)return'';
+      return`<span class="adj-link" onclick="selectSector('${adjId}')">${adjSec.name}</span>`;
+    }).join('')}
+  </div>
   <div class="supply-bar">
     <span style="font-size:11px;letter-spacing:2px;color:var(--dim)">SUPPLY CHAIN:</span>
     <span class="supply-node${st.supply_st==='C'?' disrupted':''}">${st.supply_from}</span>
