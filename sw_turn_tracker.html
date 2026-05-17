@@ -124,6 +124,11 @@ body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monosp
 .event-name-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:6px 10px;font-family:'Share Tech Mono',monospace;font-size:14px;outline:none}
 .event-effect-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--dim);padding:6px 10px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:60px}
 .event-effect-input:focus,.event-id-input:focus,.event-name-input:focus{border-color:var(--gold)}
+.draw-area{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+.draw-btn{padding:5px 14px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Orbitron',monospace;font-size:11px;letter-spacing:1px;cursor:pointer;transition:background .15s}
+.draw-btn:hover{background:rgba(200,168,75,0.1)}
+.deck-select{background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none}
+.draw-result{font-size:11px;padding:4px 10px;border:1px solid var(--border2);color:var(--gold2);font-family:'Orbitron',monospace;letter-spacing:1px;background:rgba(200,168,75,0.05)}
 
 /* END OF TURN */
 .eot-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -350,6 +355,16 @@ body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monosp
   <!-- EVENT CARD -->
   <div class="sec">
     <div class="sec-title shared">Phase 2 — Event Card</div>
+    <div class="draw-area">
+      <select class="deck-select" id="deckSelect">
+        <option value="G">Galaxy-Wide Deck (G)</option>
+        <option value="I">Imperial Deck (I)</option>
+        <option value="R">Rebel Deck (R)</option>
+        <option value="W">Wild Card Deck (W)</option>
+      </select>
+      <button class="draw-btn" onclick="drawCard()">▶ DRAW CARD</button>
+      <div class="draw-result" id="drawResult" style="display:none"></div>
+    </div>
     <div class="event-card-area">
       <div class="event-grid">
         <input class="event-id-input" id="event-id" placeholder="I-01" maxlength="4">
@@ -850,9 +865,73 @@ function clearSheet() {
   location.reload();
 }
 
+// ── DRAW CARD ─────────────────────────────────────────────────
+function drawCard(){
+  const deck = document.getElementById('deckSelect').value;
+  const num = Math.floor(Math.random() * 10) + 1;
+  const padded = String(num).padStart(2,'0');
+  const cardId = deck + '-' + padded;
+  const card = CARDS[cardId];
+  const resultEl = document.getElementById('drawResult');
+  resultEl.textContent = cardId;
+  resultEl.style.display = 'block';
+  // Auto-fill all event fields
+  document.getElementById('event-id').value = cardId;
+  if(card){
+    document.getElementById('event-name').value = card.name;
+    document.getElementById('event-effect').value = card.effect;
+  }
+  saveAll();
+}
+
 // ── AUTO-SAVE ON INPUT ────────────────────────────────────────
 document.addEventListener('input', () => saveAll());
 document.addEventListener('change', () => saveAll());
+
+
+
+const CARDS = {
+  "G-01":{"name":"The Imperial Senate Debates","effect":"Both sides gain +1 Political Will as the galaxy watches the political theater — hope on both sides. Neither side may conduct Planetary Assault actions this turn — the Senate debate draws too much scrutiny for open military aggression. POLITICAL WILLPOLITICAL"},
+  "G-02":{"name":"Hutt Space Shifts","effect":"Hutt Space becomes available to both sides for diplomatic overtures this turn only. Both players may spend 1 AP on Hutt Negotiation without normal prerequisites. Success grants: +1 Ground Force Supply (smuggler supply routes), bounty hunter contract access, or Nar Shaddaa intelligence (1 free Intel action). DIPLOMATICSUPPLY"},
+  "G-03":{"name":"Geonosian Genocide Discovered","effect":"Empire loses 2 Political Will. Rebels gain 1 Political Will. Arkanis Sector becomes Contested as word spreads and resistance activates. The Death Star's existence becomes common knowledge to both players — the Rebel player now knows the Death Star Construction Track count. POLITICAL WILLDEATH STAR"},
+  "G-04":{"name":"Hyperspace Route Disrupted","effect":"Both players lose 1 AP next turn as fleet movements become more difficult. All fleet movement costs +1 AP until the lane reopens — roll 1d6 at the start of each subsequent turn: on a 4+ the lane reopens. One supply line passing through the affected region is suspended for 1 turn. FLEETSUPPLY"},
+  "G-05":{"name":"Planetary Plague","effect":"Randomly determine a Mid Rim sector. That sector's Ground Force Supply is suspended for three turns as resources are diverted to containment. Neither side can conduct ground operations there this turn — forces are busy with quarantine. The garrison's morale drops to Shaken for the duration. SUPPLYGROUND FORCES"},
+  "G-06":{"name":"Imperial Moff Defects","effect":"Empire loses 1 Political Will. Rebels gain a free Diplomatic Mission in that Moff's sector this turn — automatic success. The sector's status shifts toward Contested. The defecting Moff's garrison is now of uncertain loyalty — treat it as Shaken morale until a new governor is appointed. POLITICAL WILLDIPLOMATIC"},
+  "G-07":{"name":"Corporate Sector Neutrality Wavers","effect":"Either side may spend 1 AP on a Diplomatic Mission in Bajic Sector this turn without prerequisites. The first side to succeed gains Corporate Sector supply access: +1 Ground Force Supply per turn and +1 Fleet Supply per turn while Corporate cooperation lasts (until a specific event disrupts it). SUPPLYDIPLOMATIC"},
+  "G-08":{"name":"Bounty Hunters Take the Field","effect":"Both sides must each reveal one named commander currently in the field. The opponent may spend 1 AP to attempt a targeted elimination — this triggers a small-scale battle (Entry 004 or 005 depending on who hunts whom). If the targeted commander is captured or killed the normal casualty table applies. COMMANDERSMILITARY"},
+  "G-09":{"name":"Death Star Rumored","effect":"Empire loses 1 Political Will as the rumor destabilizes civilian confidence. Rebels gain 1 Political Will as the rumor galvanizes resistance. The Death Star Construction Track is now visible to both players — the Rebels know exactly how many steps remain. Rebel Intelligence actions against Geonosis and Scarif cost 0 AP this turn. POLITICAL WILLDEATH STAR"},
+  "G-10":{"name":"The Force Stirs","effect":"Narrative only. No mechanical effect. Both players must describe one thing their faction feels or fears about the future before the turn continues. If either faction has a Force-sensitive commander active, that commander gains a vague premonition — the GM may hint at one coming event without specifying which. This card exists for atmosphere and storytelling. Take the moment. The galaxy is alive. NARRATIVEFORCE"},
+  "I-01":{"name":"Thrawn Promoted","effect":"Empire gains 1 free Intelligence Operation this turn and next. If Atollon Sector is still Rebel-controlled, the Empire may immediately attempt to locate the base there without spending an Action Point. Thrawn's Command Rating activates immediately if not already on the board. This is the exact moment Thrawn enters the Galactic Civil War. His promotion directly leads to the Battle of Atollon. INTELLIGENCEMILITARY"},
+  "I-02":{"name":"Seventh Fleet Mobilizes","effect":"Empire gains +2 Fleet Supply — two additional Gozanti cruisers and one Arquitens join the Seventh Fleet's complement immediately. One Imperial sector of the Empire's choice gains the defensive bonus of an ISD in orbit for two turns without spending AP. FLEETSUPPLY"},
+  "I-03":{"name":"Death Star Construction Accelerates","effect":"Advance the Death Star Construction Track by one step without spending Action Points. If Krennic is currently active, advance by two steps instead. DEATH STAR"},
+  "I-04":{"name":"ISB Crackdown","effect":"Every Rebel Covert Cell currently placed in an Imperial-controlled sector is removed. Rebels lose 1 Political Will for each cell removed this way. Cells in Rebel or Contested sectors are unaffected. INTELLIGENCEPOLITICAL WILL"},
+  "I-05":{"name":"Moff Consolidates Power","effect":"Empire chooses one sector they control. That sector's ground forces gain +1 Supply tier this turn only — a one-time reinforcement push. However the local population's resentment increases — Rebels get +1 bonus on any Diplomatic Mission attempted in that sector for the rest of the campaign. SUPPLYPOLITICAL"},
+  "I-06":{"name":"Imperial Academy Graduates","effect":"Empire may immediately replenish one Ground Force that has suffered casualties — restore it to one tier above its current headcount, up to Full Strength. Represents fresh graduates filling depleted units. GROUND FORCESSUPPLY"},
+  "I-07":{"name":"Tarkin Doctrine Enforced","effect":"Empire chooses one Contested sector. That sector immediately becomes Imperial Controlled as the population is terrorized into submission. However Empire loses 2 Political Will — the galaxy watches in horror. If Tarkin is active his specialty negates 1 of the 2 PW cost. MILITARYPOLITICAL WILL"},
+  "I-08":{"name":"Inquisitor Deployed","effect":"If any Rebel commander with Force-sensitivity is on the board (Ezra Bridger, Kanan Jarrus), they must reveal their current sector. Empire gains a free Intelligence Operation against that sector. If no Force-sensitive commanders exist, the Inquisitor hunts for leads — gain 1 free Intelligence action in any Outer Rim sector. INTELLIGENCEFORCE"},
+  "I-09":{"name":"Kuat Drive Yards Production Surge","effect":"If the Empire controls Kuat Sector: add 1 ISD-I to any fleet formation of the Empire's choice immediately. Also gain +2 Ground Force Supply from the weapons produced at KDY surface facilities. If Rebels have raided Kuat this turn: no effect. If Rebels control Kuat Sector when this card is drawn, the Empire loses 2 Political Will — they cannot access their own shipyard. FLEETSUPPLY"},
+  "I-10":{"name":"Imperial Propaganda Campaign","effect":"Rebels lose 1 Political Will. Any Diplomatic Mission the Rebels attempt this turn automatically fails — the propaganda has poisoned the well. Additionally, one Rebel Covert Cell in a Core or Inner Rim sector is discovered and removed. POLITICAL WILLPOLITICAL"},
+  "R-01":{"name":"The Ghorman Massacre","effect":"Rebels gain +3 Political Will immediately. The Sern Sector becomes Contested as the Ghorman population rises up. Empire loses 2 Political Will — the atrocity is broadcast galaxy-wide. Mon Mothma's Declaration may now be used as a free action. This is the defining radicalization event of 2 BBY. Mon Mothma's public declaration is the spark that formally ignites the war. POLITICAL WILLPOLITICAL"},
+  "R-02":{"name":"Declaration of the Rebel Alliance","effect":"Rebels gain +2 Political Will. One Neutral sector of the Rebels' choice becomes Contested as local resistance cells activate. One Rebel cell is immediately established in that sector at no AP cost. If Mon Mothma is active her +1 PW/turn bonus doubles to +2 for 3 turns. POLITICAL WILLPOLITICALGROUND FORCES"},
+  "R-03":{"name":"Agent Kallus Defects","effect":"Rebels gain 2 free Intelligence actions this turn from Kallus's knowledge dump. Empire loses 1 Political Will — a senior ISB agent has turned. Kallus switches to the Rebel commander roster (Rating 2, Fulcrum specialty). Yularen's free Intelligence action is suspended for 3 turns as he investigates the breach. If Thrawn is currently in Lothal Sector, he may immediately attempt to intercept Kallus — special event trigger. INTELLIGENCEPOLITICAL WILL"},
+  "R-04":{"name":"Phoenix Cell Strikes","effect":"Add 5 Y-Wing Bombers to Phoenix Squadron's fleet complement immediately — update the fleet card in the Sector Command document. Rebels' next fleet movement action costs 0 AP as the new ships join formation. If Hera Syndulla is active, she also gains a free Raid action this turn. FLEETSUPPLY"},
+  "R-05":{"name":"Rebel Sympathizers in the Senate","effect":"Rebels gain +1 Ground Force Supply — one depleted unit is replenished one tier — and +1 Fleet Supply — one damaged ship class is restored. Empire cannot identify the source this turn — no Intelligence action can reveal it. If Bail Organa is active, double both supply gains. SUPPLYGROUND FORCESFLEET"},
+  "R-06":{"name":"Saw Gerrera\'s Partisans Strike","effect":"One Imperial sector of the Rebels' choice loses its Ground Force Supply for two turns — the installation is destroyed. However Rebels lose 1 Political Will as Mon Mothma publicly distances the Alliance from Saw's methods. If Saw is in a Shaken morale state, also trigger the Rogue Roll. GROUND FORCESPOLITICAL WILL"},
+  "R-07":{"name":"Wookiee Uprising on Kashyyyk","effect":"If Empire controls Kashyyyk: the Kashyyyk Occupation Army's Ground Force Supply is suspended for two turns — they are fighting the uprising, not performing their normal duties. Rebels gain 1 Political Will. If Rebels control Kashyyyk: Wookiee warriors join the Alliance — add 1 SpecForce Company to the Rebel forces in that sector. GROUND FORCESPOLITICAL WILLSUPPLY"},
+  "R-08":{"name":"Fulcrum Network Expands","effect":"Rebels gain 1 free Intelligence action per turn for the next three turns — the network is humming. Additionally, one covert cell currently at risk of discovery (in an Imperial sector with active ISB) is given safe cover and cannot be found this turn. INTELLIGENCE"},
+  "R-09":{"name":"Defector from the Imperial Navy","effect":"Add one CR90 Corvette to the Rebel fleet in any sector — the defector's ship. The defector's knowledge means the Rebels' next fleet battle is fought at full complement regardless of any prior losses. Empire loses 1 Political Will from the public defection. FLEETPOLITICAL WILL"},
+  "R-10":{"name":"Rebel Supply Run Succeeds","effect":"One Rebel sector currently under blockade has it immediately lifted. Restore that sector's Ground Force Supply to Nominal. One depleted ground unit in that sector is replenished one tier as the supplies arrive. SUPPLYGROUND FORCES"},
+  "W-01":{"name":"Battle of Atollon","effect":"This card triggers immediately regardless of turn. Atollon Sector is immediately besieged. The session stops — this is a mandatory Entry 011 — Last Stand battle. If Rebels lose: Atollon falls. Rebels lose 3 Political Will but survivors escape (canon). Force Scaling changes for next engagement reflect depleted Phoenix Squadron. If Rebels somehow win: Empire loses 2 Political Will. Thrawn's fleet takes Heavy losses. A historic non-canon outcome — consequences must be determined narratively. Can only trigger if Thrawn is active AND Atollon is still Rebel-controlled. If either condition is false this card has no effect and is discarded. MANDATORYLAST STANDPOLITICAL WILL"},
+  "W-02":{"name":"Maul Dies on Tatooine","effect":"Narrative primarily — Maul's death removes a wildcard power from the galaxy. If either faction had been using Maul or his Crimson Dawn network as an asset, that asset is immediately removed from play. Tatooine (Arkanis Sector) becomes slightly less chaotic — remove one criminal element complication from that sector. Maul's death at 2 BBY is one of the most significant Force-related events of this era. NARRATIVEFORCE"},
+  "W-03":{"name":"Imperial Interdictor Deployed","effect":"Empire chooses one sector. All Rebel fleet assets in that sector cannot move for two turns — gravity wells prevent hyperspace jump. Rebels must either fight their way out (triggering a space battle) or lose those assets. The Interdictor adds 1 Interdictor to the Seventh Fleet's complement permanently. FLEETINTERDICTOR"},
+  "W-04":{"name":"Mon Mothma Goes Underground","effect":"Rebels cannot conduct Diplomatic Mission actions for two turns — Mon Mothma's political network is disrupted as she goes dark. However Rebels gain +2 Political Will — her flight galvanizes resistance cells. Empire automatically spends 1 AP per turn for two turns as ISB devotes resources to hunting her. DIPLOMATICPOLITICAL WILLCOMMANDERS"},
+  "W-05":{"name":"Saw Gerrera Censured","effect":"Rebels lose 1 Political Will from the public fracture. Saw's Partisans act independently this turn — the Rebels gain one free Sabotage action not counting against their AP (Saw acts without authorization — his target's Ground Force Supply is suspended 1 turn). Saw's morale state immediately drops to Shaken — the censure demoralizes his men. POLITICAL WILLCOMMANDERSGROUND FORCES"},
+  "W-06":{"name":"Imperial Double Agent Exposed","effect":"Roll 1d6. Odd: A Rebel agent embedded in an Imperial sector is exposed. Remove one Covert Cell from an Imperial sector. One Rebel ground unit in that sector loses 1 Supply tier as the safe house network collapses. Even: An Imperial informant feeding data to ISB is discovered and eliminated. Empire loses 1 free Intelligence action next turn and Yularen's ISB sweep has a 50% chance of failing this turn. INTELLIGENCESUPPLY"},
+  "W-07":{"name":"Supply Convoy Intercepted","effect":"The player who draws this card suffers: one Ground Force unit drops one Supply tier and one Fleet formation loses one support vessel (remove the smallest ship class from its complement). The other side gains +1 Ground Force Supply from captured materials. This triggers Entry 006 — Rebel Convoy Interdiction as an optional bonus battle if both players agree to film it. SUPPLYGROUND FORCESFLEET"},
+  "W-08":{"name":"Natural Disaster","effect":"Randomly determine a sector (roll or draw randomly from the sector list). That sector's Ground Force Supply is permanently suspended — the infrastructure is destroyed and cannot be rebuilt this campaign. Both sides must spend 1 AP next turn responding to the humanitarian crisis or each lose 1 Political Will for being seen as indifferent to suffering. SUPPLYPOLITICAL WILL"},
+  "W-09":{"name":"Jedi Survivor Emerges","effect":"Rebels gain +2 Political Will — hope is renewed. Empire immediately spends 1 AP deploying an Inquisitor to hunt the Jedi. If the Inquisitor catches them (Empire wins a targeted Entry 004 battle): Rebels lose the 2 PW gained. If the Jedi escapes: they become a permanent Rebel asset worth +1 Political Will per turn until end of campaign. POLITICAL WILLFORCECOMMANDERS"},
+  "W-10":{"name":"The Emperor Acts Personally","effect":"The Imperial player must reveal their next two intended actions to their opponent before the turn begins — Palpatine's move is so overt it cannot be hidden. However both those actions cost 0 AP — when the Emperor acts personally, the galaxy bends. Rebels gain 1 Political Will from the sheer audacity of Imperial overreach galvanizing resistance cells. POLITICAL WILLEMPEROR"}
+};
 
 // ── INIT ─────────────────────────────────────────────────────
 loadAll();
