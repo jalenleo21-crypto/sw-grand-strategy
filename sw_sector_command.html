@@ -319,7 +319,7 @@ const SECTORS=[
   // ======================================================
   {id:'coruscant_sec',name:'Coruscant Sector',region:'core',ctrl:E,
    commander:'Grand Moff Wilhuff Tarkin',cmd_role:'Oversector West Commander',
-   supply_from:'Self-sufficient',supply_to:'Kuat Sector, Bormea Sector',supply_st:'O',
+   supply_from:'Self-sufficient',supply_to:'Self-sufficient — no external supply chain',supply_st:'O',
    strat:'Imperial capital — seat of Palpatine — Military High Command — impregnable',
    planets:[
      {name:'Coruscant',imp:'Imperial Capital — Throne World',ctrl:E,gov:'Sector Prefect Arnelo Vance',force:'Coruscant Defense Legion / Home Fleet',sup:'O',notes:'Full military lockdown. Home Fleet in orbit. Rebel activity impossible.'},
@@ -379,7 +379,7 @@ const SECTORS=[
 
   {id:'kuat_sec',name:'Kuat Sector',region:'core',ctrl:E,
    commander:'Moff Deon Stonefield',cmd_role:'Sector Moff — KDY Liaison',
-   supply_from:'Coruscant Sector',supply_to:'Lothal Sector (Kuat-Lothal Route), Mid Rim garrisons',supply_st:'O',
+   supply_from:'Coruscant Sector',supply_to:'Tapani Sector, Bormea Sector',supply_st:'O',
    strat:'Kuat Drive Yards — primary ISD production — most heavily fortified sector outside Coruscant',
    planets:[
      {name:'Kuat',imp:'Kuat Drive Yards — Primary ISD Production',ctrl:E,gov:'Governor-Director Kiles Lannan',force:'Kuat Ground Shield',sup:'O',notes:'Loss of Kuat = catastrophic Imperial production collapse. Fortified beyond any Rebel capability at 2 BBY.'},
@@ -400,7 +400,7 @@ const SECTORS=[
 
   {id:'bormea_sec',name:'Bormea Sector',region:'core',ctrl:E,
    commander:'Moff Jamson Tharsen',cmd_role:'Sector Moff — Ringali Shell',
-   supply_from:'Coruscant Sector',supply_to:'Darpa Sector, Sern Sector',supply_st:'O',
+   supply_from:'Coruscant Sector',supply_to:'Darpa Sector, Corellian Sector',supply_st:'O',
    strat:'Chandrila — Mon Mothma\'s homeworld — Brentaal IV trade junction — political surveillance priority',
    planets:[
      {name:'Chandrila',imp:'Mon Mothma\'s Homeworld — Senate Opposition',ctrl:E,gov:'Governor Tarko Prellon',force:'Chandrila ISB Detachment',sup:'O',notes:'Mon Mothma has fled. ISB watching remaining family. Population restless but compliant.'},
@@ -451,7 +451,7 @@ const SECTORS=[
   // ======================================================
   {id:'tapani_sec',name:'Tapani Sector',region:'colonies',ctrl:E,
    commander:'Moff Varedian Sorn',cmd_role:'Sector Moff',
-   supply_from:'Duro Sector',supply_to:'Darpa Sector',supply_st:'O',
+   supply_from:'Duro Sector',supply_to:'Sesswenna Sector, Sern Sector',supply_st:'O',
    strat:'Fondor shipyards — noble house politics — rival to Kuat for shipbuilding contracts',
    planets:[
      {name:'Fondor',imp:'Secondary Shipyard — Rival to Kuat',ctrl:E,gov:'Director Avin Tennar',force:'Tapani Sector Army',sup:'O',notes:'Fondor Shipyards produce Victory-class and support vessels. Noble house intrigue constant.'},
@@ -478,7 +478,7 @@ const SECTORS=[
 
   {id:'darpa_sec',name:'Darpa Sector',region:'colonies',ctrl:E,
    commander:'Moff Hindane Darcc',cmd_role:'Sector Moff',
-   supply_from:'Tapani Sector',supply_to:'Sern Sector',supply_st:'O',
+   supply_from:'Coruscant Sector, Kuat Sector',supply_to:'Sern Sector',supply_st:'O',
    strat:'Ralltiir financial center — brutal crackdown created deep resentment — prime Rebel recruitment ground',
    planets:[
      {name:'Ralltiir',imp:'Financial Center — Brutal Crackdown Site',ctrl:E,gov:'Provisional Governor Brekken Voss',force:'Ralltiir Occupation Force',sup:'O',notes:'Population openly hostile after crackdown. Underground Rebel sympathy growing. ISB making arrests weekly.'},
@@ -499,7 +499,7 @@ const SECTORS=[
 
   {id:'sesswenna_sec',name:'Sesswenna Sector',region:'colonies',ctrl:E,
    commander:'Grand Moff Wilhuff Tarkin',cmd_role:'Grand Moff — Personal Domain (Eriadu)',
-   supply_from:'Coruscant Sector',supply_to:'Outer Rim logistics chain',supply_st:'O',
+   supply_from:'Tapani Sector, Sern Sector',supply_to:'Outer Rim logistics chain',supply_st:'O',
    strat:'Eriadu — Tarkin\'s homeworld — Outer Rim logistics hub — Tarkin Doctrine enforced absolutely',
    planets:[
      {name:'Eriadu',imp:'Tarkin\'s Homeworld — Major Imperial Hub',ctrl:E,gov:'Lieutenant Governor Nallis Cray',force:'Eriadu Sector Army',sup:'O',notes:'Tarkin rules this world with iron fist. His family machine is local government. Zero dissent. Model Imperial world by force.'},
@@ -523,7 +523,7 @@ const SECTORS=[
   // ======================================================
   {id:'sern_sec',name:'Sern Sector',region:'inner',ctrl:E,
    commander:'Moff Renton Draal',cmd_role:'Sector Moff',
-   supply_from:'Bormea Sector',supply_to:'Chommell Sector',supply_st:'O',
+   supply_from:'Darpa Sector, Tapani Sector',supply_to:'Sesswenna Sector, Chommel Sector',supply_st:'O',
    strat:'Ghorman — site of the Massacre — deeply anti-Imperial — major Rebel recruitment potential',
    planets:[
      {name:'Ghorman',imp:'Ghorman Massacre Site — Hostile Population',ctrl:E,gov:'Governor Linz Datten',force:'Sern Occupation Corps',sup:'O',notes:'The Massacre galvanized anti-Imperial sentiment galaxy-wide. Underground Rebel cell suspected. ISB has found nothing concrete yet.'},
@@ -561,7 +561,7 @@ const SECTORS=[
 
   {id:'lothal_sec',name:'Lothal Sector',region:'inner',ctrl:C,
    commander:'Governor Arihnda Pryce',cmd_role:'Planetary Governor — Sector Military Liaison',
-   supply_from:'Kuat Sector via Kuat-Lothal Route',supply_to:'Outer Rim forward positions',supply_st:'L',
+   supply_from:'Halla Sector, Atollon Sector',supply_to:'Atollon Sector, Mandalore Sector',supply_st:'L',
    strat:'Imperial military complex — TIE manufacturing — Ghost Crew actively disrupting operations — Thrawn requested',
    planets:[
      {name:'Lothal',imp:'Imperial Military Complex — TIE Manufacturing',ctrl:C,gov:'Governor Arihnda Pryce',force:'Lothal Garrison Corps / Phoenix Cell — Lothal Operations',sup:'L',notes:'Contested. Ghost Crew raids have disrupted TIE production. Supply line from Kuat partially interdicted. Pryce requesting Thrawn.'},
@@ -613,7 +613,7 @@ const SECTORS=[
 
   {id:'doldur_sec',name:'Doldur Sector',region:'expansion',ctrl:E,
    commander:'Moff Tavari Kord',cmd_role:'Sector Moff',
-   supply_from:'Tapani Sector',supply_to:'Mid Rim forward positions',supply_st:'O',
+   supply_from:'Bajic Sector, Chommel Sector',supply_to:'Halla Sector, Bothan Space',supply_st:'O',
    strat:'Druckenwell manufacturing — industrial output — active low-level worker insurgency',
    planets:[
      {name:'Druckenwell',imp:'Industrial Manufacturing — Active Insurgency',ctrl:E,gov:'Director Myrnen Voss',force:'Doldur Sector Garrison',sup:'O',notes:'History of labor unrest. Imperial management brutal. Rebel agitators active. ISB making arrests.'},
@@ -698,7 +698,7 @@ const SECTORS=[
 
   {id:'kashyyyk_sec',name:'Kashyyyk Sector',region:'mid',ctrl:E,
    commander:'Moff Willan Tarkin (Tarkin\'s cousin)',cmd_role:'Sector Moff — Slave Labor Overseer',
-   supply_from:'Core logistics',supply_to:'Arkanis Sector construction',supply_st:'O',
+   supply_from:'Core logistics',supply_to:'Sesswenna Sector, Chommel Sector',supply_st:'O',
    strat:'Wookiee homeworld — Imperial slave labor — massive timber and resource extraction — uprising risk',
    planets:[
      {name:'Kashyyyk',imp:'Wookiee Homeworld — Imperial Slave Labor',ctrl:E,gov:'Commandant Dessard',force:'Kashyyyk Occupation Army',sup:'O',notes:'Wookiees enslaved for construction labor. Another uprising is inevitable. Liberation would be massive propaganda coup for Rebels.'},
@@ -714,7 +714,7 @@ const SECTORS=[
 
   {id:'atollon_sec',name:'Atollon Sector',region:'mid',ctrl:R,
    commander:'Commander Jun Sato',cmd_role:'Phoenix Squadron Fleet Commander',
-   supply_from:'Rebel supply runs — contested',supply_to:'Ryloth Sector operations',supply_st:'O',
+   supply_from:'Rebel supply runs — contested',supply_to:'Lothal Sector, Mandalore Sector',supply_st:'O',
    strat:'CHOPPER BASE — Phoenix Squadron HQ — Rebel Alliance high command node — location secret',
    planets:[
      {name:'Atollon',imp:'CHOPPER BASE — Phoenix Squadron HQ — Hidden',ctrl:R,gov:'N/A — Hidden Rebel Base',force:'Phoenix Squadron',sup:'O',notes:'Remote barren world. Hidden from Empire. Thrawn is triangulating the location. If discovered — Battle of Atollon triggers.'},
@@ -738,7 +738,7 @@ const SECTORS=[
   // ======================================================
   {id:'arkanis_sec',name:'Arkanis Sector',region:'outer',ctrl:E,
    commander:'Moff Dardo Blen',cmd_role:'Sector Moff — Death Star Security Liaison',
-   supply_from:'Sesswenna Sector',supply_to:'Death Star construction',supply_st:'O',
+   supply_from:'Ryloth Sector, Sullust Sector',supply_to:'Death Star construction',supply_st:'O',
    strat:'Geonosis Death Star construction — Tatooine Hutt border — Scarif data vault — maximum security',
    planets:[
      {name:'Geonosis',imp:'Death Star Construction Site',ctrl:E,gov:'Director Krennic (oversight)',force:'Arkanis Sector Army',sup:'O',notes:'Death Star construction nearing completion. Geonosian population exterminated. Genocide known to Saw Gerrera — time bomb for Imperial PW.'},
@@ -782,7 +782,7 @@ const SECTORS=[
 
   {id:'sullust_sec',name:'Sullust Sector',region:'outer',ctrl:E,
    commander:'Moff Teglen Dore',cmd_role:'Sector Moff — SoroSuub Liaison',
-   supply_from:'Sesswenna Sector',supply_to:'Western Outer Rim',supply_st:'O',
+   supply_from:'Arkanis Sector, Kashyyyk Sector',supply_to:'Western Outer Rim',supply_st:'O',
    strat:'SoroSuub Corporation — underground cities — covert Rebel sympathy — diplomatic target',
    planets:[
      {name:'Sullust',imp:'SoroSuub Corp — Underground Cities — Rebel Sympathy',ctrl:E,gov:'SoroSuub CEO Sian Tevv (covert)',force:'Sullust Garrison Force',sup:'O',notes:'SoroSuub publicly cooperates with Empire but leadership secretly sympathizes with Rebels. Diplomatic mission could flip this sector.'},
@@ -798,7 +798,7 @@ const SECTORS=[
 
   {id:'moddell_sec',name:'Moddell Sector',region:'outer',ctrl:E,
    commander:'Moff Ferral Denn',cmd_role:'Sector Moff — Remote Station',
-   supply_from:'Arkanis Sector',supply_to:'None significant',supply_st:'O',
+   supply_from:'Bajic Sector, Chommel Sector',supply_to:'None significant',supply_st:'O',
    strat:'Endor — remote forest moon — Imperial waystation — Ewok population ignored — strategically minor at 2 BBY',
    planets:[
      {name:'Endor',imp:'Forest Moon — Imperial Waystation',ctrl:E,gov:'Station Commander Igar',force:'Endor Station Garrison',sup:'O',notes:'Remote forest moon. Ewok natives ignored as primitive. Imperial waystation minimal. Unimportant at 2 BBY.'},
@@ -814,7 +814,7 @@ const SECTORS=[
 
   {id:'kessel_sec',name:'Kessel Sector',region:'outer',ctrl:E,
    commander:'Moff Sarn Shild',cmd_role:'Sector Moff',
-   supply_from:'Arkanis Sector',supply_to:'Hutt Space border',supply_st:'O',
+   supply_from:'Lothal Sector, Kashyyyk Sector',supply_to:'Hutt Space border',supply_st:'O',
    strat:'Kessel spice mines — slave labor — The Maw — major criminal smuggling traffic',
    planets:[
      {name:'Kessel',imp:'Spice Mines — Slave Labor — The Maw',ctrl:E,gov:'Director Zylas Vorren',force:'Kessel Garrison Corps',sup:'O',notes:'Spice mines run on slave labor. Kessel Run is notorious smuggling route. Rebel raid could free prisoners and acquire spice funding.'},
@@ -830,7 +830,7 @@ const SECTORS=[
 
   {id:'atrivis_sec',name:'Atrivis Sector',region:'outer',ctrl:E,
    commander:'Moff Birra Seah',cmd_role:'Sector Moff',
-   supply_from:'Sesswenna Sector',supply_to:'None significant',supply_st:'O',
+   supply_from:'Atollon Sector, Sullust Sector',supply_to:'None significant',supply_st:'O',
    strat:'Fest research center — Mantooine uprising history — Despayre Death Star labor site',
    planets:[
      {name:'Fest',imp:'Imperial Research Center',ctrl:E,gov:'Director Kaird Tessek',force:'Atrivis Sector Garrison',sup:'O',notes:'AT-AT walker development and other Imperial research projects. Rebel intelligence interest.'},
@@ -868,7 +868,7 @@ const SECTORS=[
 
   {id:'mandalore_sec',name:'Mandalore Sector',region:'outer',ctrl:E,
    commander:'Viceroy Gar Saxon',cmd_role:'Imperial-Aligned Mandalorian Viceroy',
-   supply_from:'Kuat Sector',supply_to:'Outer Rim northern arc',supply_st:'O',
+   supply_from:'Lothal Sector, Atollon Sector',supply_to:'Outer Rim northern arc',supply_st:'O',
    strat:'Mandalorian warrior culture — Imperial occupation — Death Watch remnants — Darksaber — Fenn Rau defecting',
    planets:[
      {name:'Mandalore',imp:'Imperial Occupation — Warrior Culture',ctrl:E,gov:'Viceroy Gar Saxon',force:'Saxon\'s Super Commandos',sup:'O',notes:'Saxon rules in Emperor\'s name. Traditional Mandalorians resist. Darksaber is out there — its wielder could unite Mandalore against Saxon.'},
@@ -907,7 +907,7 @@ const SECTORS=[
 
   {id:'lahara_sec',name:'Lahara Sector',region:'outer',ctrl:E,
    commander:'Moff Tann Steros',cmd_role:'Sector Moff',
-   supply_from:'Sesswenna Sector',supply_to:'Atrivis Sector',supply_st:'O',
+   supply_from:'Modell Sector, Rabishal Sector',supply_to:'Quelii Sector',supply_st:'O',
    strat:'Agamar Imperial supply depot — Mygeeto Banking Clan ruins — remote Outer Rim logistics chain',
    planets:[
      {name:'Agamar',imp:'Imperial Supply Depot — Remote Outer Rim',ctrl:E,gov:'Depot Commander Ralo Dent',force:'Agamar Garrison Platoon',sup:'O',notes:'Remote Imperial supply depot. Feeds Atrivis Sector garrison. Low threat. Agricultural world that became an Imperial logistics node.'},
