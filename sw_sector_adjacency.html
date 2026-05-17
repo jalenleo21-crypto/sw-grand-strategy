@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sector Adjacency — Star Wars Grand Strategy 2 BBY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05080f;--panel:#080e1a;--panel2:#0c1422;--border:#1a2e45;--border2:#243d58;
+  --text:#b8cfe0;--dim:#4a6a82;--bright:#d8eeff;--gold:#c8a84b;--gold2:#e8c86b;
+  --empire:#3a78e8;--rebel:#e83838;--neutral:#607888;--hutt:#9848c8;
+  --green:#28c868;--yellow:#e8c020;--orange:#e87820;
+}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh}
+.hdr{background:var(--panel);border-bottom:2px solid var(--border2);padding:14px 28px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-family:'Orbitron',monospace;font-size:17px;font-weight:800;color:var(--gold);letter-spacing:4px}
+.hdr-sub{font-size:14px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+.container{max-width:1100px;margin:0 auto;padding:28px 20px}
+
+/* INTRO */
+.intro{background:var(--panel);border:1px solid var(--border);padding:16px 20px;margin-bottom:24px;font-size:14px;color:var(--dim);line-height:1.8}
+.intro strong{color:var(--text)}
+
+/* HYPERLANE LEGEND */
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px;font-size:14px}
+.leg-item{display:flex;align-items:center;gap:8px}
+.leg-line{height:3px;width:32px;flex-shrink:0}
+
+/* REGION SECTIONS */
+.region{margin-bottom:32px}
+.region-hdr{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;letter-spacing:3px;text-transform:uppercase;border-bottom:2px solid var(--border2);padding-bottom:7px;margin-bottom:14px;color:var(--gold)}
+
+/* SECTOR CARDS */
+.sector-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.sector-card{border:1px solid var(--border);background:var(--panel2);padding:14px 16px}
+.sector-name{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--bright);margin-bottom:3px}
+.sector-ctrl{font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.sector-ctrl.imperial{color:var(--empire)}
+.sector-ctrl.rebel{color:var(--rebel)}
+.sector-ctrl.contested{color:var(--yellow)}
+.sector-ctrl.neutral{color:var(--neutral)}
+.sector-ctrl.hutt{color:var(--hutt)}
+.adj-label{font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:6px}
+.adj-list{display:flex;flex-direction:column;gap:4px}
+.adj-item{display:flex;align-items:center;gap:8px;font-size:14px}
+.adj-route{font-size:11px;padding:1px 5px;border:1px solid;letter-spacing:1px;flex-shrink:0}
+.route-major{color:var(--gold);border-color:var(--gold)}
+.route-minor{color:var(--dim);border-color:var(--border2)}
+.route-secret{color:var(--orange);border-color:var(--orange)}
+.adj-sector-name{color:var(--text)}
+.adj-region{color:var(--dim);font-size:11px;margin-left:2px}
+.sector-note{font-size:11px;color:var(--dim);margin-top:10px;padding-top:8px;border-top:1px solid var(--border);line-height:1.6;font-style:italic}
+
+/* MOVE COST TABLE */
+.move-table{margin-bottom:24px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--panel2);color:var(--dim);letter-spacing:1px;font-size:11px;padding:7px 10px;text-align:left;border:1px solid var(--border);text-transform:uppercase}
+td{padding:7px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.5}
+tr:hover td{background:rgba(255,255,255,0.01)}
+
+/* QUICK REF */
+.quick-ref{background:var(--panel);border:1px solid var(--border2);padding:16px 20px;margin-bottom:24px}
+.qr-title{font-family:'Orbitron',monospace;font-size:14px;color:var(--gold);letter-spacing:2px;margin-bottom:12px}
+.qr-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.qr-region{font-size:14px}
+.qr-region-name{color:var(--gold2);font-weight:bold;margin-bottom:4px;font-size:11px;letter-spacing:1px}
+.qr-sector{color:var(--dim);font-size:11px;padding:1px 0}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">Sector Adjacency & Hyperlane Reference</div>
+    <div class="hdr-sub">Star Wars Grand Strategy — 2 BBY — Movement Planning</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="intro">
+    <strong>How to use this document:</strong> When declaring a Move action in Phase 1, the fleet or force can only travel to sectors listed as adjacent — connected by hyperlane in one jump. A standard Move action (1 AP) moves forces to any directly adjacent sector. Moving two sectors away requires either 2 AP across 2 turns, or a Rating 5 commander spending 1 PW to move any distance in a single turn.<br><br>
+    <strong>Hyperlane types affect strategic chokepoints:</strong> Major hyperlanes are the fastest routes and the most heavily patrolled. Minor routes take longer but are harder to blockade. Secret routes are known only to smugglers and intelligence operatives — they cannot be blocked conventionally.
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-line" style="background:var(--gold)"></div><span style="color:var(--gold)">MAJOR HYPERLANE — Fast, high traffic, blockadeable</span></div>
+    <div class="leg-item"><div class="leg-line" style="background:var(--dim)"></div><span style="color:var(--dim)">MINOR ROUTE — Slower, less patrolled</span></div>
+    <div class="leg-item"><div class="leg-line" style="background:var(--orange)"></div><span style="color:var(--orange)">SECRET ROUTE — Smuggler lanes, cannot be conventionally blocked</span></div>
+  </div>
+
+  <!-- QUICK REFERENCE -->
+  <div class="quick-ref">
+    <div class="qr-title">All 29 Sectors by Region</div>
+    <div class="qr-grid">
+      <div class="qr-region">
+        <div class="qr-region-name">CORE WORLDS</div>
+        <div class="qr-sector">Coruscant Sector</div>
+        <div class="qr-sector">Corellian Sector</div>
+        <div class="qr-sector">Kuat Sector</div>
+        <div class="qr-sector">Bormea Sector</div>
+        <div class="qr-sector">Duro Sector</div>
+        <br>
+        <div class="qr-region-name">COLONIES</div>
+        <div class="qr-sector">Tapani Sector</div>
+        <div class="qr-sector">Darpa Sector</div>
+        <div class="qr-sector">Sesswenna Sector</div>
+        <br>
+        <div class="qr-region-name">INNER RIM</div>
+        <div class="qr-sector">Sern Sector</div>
+        <div class="qr-sector">Chommel Sector</div>
+        <div class="qr-sector">Lothal Sector</div><!-- note: Lothal is actually Outer Rim but in our campaign inner rim for balance -->
+      </div>
+      <div class="qr-region">
+        <div class="qr-region-name">EXPANSION REGION</div>
+        <div class="qr-sector">Bajic Sector</div>
+        <div class="qr-sector">Doldur Sector</div>
+        <br>
+        <div class="qr-region-name">MID RIM</div>
+        <div class="qr-sector">Bothan Space</div>
+        <div class="qr-sector">Halla Sector</div>
+        <div class="qr-sector">Ryloth Sector</div>
+        <div class="qr-sector">Kashyyyk Sector</div>
+        <div class="qr-sector">Atollon Sector</div>
+        <br>
+        <div class="qr-region-name">OUTER RIM</div>
+        <div class="qr-sector">Arkanis Sector</div>
+        <div class="qr-sector">Gordian Reach</div>
+        <div class="qr-sector">Sullust Sector</div>
+        <div class="qr-sector">Modell Sector</div>
+      </div>
+      <div class="qr-region">
+        <div class="qr-region-name">OUTER RIM (cont.)</div>
+        <div class="qr-sector">Kessel Sector</div>
+        <div class="qr-sector">Atrivis Sector</div>
+        <div class="qr-sector">Rabishal Sector</div>
+        <div class="qr-sector">Mandalore Sector</div>
+        <div class="qr-sector">Quelii Sector</div>
+        <div class="qr-sector">Lahara Sector</div>
+        <br>
+        <div class="qr-region-name">HUTT SPACE</div>
+        <div class="qr-sector">Hutt Sector</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- CORE WORLDS -->
+  <!-- ============================================================ -->
+  <div class="region">
+    <div class="region-hdr">Core Worlds</div>
+    <div class="sector-grid">
+
+      <div class="sector-card">
+        <div class="sector-name">Coruscant Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Capital</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Kuat Sector</span><span class="adj-region">— Corellian Run / Hydian Way junction</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Bormea Sector</span><span class="adj-region">— Corellian Trade Spine</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Corellian Sector</span><span class="adj-region">— Corellian Run</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Duro Sector</span><span class="adj-region">— Perlemian Trade Route / Duros Space Run</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Darpa Sector</span><span class="adj-region">— Hydian Way</span></div>
+        </div>
+        <div class="sector-note">Imperial capital. All major hyperlanes in the galaxy pass through or near Coruscant. Virtually impregnable to direct assault — political and military hub of the Empire.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Corellian Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Contested Loyalty</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Coruscant Sector</span><span class="adj-region">— Corellian Run (coreward)</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Duro Sector</span><span class="adj-region">— Corellian Trade Spine</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Tapani Sector</span><span class="adj-region">— Corellian Run (rimward)</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bormea Sector</span><span class="adj-region">— Secondary corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-secret">SECRET</span><span class="adj-sector-name">Kessel Sector</span><span class="adj-region">— Kessel Run (smuggler route)</span></div>
+        </div>
+        <div class="sector-note">Corellia is a major shipbuilding world with partial Imperial loyalty. CorSec (Corellian Security Force) is partially co-opted but unreliable. The Kessel Run secret route makes this sector a smuggling hub.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Kuat Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — KDY Shipyards</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Coruscant Sector</span><span class="adj-region">— Kuat Run / Hydian Way</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Bormea Sector</span><span class="adj-region">— Kuat Drive Yards corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Tapani Sector</span><span class="adj-region">— Shapani Bypass</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Darpa Sector</span><span class="adj-region">— Secondary route</span></div>
+        </div>
+        <div class="sector-note">Home of Kuat Drive Yards — the Empire's primary warship manufacturer. Loss of this sector would cripple Imperial shipbuilding. The Empire will defend it at any cost.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Bormea Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Coruscant Sector</span><span class="adj-region">— Corellian Trade Spine</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Kuat Sector</span><span class="adj-region">— Core corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Corellian Sector</span><span class="adj-region">— Secondary corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Darpa Sector</span><span class="adj-region">— Inner corridor</span></div>
+        </div>
+        <div class="sector-note">Core buffer sector between Coruscant and the Colonies. Heavily garrisoned. Supply chain hub for Core operations.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Duro Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Coruscant Sector</span><span class="adj-region">— Duros Space Run / Perlemian</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Corellian Sector</span><span class="adj-region">— Corellian Trade Spine</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Tapani Sector</span><span class="adj-region">— Perlemian Trade Route (rimward)</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bajic Sector</span><span class="adj-region">— Expansion corridor</span></div>
+        </div>
+        <div class="sector-note">Duro is a major trading hub. Duros are natural pilots and spacers — many serve in both Imperial and Rebel fleets. The Duros Space Run is one of the oldest hyperlanes in the galaxy.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- COLONIES -->
+  <!-- ============================================================ -->
+  <div class="region">
+    <div class="region-hdr">Colonies</div>
+    <div class="sector-grid">
+
+      <div class="sector-card">
+        <div class="sector-name">Tapani Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Noble Houses</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Corellian Sector</span><span class="adj-region">— Corellian Run (coreward)</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Kuat Sector</span><span class="adj-region">— Shapani Bypass</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Duro Sector</span><span class="adj-region">— Perlemian (coreward)</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Sesswenna Sector</span><span class="adj-region">— Rimma Trade Route (rimward)</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Sern Sector</span><span class="adj-region">— Inner Rim approach</span></div>
+        </div>
+        <div class="sector-note">Tapani noble houses maintain partial autonomy under the Empire. Important political buffer between Core and Mid Rim. The Shapani Bypass makes this a key strategic corridor.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Darpa Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Coruscant Sector</span><span class="adj-region">— Hydian Way</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Kuat Sector</span><span class="adj-region">— Secondary corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bormea Sector</span><span class="adj-region">— Inner corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bajic Sector</span><span class="adj-region">— Expansion Route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Sern Sector</span><span class="adj-region">— Hydian Way (rimward)</span></div>
+        </div>
+        <div class="sector-note">Key staging point for Hydian Way traffic between Core and Outer Rim. Imperial patrol presence heavy due to proximity to Coruscant.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Sesswenna Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Eriadu / Tarkin's Home</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Tapani Sector</span><span class="adj-region">— Rimma Trade Route (coreward)</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Sern Sector</span><span class="adj-region">— Rimma Trade Route</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Ryloth Sector</span><span class="adj-region">— Rimma Trade Route (rimward)</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Chommel Sector</span><span class="adj-region">— Seswenna Expansion</span></div>
+        </div>
+        <div class="sector-note">Eriadu is Tarkin's home sector and a major Imperial stronghold. The Rimma Trade Route runs through here — controlling this sector means controlling traffic between Core and Outer Rim south.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- INNER RIM -->
+  <!-- ============================================================ -->
+  <div class="region">
+    <div class="region-hdr">Inner Rim</div>
+    <div class="sector-grid">
+
+      <div class="sector-card">
+        <div class="sector-name">Sern Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Sesswenna Sector</span><span class="adj-region">— Rimma Trade Route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Tapani Sector</span><span class="adj-region">— Inner Rim corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Darpa Sector</span><span class="adj-region">— Hydian Way approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Chommel Sector</span><span class="adj-region">— Inner Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bajic Sector</span><span class="adj-region">— Expansion approach</span></div>
+        </div>
+        <div class="sector-note">Buffer zone between Core Worlds and the contested Mid Rim. Important for supply chain routing from Core to the Outer Rim campaigns.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Chommel Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Naboo</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Sesswenna Sector</span><span class="adj-region">— Seswenna Expansion</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Sern Sector</span><span class="adj-region">— Inner Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Halla Sector</span><span class="adj-region">— Mid Rim approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Doldur Sector</span><span class="adj-region">— Expansion corridor</span></div>
+        </div>
+        <div class="sector-note">Naboo is here — home of Palpatine. Imperial presence is significant but public image is maintained. Not a front-line combat sector.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Lothal Sector</div>
+        <div class="sector-ctrl contested">◈ CONTESTED — Primary Battleground</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Atollon Sector</span><span class="adj-region">— Outer Rim corridor (Thrawn's hunt route)</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Ryloth Sector</span><span class="adj-region">— Mid Rim connection</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Halla Sector</span><span class="adj-region">— Regional route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Mandalore Sector</span><span class="adj-region">— Mandalorian Road</span></div>
+          <div class="adj-item"><span class="adj-route route-secret">SECRET</span><span class="adj-sector-name">Kessel Sector</span><span class="adj-region">— Ghost crew smuggler route</span></div>
+        </div>
+        <div class="sector-note">The central battleground of Star Wars Rebels. Thrawn's Seventh Fleet is based here. Phoenix Squadron has an active cell here. The hyperlane to Atollon is the route Thrawn uses to finally locate and destroy Phoenix Base.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- EXPANSION REGION -->
+  <!-- ============================================================ -->
+  <div class="region">
+    <div class="region-hdr">Expansion Region</div>
+    <div class="sector-grid">
+
+      <div class="sector-card">
+        <div class="sector-name">Bajic Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Thin garrison</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Duro Sector</span><span class="adj-region">— Core approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Darpa Sector</span><span class="adj-region">— Hydian Way connection</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Sern Sector</span><span class="adj-region">— Inner Rim approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Doldur Sector</span><span class="adj-region">— Expansion corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bothan Space</span><span class="adj-region">— Mid Rim approach</span></div>
+        </div>
+        <div class="sector-note">Thinly garrisoned Expansion Region sector. Imperial presence exists but patrols are stretched. Rebel cells have operated here without major confrontation.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Doldur Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Chommel Sector</span><span class="adj-region">— Inner Rim connection</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bajic Sector</span><span class="adj-region">— Expansion corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Halla Sector</span><span class="adj-region">— Mid Rim approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bothan Space</span><span class="adj-region">— Regional route</span></div>
+        </div>
+        <div class="sector-note">Quiet sector between the Colonies and Mid Rim. Minor strategic value but important as a transit corridor.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MID RIM -->
+  <!-- ============================================================ -->
+  <div class="region">
+    <div class="region-hdr">Mid Rim</div>
+    <div class="sector-grid">
+
+      <div class="sector-card">
+        <div class="sector-name">Bothan Space</div>
+        <div class="sector-ctrl contested">◈ CONTESTED — Intelligence Hub</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bajic Sector</span><span class="adj-region">— Expansion approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Doldur Sector</span><span class="adj-region">— Regional route</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Halla Sector</span><span class="adj-region">— Bothan Run</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Kashyyyk Sector</span><span class="adj-region">— Mid Rim corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Gordian Reach</span><span class="adj-region">— Outer Rim approach</span></div>
+        </div>
+        <div class="sector-note">Bothans run one of the galaxy's most extensive spy networks. Both factions cultivate Bothan contacts. The Bothan Spynet will eventually deliver the Death Star II plans — their neutrality is carefully maintained.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Halla Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Bothan Space</span><span class="adj-region">— Bothan Run</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Chommel Sector</span><span class="adj-region">— Inner Rim approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Doldur Sector</span><span class="adj-region">— Expansion corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Lothal Sector</span><span class="adj-region">— Regional route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Ryloth Sector</span><span class="adj-region">— Mid Rim connection</span></div>
+        </div>
+        <div class="sector-note">Mid Rim sector between the Expansion Region and active conflict zones. Serves as a staging point for operations deeper into the Outer Rim.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Ryloth Sector</div>
+        <div class="sector-ctrl contested">◈ CONTESTED — Free Ryloth Movement</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Sesswenna Sector</span><span class="adj-region">— Rimma Trade Route (coreward)</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Arkanis Sector</span><span class="adj-region">— Corellian Run / Rimma junction</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Lothal Sector</span><span class="adj-region">— Mid Rim connection</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Halla Sector</span><span class="adj-region">— Regional route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Hutt Sector</span><span class="adj-region">— Pabol Hutta approach</span></div>
+        </div>
+        <div class="sector-note">Twi'lek homeworld. Cham Syndulla's Free Ryloth Movement has fought the Empire for years. The Rimma Trade Route runs through here — strategically vital. Rebels here are fighting for their home — morale is unbreakable on Ryloth itself.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Kashyyyk Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Wookiee Occupation</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Sullust Sector</span><span class="adj-region">— Great Kashyyyk Branch</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bothan Space</span><span class="adj-region">— Mid Rim corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Halla Sector</span><span class="adj-region">— Regional route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Kessel Sector</span><span class="adj-region">— Spice run corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Hutt Sector</span><span class="adj-region">— Ootmian Pabol approach</span></div>
+        </div>
+        <div class="sector-note">Wookiees are enslaved by the Empire — used as labor on construction projects including the Death Star. Liberating Kashyyyk would provide the Rebels with powerful Wookiee Warrior allies and deal a propaganda blow to the Empire.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Atollon Sector</div>
+        <div class="sector-ctrl rebel">◈ REBEL — Phoenix Base</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Lothal Sector</span><span class="adj-region">— Outer Rim corridor (Thrawn's hunt route)</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Ryloth Sector</span><span class="adj-region">— Mid Rim approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Mandalore Sector</span><span class="adj-region">— Outer Rim corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Atrivis Sector</span><span class="adj-region">— Outer Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-secret">SECRET</span><span class="adj-sector-name">Gordian Reach</span><span class="adj-region">— Hidden Rebel route</span></div>
+        </div>
+        <div class="sector-note">Phoenix Base — Chopper Base on Atollon. The hidden heart of Phoenix Squadron. The Archeon Nebula provides concealment. Only 2 hyperlanes are publicly known — the secret route to Gordian Reach is how Rebels supply and reinforce the base without being tracked.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- OUTER RIM -->
+  <!-- ============================================================ -->
+  <div class="region">
+    <div class="region-hdr">Outer Rim</div>
+    <div class="sector-grid">
+
+      <div class="sector-card">
+        <div class="sector-name">Arkanis Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Geonosis / Scarif</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Ryloth Sector</span><span class="adj-region">— Corellian Run / Rimma junction</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Sullust Sector</span><span class="adj-region">— Rimma Trade Route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Hutt Sector</span><span class="adj-region">— Outer Rim approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Gordian Reach</span><span class="adj-region">— Outer Rim corridor</span></div>
+        </div>
+        <div class="sector-note">Contains Geonosis (Death Star construction origin) and Scarif (where the Death Star plans are stored). The most strategically critical Imperial sector in the Outer Rim. Death Troopers and Shoretroopers garrison Scarif.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Gordian Reach</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Thin presence</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Bothan Space</span><span class="adj-region">— Mid Rim approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Arkanis Sector</span><span class="adj-region">— Outer Rim corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Modell Sector</span><span class="adj-region">— Outer Rim route (Endor approach)</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Quelii Sector</span><span class="adj-region">— Outer Rim corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-secret">SECRET</span><span class="adj-sector-name">Atollon Sector</span><span class="adj-region">— Hidden Rebel supply route</span></div>
+        </div>
+        <div class="sector-note">Sparse Outer Rim sector. The hidden route to Atollon passes through here — the Empire doesn't know it exists yet. Yavin 4 is in this sector (Gordian Reach / Yavin system).</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Sullust Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — SoroSuub Corporation</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Arkanis Sector</span><span class="adj-region">— Rimma Trade Route</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Kashyyyk Sector</span><span class="adj-region">— Great Kashyyyk Branch</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Modell Sector</span><span class="adj-region">— Outer Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Atrivis Sector</span><span class="adj-region">— Regional corridor</span></div>
+        </div>
+        <div class="sector-note">SoroSuub Corporation secretly supports the Rebellion — Sullust will eventually become a key Alliance staging point. If Rebels can flip this sector SoroSuub vehicles become available as Garrison Reinforcement options.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Modell Sector</div>
+        <div class="sector-ctrl neutral">○ NEUTRAL — Remote</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Gordian Reach</span><span class="adj-region">— Outer Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Sullust Sector</span><span class="adj-region">— Outer Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Quelii Sector</span><span class="adj-region">— Far Outer Rim</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Lahara Sector</span><span class="adj-region">— Remote corridor</span></div>
+        </div>
+        <div class="sector-note">Contains Endor — location of the second Death Star shield generator in 1 ABY. At 2 BBY it is remote and largely unimportant. Good hiding spot for Rebel assets.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Kessel Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Spice Mines</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-secret">SECRET</span><span class="adj-sector-name">Corellian Sector</span><span class="adj-region">— Kessel Run (smuggler route)</span></div>
+          <div class="adj-item"><span class="adj-route route-secret">SECRET</span><span class="adj-sector-name">Lothal Sector</span><span class="adj-region">— Ghost crew smuggler route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Kashyyyk Sector</span><span class="adj-region">— Spice run corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Mandalore Sector</span><span class="adj-region">— Outer Rim route</span></div>
+        </div>
+        <div class="sector-note">The spice mines of Kessel use enslaved Wookiee labor. The Kessel Run is the most famous smuggler route in the galaxy — connects Kessel to Corellia and Lothal through dangerous black hole clusters. Cannot be blockaded by conventional means.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Atrivis Sector</div>
+        <div class="sector-ctrl contested">◈ CONTESTED</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Atollon Sector</span><span class="adj-region">— Outer Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Sullust Sector</span><span class="adj-region">— Regional corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Rabishal Sector</span><span class="adj-region">— Outer Rim corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Quelii Sector</span><span class="adj-region">— Far Outer Rim</span></div>
+        </div>
+        <div class="sector-note">Active Rebel cell presence. Contested control. ISB active in the sector trying to root out Rebel networks.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Rabishal Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Atrivis Sector</span><span class="adj-region">— Outer Rim corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Mandalore Sector</span><span class="adj-region">— Mandalorian Road approach</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Quelii Sector</span><span class="adj-region">— Outer Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Lahara Sector</span><span class="adj-region">— Far Outer Rim</span></div>
+        </div>
+        <div class="sector-note">Outer Rim sector with thin Imperial presence. Supply lines are stretched. Rebel raiding is possible without significant Imperial response.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Mandalore Sector</div>
+        <div class="sector-ctrl imperial">● IMPERIAL — Saxon's Commandos</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Lothal Sector</span><span class="adj-region">— Mandalorian Road</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Atollon Sector</span><span class="adj-region">— Outer Rim corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Rabishal Sector</span><span class="adj-region">— Mandalorian Road (rimward)</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Kessel Sector</span><span class="adj-region">— Outer Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-secret">SECRET</span><span class="adj-sector-name">Quelii Sector</span><span class="adj-region">— Hidden Mandalorian route</span></div>
+        </div>
+        <div class="sector-note">Mandalore is under Imperial control via Gar Saxon's Super Commandos. Bo-Katan Kryze's resistance is active. Cham Syndulla has connections here. Fenn Rau's Protectors on Concord Dawn control access to the sector from certain directions.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Quelii Sector</div>
+        <div class="sector-ctrl rebel">◈ REBEL — Outer Rim cell</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Gordian Reach</span><span class="adj-region">— Outer Rim corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Atrivis Sector</span><span class="adj-region">— Outer Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Rabishal Sector</span><span class="adj-region">— Outer Rim route</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Modell Sector</span><span class="adj-region">— Far Outer Rim</span></div>
+          <div class="adj-item"><span class="adj-route route-secret">SECRET</span><span class="adj-sector-name">Mandalore Sector</span><span class="adj-region">— Hidden Mandalorian route</span></div>
+        </div>
+        <div class="sector-note">Remote Outer Rim sector with an active Rebel cell. Imperial presence is minimal — not worth the supply cost to garrison heavily. Good staging point for Rebel operations into the Mid Rim.</div>
+      </div>
+
+      <div class="sector-card">
+        <div class="sector-name">Lahara Sector</div>
+        <div class="sector-ctrl neutral">○ NEUTRAL — Remote</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Modell Sector</span><span class="adj-region">— Remote corridor</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Rabishal Sector</span><span class="adj-region">— Far Outer Rim</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Quelii Sector</span><span class="adj-region">— Far Outer Rim</span></div>
+        </div>
+        <div class="sector-note">Extremely remote. Minimal strategic value at 2 BBY. Could serve as a hidden Rebel staging point — too far from Imperial supply lines to patrol effectively.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- HUTT SPACE -->
+  <!-- ============================================================ -->
+  <div class="region">
+    <div class="region-hdr">Hutt Space</div>
+    <div class="sector-grid">
+
+      <div class="sector-card">
+        <div class="sector-name">Hutt Sector</div>
+        <div class="sector-ctrl hutt">◆ HUTT CARTEL — Neutral</div>
+        <div class="adj-label">Adjacent Sectors (Hyperlane Connected)</div>
+        <div class="adj-list">
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Ryloth Sector</span><span class="adj-region">— Pabol Hutta / Corellian Run approach</span></div>
+          <div class="adj-item"><span class="adj-route route-major">MAJOR</span><span class="adj-sector-name">Kashyyyk Sector</span><span class="adj-region">— Ootmian Pabol</span></div>
+          <div class="adj-item"><span class="adj-route route-minor">MINOR</span><span class="adj-sector-name">Arkanis Sector</span><span class="adj-region">— Outer Rim approach</span></div>
+          <div class="adj-item"><span class="adj-route route-secret">SECRET</span><span class="adj-sector-name">Kessel Sector</span><span class="adj-region">— Hutt smuggling routes</span></div>
+        </div>
+        <div class="sector-note">Nal Hutta — Hutt homeworld. Neither faction can openly garrison here. Either faction can operate covertly through Hutt connections (costs 1 PW to arrange). Hutt smuggling routes provide secret connections across the galaxy that bypass Imperial blockades.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MOVEMENT RULES SUMMARY -->
+  <!-- ============================================================ -->
+  <div style="margin-top:32px;border:1px solid var(--border2);padding:16px 20px;background:var(--panel)">
+    <div style="font-family:'Orbitron',monospace;font-size:14px;color:var(--gold);letter-spacing:2px;margin-bottom:12px">MOVEMENT RULES SUMMARY</div>
+    <table>
+      <tr><th>Situation</th><th>AP Cost</th><th>Turns</th><th>Rule</th></tr>
+      <tr><td>Move fleet to adjacent sector</td><td>1 AP</td><td>Arrives same turn</td><td>Must be connected by hyperlane (listed above)</td></tr>
+      <tr><td>Move ground force (with fleet transports)</td><td>1 AP</td><td>Arrives same turn</td><td>Fleet must have Gozantis (Imp) or GR-75s (Reb)</td></tr>
+      <tr><td>Move commander to adjacent sector</td><td>1 AP</td><td>Arrives same turn</td><td>Cannot use specialty same turn they move</td></tr>
+      <tr><td>Move commander two sectors away</td><td>2 AP (across 2 turns)</td><td>2 turns</td><td>Commander unavailable both turns in transit</td></tr>
+      <tr><td>Rating 5 commander — any distance</td><td>0 AP + 1 PW</td><td>Same turn</td><td>Tarkin, Thrawn, Vader, Mon Mothma only</td></tr>
+      <tr><td>Move through secret route</td><td>1 AP</td><td>Same turn</td><td>Cannot be blockaded. Intelligence required to discover route.</td></tr>
+      <tr><td>Move through Hutt Space</td><td>1 AP + 1 PW</td><td>Same turn</td><td>Must arrange with Hutt contacts. Cannot bring large fleet.</td></tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
