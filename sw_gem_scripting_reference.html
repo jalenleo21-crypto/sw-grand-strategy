@@ -792,6 +792,90 @@ Fires when Saw's Partisans are in a joint operation AND have taken heavy casualt
 </table>
 </div>
 
+
+<!-- ============================================================ -->
+<div class="section" id="s13">
+<div class="section-hdr">13. Vehicle Transport & Crew Scripting</div>
+
+<div class="sub-hdr">Pre-Mission Vehicle Crewing — Setup Method</div>
+<p class="intro-text">To have AI units start a scenario already inside a vehicle (transport truck, half-track, AT-AT etc.), you cannot simply place them in the editor. You must crew them manually during setup. This is the confirmed method from community sources.</p>
+
+<table>
+  <tr><th>Step</th><th>What To Do</th><th>Notes</th></tr>
+  <tr><td style="color:var(--gold);font-family:'Orbitron',monospace">1</td><td>Place the vehicle and crew units on the map in F3 mode</td><td>Make sure vehicle and crew are assigned to the same player number. They must match or crew will commandeer / exit immediately.</td></tr>
+  <tr><td style="color:var(--gold);font-family:'Orbitron',monospace">2</td><td>Switch to F1 mode. Press the player's numpad number to take control.</td><td>NumLock must be ON. Press the numpad number matching the player (e.g. Numpad 1 for Player 1).</td></tr>
+  <tr><td style="color:var(--gold);font-family:'Orbitron',monospace">3</td><td>Select the crew units and order them into the vehicle manually</td><td>Click the crew, right-click the vehicle to board. Wait for them to fully enter before proceeding.</td></tr>
+  <tr><td style="color:var(--gold);font-family:'Orbitron',monospace">4</td><td>Switch back to F3 mode and save the mission (0.mi)</td><td>The crew position is now saved. The vehicle will start the scenario with crew aboard.</td></tr>
+  <tr><td style="color:var(--gold);font-family:'Orbitron',monospace">5</td><td>Copy-paste the crewed vehicle as needed</td><td>Each copy retains the crew. Use this to fill out a full transport complement without repeating the process.</td></tr>
+</table>
+
+<div class="alert alert-note">
+  <div class="alert-title">Keep Troops on Transports — Emit Problem Fix</div>
+  If troops keep jumping out of vehicles when the scenario starts, the vehicle's .def file may have "emit on enemy" set. The fix: assign the vehicle to one player and the troops to a different player in F3, manually board them in F1, then switch the troops back to the vehicle's player before they enter. This prevents the emit-on-enemy trigger from firing on scenario start.
+</div>
+
+<div class="sub-hdr">g_link Console Command — Force Unit Into Vehicle</div>
+<p class="intro-text">An alternative to the F1 manual boarding method. Works for linking any unit into any other unit instantly.</p>
+
+<table>
+  <tr><th>Command</th><th>How To Use</th><th>When To Use</th></tr>
+  <tr><td style="color:var(--gold)">g_link</td><td>Select both the unit and the vehicle in F3 mode. Open the console with the apostrophe key ( ' ). Type g_link and press Enter.</td><td>When you need to quickly link a soldier into a vehicle or gun without switching to F1 mode. Confirmed on Men of War Wiki.</td></tr>
+</table>
+
+<div class="sub-hdr">emit Command — Dismounting Units from Vehicles via Trigger</div>
+<p class="intro-text">To script units dismounting from a vehicle at a specific moment — for example troops exiting a transport at a waypoint — use the emit command in a trigger.</p>
+
+<table>
+  <tr><th>Parameter</th><th>Value</th><th>Effect</th></tr>
+  <tr><td style="color:var(--gold)">selector</td><td>Tag of the vehicle</td><td>Targets the vehicle whose passengers will be emitted</td></tr>
+  <tr><td style="color:var(--gold)">mode</td><td>all</td><td>Emits all passengers and crew at once</td></tr>
+  <tr><td style="color:var(--gold)">count</td><td>-1</td><td>-1 means emit everyone — no limit on number emitted</td></tr>
+</table>
+
+<div class="code-block">
+<span class="cm">// TRIGGER: TRANSPORT_ARRIVE — fires when transport reaches landing zone</span>
+<span class="kw">delay</span> { 1 }
+<span class="cm">// Stop the transport at landing zone</span>
+<span class="kw">actor_state</span> { selector: TRANSPORT_TAG, fire_mode: disable, speed: hold }
+<span class="kw">delay</span> { 2 }
+<span class="cm">// Emit all troops from the transport</span>
+<span class="kw">emit</span> { selector: TRANSPORT_TAG, mode: all, count: -1 }
+<span class="kw">delay</span> { 1 }
+<span class="cm">// Re-enable troops and send them to attack waypoint</span>
+<span class="kw">actor_state</span> { selector: TROOP_TAG, fire_mode: open, speed: assault, ai_move: on }
+<span class="kw">actor_to_waypoint</span> { selector: TROOP_TAG, waypoint: ATTACK_WP }
+</div>
+
+<div class="alert alert-note">
+  <div class="alert-title">Important — Tag Your Troops Separately</div>
+  Give the troops inside the transport their own tag before they board. The emit command targets the VEHICLE tag — once emitted the troops revert to their own tag and can be targeted by subsequent actor_state and actor_to_waypoint commands.
+</div>
+
+<div class="sub-hdr">Campaign Use — Gozanti Troop Deployment</div>
+<p class="intro-text">For the Star Wars campaign this is how to script a Gozanti deploying troops at a landing zone for a cinematic planetary assault sequence.</p>
+
+<div class="code-block">
+<span class="cm">// Setup: Gozanti tagged GOZANTI_01, troops inside tagged PLT1_TROOPS</span>
+<span class="cm">// Gozanti moves to landing zone via actor_to_waypoint first</span>
+<span class="cm">// Then this trigger fires:</span>
+
+<span class="cm">// Land and deploy sequence</span>
+<span class="kw">actor_state</span> { selector: GOZANTI_01, fire_mode: disable, speed: hold }
+<span class="kw">delay</span> { 3 }
+<span class="cm">// Troops disembark</span>
+<span class="kw">emit</span> { selector: GOZANTI_01, mode: all, count: -1 }
+<span class="kw">delay</span> { 2 }
+<span class="cm">// Troops advance on objective</span>
+<span class="kw">actor_state</span> { selector: PLT1_TROOPS, fire_mode: open, speed: assault, ai_move: on, no_retreat: on }
+<span class="kw">actor_to_waypoint</span> { selector: PLT1_TROOPS, waypoint: OBJECTIVE_WP }
+<span class="cm">// Gozanti pulls back</span>
+<span class="kw">actor_state</span> { selector: GOZANTI_01, fire_mode: disable, speed: run }
+<span class="kw">delay</span> { 1 }
+<span class="kw">actor_to_waypoint</span> { selector: GOZANTI_01, waypoint: RETREAT_WP }
+</div>
+
+</div><!-- /s13 -->
+
 </div><!-- /container -->
 </body>
 </html>
