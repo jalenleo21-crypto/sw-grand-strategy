@@ -83,13 +83,6 @@ body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monosp
 .welcome p{font-size:14px;line-height:1.9}
 
 /* EVENT LOG */
-.event-log{background:var(--panel);border:1px solid var(--border);padding:12px 16px;margin-bottom:20px}
-.event-log-title{font-family:'Orbitron',monospace;font-size:12px;color:var(--gold);letter-spacing:2px;margin-bottom:8px}
-.event-entry{font-size:12px;color:var(--dim);padding:3px 0 3px 8px;border-bottom:1px solid rgba(26,46,69,0.4);line-height:1.5}
-.event-entry span{color:var(--text)}
-.event-entry.empire{border-left:2px solid var(--empire)}
-.event-entry.rebel{border-left:2px solid var(--rebel)}
-.event-entry.neutral{border-left:2px solid var(--neutral)}
 
 /* SECTOR CARD */
 .sector-card{background:var(--panel);border:1px solid var(--border);margin-bottom:20px;display:none}
@@ -256,12 +249,7 @@ textarea.fi{resize:vertical;min-height:55px}
     Advance turns to generate events in contested sectors.<br>
     Click EDIT on any force, planet, or sector to update after a battle.</p>
   </div>
-  <div id="eventLogWrap" style="display:none">
-    <div class="event-log">
-      <div class="event-log-title">Turn Event Log</div>
-      <div id="eventLog"></div>
-    </div>
-  </div>
+
   <div id="sectorCards"></div>
 </div>
 </div>
@@ -961,7 +949,7 @@ const SECTORS=[
 // ============================================================
 // GAME STATE
 // ============================================================
-let GS={turn:1,ePW:15,rPW:20,dsStep:0,sectors:{},eventLog:[]};
+let GS={turn:1,ePW:15,rPW:20,dsStep:0,sectors:{}};
 
 async function initGS(){
   // Init Supabase client (safely - CDN must be loaded first)
@@ -1015,53 +1003,13 @@ function updateTurnDisplay(){
   document.getElementById('turnDate').textContent=`${2-yo} BBY — Week ${w}`;
 }
 
-const EVTS=[
-  s=>`ISB sweep in ${s.name} uncovers Rebel safehouse. Three operatives captured. Cell disrupted.`,
-  s=>`Imperial patrol in ${s.name} intercepts Rebel supply shipment. Materiel destroyed.`,
-  s=>`Garrison in ${s.name} receives reinforcement platoon from adjacent sector.`,
-  s=>`Rebel sympathizers in ${s.name} pass targeting data to Phoenix Squadron. Patrol route compromised.`,
-  s=>`Local population in ${s.name} shelters Rebel operatives evading Imperial sweep.`,
-  s=>`Rebel cell in ${s.name} sabotages Imperial communications relay. Comms disrupted 48 hours.`,
-  s=>`Supply convoy to ${s.name} reports checkpoint delay. Minor disruption.`,
-  s=>`Civilian unrest in ${s.name} following Imperial taxation increase. ISB monitoring.`,
-  s=>`Routine Imperial inspection in ${s.name} finds nothing actionable. Status quo maintained.`,
-  s=>`Underground informant network in ${s.name} reports increased Imperial patrols.`,
-];
-
 function advanceTurn(dir){
   if(dir<0&&GS.turn<=1)return;
   GS.turn+=dir;
-  if(dir>0)generateEvents();
   updateTurnDisplay();
   updateCounts();
   saveGS();
   if(activeSec)renderSector(activeSec);
-}
-
-function generateEvents(){
-  const evts=[];
-  SECTORS.forEach(sec=>{
-    const st=GS.sectors[sec.id];
-    const hot=st.ctrl===C||st.ctrl===R||(sec.region==='outer'&&Math.random()<0.12);
-    if(hot&&Math.random()<0.38){
-      const t=EVTS[Math.floor(Math.random()*EVTS.length)](sec);
-      const f=st.ctrl===R?'rebel':st.ctrl===C?(Math.random()<0.5?'empire':'rebel'):'neutral';
-      evts.push({turn:GS.turn,sector:sec.name,text:t,faction:f});
-    }
-  });
-  if(evts.length){
-    GS.eventLog=[...evts,...GS.eventLog].slice(0,60);
-    renderEventLog();
-    document.getElementById('eventLogWrap').style.display='block';
-  }
-}
-
-function renderEventLog(){
-  const el=document.getElementById('eventLog');
-  const recent=GS.eventLog.filter(e=>e.turn===GS.turn);
-  if(!recent.length){document.getElementById('eventLogWrap').style.display='none';return;}
-  el.innerHTML=recent.map(e=>`<div class="event-entry ${e.faction}"><span>[T${String(e.turn).padStart(2,'0')} — ${e.sector.toUpperCase()}]</span> ${e.text}</div>`).join('');
-  document.getElementById('eventLogWrap').style.display='block';
 }
 
 // ============================================================
@@ -1573,8 +1521,7 @@ async function resetCampaign(){
         buildDS();
         buildNav();
         if(activeSec)renderSector(activeSec);
-        renderEventLog();
-        console.log('Synced from remote');
+              console.log('Synced from remote');
       }
     }catch(e){}
   },5000);
