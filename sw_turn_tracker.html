@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turn Tracker — Star Wars Grand Strategy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05080f;--panel:#080e1a;--panel2:#0c1422;--border:#1a2e45;--border2:#243d58;
+  --text:#b8cfe0;--dim:#4a6a82;--bright:#d8eeff;
+  --gold:#c8a84b;--gold2:#e8c86b;
+  --empire:#3a78e8;--rebel:#e83838;--shared:#28c8a8;
+  --green:#28c868;--red:#e84848;--yellow:#e8c020;
+}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh}
+
+/* HEADER */
+.hdr{background:var(--panel);border-bottom:2px solid var(--border2);padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.hdr-left{display:flex;flex-direction:column}
+.hdr-title{font-family:'Orbitron',monospace;font-size:17px;font-weight:800;color:var(--gold);letter-spacing:4px}
+.hdr-sub{font-size:11px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+.hdr-right{display:flex;align-items:center;gap:16px}
+.turn-info{text-align:center}
+.turn-num{font-family:'Orbitron',monospace;font-size:28px;font-weight:800;color:var(--gold2);line-height:1}
+.turn-date{font-size:11px;color:var(--dim);margin-top:2px;letter-spacing:2px}
+.turn-btns{display:flex;gap:5px;margin-top:4px;justify-content:center}
+.tbtn{padding:2px 10px;background:transparent;border:1px solid var(--border2);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:1px;transition:all .15s}
+.tbtn:hover{border-color:var(--gold);color:var(--gold)}
+.tbtn.danger{border-color:var(--red);color:var(--red)}
+.tbtn.danger:hover{background:rgba(232,72,72,0.1)}
+
+/* PHASE BAR */
+.phase-bar{background:var(--panel2);border-bottom:1px solid var(--border);padding:8px 24px;display:flex;align-items:center;gap:0}
+.phase{flex:1;padding:6px 12px;text-align:center;font-size:11px;letter-spacing:2px;text-transform:uppercase;border-right:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative}
+.phase:last-child{border-right:none}
+.phase.active{background:rgba(200,168,75,0.1);color:var(--gold2)}
+.phase.done{background:rgba(40,200,104,0.05);color:var(--green)}
+.phase.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold)}
+.phase.done::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green)}
+.phase-num{font-family:'Orbitron',monospace;font-size:18px;font-weight:800;display:block;margin-bottom:2px}
+
+/* TABS */
+.tabs{display:flex;background:var(--panel);border-bottom:1px solid var(--border)}
+.tab{padding:10px 24px;font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;text-transform:uppercase}
+.tab.imperial{color:var(--dim)}
+.tab.imperial.active{color:var(--empire);border-bottom-color:var(--empire);background:rgba(58,120,232,0.05)}
+.tab.rebel{color:var(--dim)}
+.tab.rebel.active{color:var(--rebel);border-bottom-color:var(--rebel);background:rgba(232,56,56,0.05)}
+.tab.shared{color:var(--dim)}
+.tab.shared.active{color:var(--shared);border-bottom-color:var(--shared);background:rgba(40,200,168,0.05)}
+
+/* CONTENT */
+.tab-content{display:none;padding:20px 24px}
+.tab-content.active{display:block}
+
+/* SECTIONS */
+.sec{margin-bottom:24px}
+.sec-title{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.sec-title.imperial{color:var(--empire)}
+.sec-title.rebel{color:var(--rebel)}
+.sec-title.shared{color:var(--shared)}
+.sec-title.gold{color:var(--gold)}
+
+/* AP TRACKER */
+.ap-track{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.ap-label{font-size:11px;color:var(--dim);min-width:120px}
+.ap-pips{display:flex;gap:6px}
+.ap-pip{width:28px;height:28px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;transition:all .2s;font-family:'Orbitron',monospace;font-weight:800;user-select:none}
+.ap-pip.spent{background:var(--border);color:var(--dim);border-color:var(--border)}
+.ap-pip.available{color:var(--gold2);border-color:var(--gold)}
+.ap-pip.available.imperial{color:var(--empire);border-color:var(--empire);background:rgba(58,120,232,0.1)}
+.ap-pip.available.rebel{color:var(--rebel);border-color:var(--rebel);background:rgba(232,56,56,0.1)}
+.ap-total{font-size:11px;color:var(--dim);margin-left:8px}
+.ap-mod{font-size:11px;color:var(--green);margin-left:4px}
+
+/* ACTION LOG */
+.action-rows{display:flex;flex-direction:column;gap:6px}
+.action-row{display:grid;grid-template-columns:28px 160px 1fr 80px;gap:8px;align-items:center}
+.action-num{font-size:11px;color:var(--dim);text-align:center}
+.action-type select,.action-detail input,.action-cost select{
+  width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);
+  padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;
+  transition:border-color .15s
+}
+.action-type select:focus,.action-detail input:focus{border-color:var(--gold)}
+.action-cost select{border-color:var(--border)}
+.action-row-reveal{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:center;margin-top:4px}
+.reveal-field{width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--dim);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none}
+.reveal-field:focus{border-color:var(--gold);color:var(--text)}
+.add-action-btn{margin-top:6px;padding:4px 12px;background:transparent;border:1px solid var(--border2);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:1px;transition:all .15s}
+.add-action-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* MOVEMENT LOG */
+.move-rows{display:flex;flex-direction:column;gap:6px}
+.move-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 80px;gap:6px}
+.move-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none}
+.move-input:focus{border-color:var(--gold)}
+.move-header{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 80px;gap:6px;margin-bottom:4px}
+.move-header span{font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+
+/* BATTLE RECORD */
+.battle-rows{display:flex;flex-direction:column;gap:10px}
+.battle-card{border:1px solid var(--border);padding:12px 14px;background:var(--panel2)}
+.battle-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.battle-field{display:flex;flex-direction:column;gap:3px}
+.battle-label{font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.battle-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none}
+.battle-input:focus{border-color:var(--gold)}
+.battle-outcome{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:6px}
+.outcome-btn{padding:4px 8px;background:transparent;border:1px solid var(--border2);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;text-align:center;transition:all .15s}
+.outcome-btn.selected.imperial-win{border-color:var(--empire);color:var(--empire);background:rgba(58,120,232,0.1)}
+.outcome-btn.selected.rebel-win{border-color:var(--rebel);color:var(--rebel);background:rgba(232,56,56,0.1)}
+.outcome-btn.selected.pyrrhic{border-color:var(--yellow);color:var(--yellow);background:rgba(232,192,32,0.1)}
+.outcome-btn.selected.ongoing{border-color:var(--dim);color:var(--text);background:rgba(255,255,255,0.05)}
+.add-battle-btn{margin-top:8px;padding:4px 12px;background:transparent;border:1px solid var(--border2);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:1px;transition:all .15s}
+.add-battle-btn:hover{border-color:var(--shared);color:var(--shared)}
+
+/* EVENT CARD */
+.event-card-area{border:1px solid var(--border);padding:14px;background:var(--panel2)}
+.event-grid{display:grid;grid-template-columns:120px 1fr;gap:10px;margin-bottom:10px;align-items:center}
+.event-id-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--gold);padding:6px 10px;font-family:'Orbitron',monospace;font-size:18px;font-weight:800;outline:none;text-align:center}
+.event-name-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:6px 10px;font-family:'Share Tech Mono',monospace;font-size:14px;outline:none}
+.event-effect-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--dim);padding:6px 10px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:60px}
+.event-effect-input:focus,.event-id-input:focus,.event-name-input:focus{border-color:var(--gold)}
+
+/* END OF TURN */
+.eot-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.eot-block{border:1px solid var(--border);padding:12px 14px;background:var(--panel2)}
+.eot-title{font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:8px}
+.eot-row{display:flex;gap:8px;align-items:center;margin-bottom:5px}
+.eot-label{font-size:11px;color:var(--dim);min-width:80px}
+.eot-input{flex:1;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:4px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none}
+.eot-input:focus{border-color:var(--gold)}
+.eot-textarea{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:50px}
+.eot-textarea:focus{border-color:var(--gold)}
+
+/* COMMANDER STATUS */
+.cmd-status-rows{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cmd-status-row{display:grid;grid-template-columns:130px 1fr;gap:6px;align-items:center}
+.cmd-name-label{font-size:11px;color:var(--dim)}
+.cmd-status-select{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:4px 6px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none}
+
+/* NOTES */
+.notes-area{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:8px 10px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:80px;line-height:1.6}
+.notes-area:focus{border-color:var(--gold)}
+
+/* SAVE BAR */
+.save-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:8px 24px;display:flex;align-items:center;justify-content:space-between;z-index:100}
+.save-status{font-size:11px;color:var(--dim);letter-spacing:2px}
+.save-status.saved{color:var(--green)}
+.save-btn{padding:5px 16px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;transition:background .15s}
+.save-btn:hover{background:rgba(200,168,75,0.1)}
+.clear-btn{padding:5px 16px;background:transparent;border:1px solid var(--border2);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s}
+.clear-btn:hover{border-color:var(--red);color:var(--red)}
+
+.divider{height:1px;background:var(--border);margin:16px 0}
+.hint{font-size:11px;color:var(--dim);font-style:italic;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-title">Turn Tracker</div>
+    <div class="hdr-sub">Star Wars Grand Strategy — 2 BBY</div>
+  </div>
+  <div class="hdr-right">
+    <div class="turn-info">
+      <div class="turn-num" id="turnNum">01</div>
+      <div class="turn-date" id="turnDate">2 BBY — WEEK 1</div>
+      <div class="turn-btns">
+        <button class="tbtn" onclick="changeTurn(-1)">◀ PREV</button>
+        <button class="tbtn" onclick="changeTurn(1)">NEXT ▶</button>
+        <button class="tbtn danger" onclick="clearSheet()">⚠ CLEAR</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE BAR -->
+<div class="phase-bar">
+  <div class="phase" id="ph1" onclick="setPhase(1)">
+    <span class="phase-num">01</span>Strategic Planning
+  </div>
+  <div class="phase" id="ph2" onclick="setPhase(2)">
+    <span class="phase-num">02</span>Event Card
+  </div>
+  <div class="phase" id="ph3" onclick="setPhase(3)">
+    <span class="phase-num">03</span>Action Resolution
+  </div>
+  <div class="phase" id="ph4" onclick="setPhase(4)">
+    <span class="phase-num">04</span>Cleanup
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab imperial active" onclick="showTab('imperial')">⬛ Imperial</div>
+  <div class="tab rebel" onclick="showTab('rebel')">◈ Rebel Alliance</div>
+  <div class="tab shared" onclick="showTab('shared')">◆ Shared Record</div>
+</div>
+
+<!-- IMPERIAL TAB -->
+<div class="tab-content active" id="tab-imperial">
+
+  <!-- AP TRACKER -->
+  <div class="sec">
+    <div class="sec-title imperial">Action Points — Imperial</div>
+    <div class="ap-track">
+      <div class="ap-label">Base AP (4/turn)</div>
+      <div class="ap-pips" id="imp-ap-pips"></div>
+      <div class="ap-total" id="imp-ap-total">4 remaining</div>
+    </div>
+    <div class="ap-track">
+      <div class="ap-label">Modifiers</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <label style="font-size:11px;color:var(--dim);display:flex;align-items:center;gap:5px;cursor:pointer">
+          <input type="checkbox" id="imp-tarkin" onchange="recalcImpAP()"> Tarkin active (+1 AP)
+        </label>
+        <label style="font-size:11px;color:var(--dim);display:flex;align-items:center;gap:5px;cursor:pointer">
+          <input type="checkbox" id="imp-pw-low" onchange="recalcImpAP()"> PW below 5 (-1 AP)
+        </label>
+        <label style="font-size:11px;color:var(--dim);display:flex;align-items:center;gap:5px;cursor:pointer">
+          <input type="checkbox" id="imp-pw-max" onchange="recalcImpAP()"> PW at 20 (+1 AP)
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ACTION DECLARATIONS (Phase 1 - Secret) -->
+  <div class="sec">
+    <div class="sec-title imperial">Phase 1 — Secret Action Declarations</div>
+    <p class="hint">Write your planned actions here before revealing. Only you can see this tab.</p>
+    <div style="margin-top:10px">
+      <div style="display:grid;grid-template-columns:28px 160px 1fr 80px;gap:8px;margin-bottom:4px">
+        <span style="font-size:11px;color:var(--dim)">#</span>
+        <span style="font-size:11px;color:var(--dim);letter-spacing:1px">ACTION TYPE</span>
+        <span style="font-size:11px;color:var(--dim);letter-spacing:1px">DETAILS</span>
+        <span style="font-size:11px;color:var(--dim);letter-spacing:1px">AP COST</span>
+      </div>
+      <div class="action-rows" id="imp-action-rows"></div>
+      <button class="add-action-btn" onclick="addActionRow('imp')">+ ADD ACTION</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MOVEMENT LOG -->
+  <div class="sec">
+    <div class="sec-title imperial">Movement Log</div>
+    <div class="move-header">
+      <span>Force / Fleet Name</span>
+      <span>From Sector</span>
+      <span>To Sector</span>
+      <span>Traveling With</span>
+      <span>Arrives Turn</span>
+    </div>
+    <div class="move-rows" id="imp-move-rows"></div>
+    <button class="add-action-btn" onclick="addMoveRow('imp')">+ ADD MOVEMENT</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- IMPERIAL NOTES -->
+  <div class="sec">
+    <div class="sec-title imperial">Imperial Field Notes</div>
+    <textarea class="notes-area" id="imp-notes" placeholder="Strategic notes, orders, situation assessment..."></textarea>
+  </div>
+
+</div>
+
+<!-- REBEL TAB -->
+<div class="tab-content" id="tab-rebel">
+
+  <!-- AP TRACKER -->
+  <div class="sec">
+    <div class="sec-title rebel">Action Points — Rebel Alliance</div>
+    <div class="ap-track">
+      <div class="ap-label">Base AP (3/turn)</div>
+      <div class="ap-pips" id="reb-ap-pips"></div>
+      <div class="ap-total" id="reb-ap-total">3 remaining</div>
+    </div>
+    <div class="ap-track">
+      <div class="ap-label">Modifiers</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <label style="font-size:11px;color:var(--dim);display:flex;align-items:center;gap:5px;cursor:pointer">
+          <input type="checkbox" id="reb-mothma" onchange="recalcRebAP()"> Mon Mothma active (+1 AP)
+        </label>
+        <label style="font-size:11px;color:var(--dim);display:flex;align-items:center;gap:5px;cursor:pointer">
+          <input type="checkbox" id="reb-pw-low" onchange="recalcRebAP()"> PW below 5 (-1 AP)
+        </label>
+        <label style="font-size:11px;color:var(--dim);display:flex;align-items:center;gap:5px;cursor:pointer">
+          <input type="checkbox" id="reb-pw-max" onchange="recalcRebAP()"> PW at 20 (+1 AP)
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ACTION DECLARATIONS -->
+  <div class="sec">
+    <div class="sec-title rebel">Phase 1 — Secret Action Declarations</div>
+    <p class="hint">Write your planned actions here before revealing. Only you can see this tab.</p>
+    <div style="margin-top:10px">
+      <div style="display:grid;grid-template-columns:28px 160px 1fr 80px;gap:8px;margin-bottom:4px">
+        <span style="font-size:11px;color:var(--dim)">#</span>
+        <span style="font-size:11px;color:var(--dim);letter-spacing:1px">ACTION TYPE</span>
+        <span style="font-size:11px;color:var(--dim);letter-spacing:1px">DETAILS</span>
+        <span style="font-size:11px;color:var(--dim);letter-spacing:1px">AP COST</span>
+      </div>
+      <div class="action-rows" id="reb-action-rows"></div>
+      <button class="add-action-btn" onclick="addActionRow('reb')">+ ADD ACTION</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MOVEMENT LOG -->
+  <div class="sec">
+    <div class="sec-title rebel">Movement Log</div>
+    <div class="move-header">
+      <span>Force / Fleet Name</span>
+      <span>From Sector</span>
+      <span>To Sector</span>
+      <span>Traveling With</span>
+      <span>Arrives Turn</span>
+    </div>
+    <div class="move-rows" id="reb-move-rows"></div>
+    <button class="add-action-btn" onclick="addMoveRow('reb')">+ ADD MOVEMENT</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- REBEL NOTES -->
+  <div class="sec">
+    <div class="sec-title rebel">Rebel Field Notes</div>
+    <textarea class="notes-area" id="reb-notes" placeholder="Strategic notes, orders, situation assessment..."></textarea>
+  </div>
+
+</div>
+
+<!-- SHARED TAB -->
+<div class="tab-content" id="tab-shared">
+
+  <!-- EVENT CARD -->
+  <div class="sec">
+    <div class="sec-title shared">Phase 2 — Event Card</div>
+    <div class="event-card-area">
+      <div class="event-grid">
+        <input class="event-id-input" id="event-id" placeholder="I-01" maxlength="4">
+        <input class="event-name-input" id="event-name" placeholder="Event card name...">
+      </div>
+      <textarea class="event-effect-input" id="event-effect" placeholder="Effect applied this turn..."></textarea>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- BATTLE RECORD -->
+  <div class="sec">
+    <div class="sec-title shared">Phase 3 — Battle Record</div>
+    <div class="battle-rows" id="battle-rows"></div>
+    <button class="add-battle-btn" onclick="addBattle()">+ ADD BATTLE</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- END OF TURN -->
+  <div class="sec">
+    <div class="sec-title shared">Phase 4 — End of Turn</div>
+    <div class="eot-grid">
+
+      <div class="eot-block">
+        <div class="eot-title" style="color:var(--gold)">Political Will Changes</div>
+        <div class="eot-row">
+          <span class="eot-label" style="color:var(--empire)">Empire PW</span>
+          <input class="eot-input" id="eot-epw" placeholder="e.g. 15 → 13 (Tarkin bombardment -2)">
+        </div>
+        <div class="eot-row">
+          <span class="eot-label" style="color:var(--rebel)">Rebel PW</span>
+          <input class="eot-input" id="eot-rpw" placeholder="e.g. 18 → 20 (Mon Mothma +1, event +1)">
+        </div>
+      </div>
+
+      <div class="eot-block">
+        <div class="eot-title" style="color:var(--green)">Supply Changes</div>
+        <textarea class="eot-textarea" id="eot-supply" placeholder="Note any sectors where supply changed this turn..."></textarea>
+      </div>
+
+      <div class="eot-block">
+        <div class="eot-title" style="color:var(--yellow)">Sector Control Changes</div>
+        <textarea class="eot-textarea" id="eot-sectors" placeholder="e.g. Lothal: Contested → Imperial&#10;Ryloth: Imperial → Contested"></textarea>
+      </div>
+
+      <div class="eot-block">
+        <div class="eot-title" style="color:var(--ds, #ff4400)">Death Star Track</div>
+        <div class="eot-row">
+          <span class="eot-label">Step</span>
+          <input class="eot-input" id="eot-ds" placeholder="e.g. Step 3 → Step 4">
+        </div>
+        <div class="eot-row" style="margin-top:4px">
+          <span class="eot-label">Note</span>
+          <input class="eot-input" id="eot-ds-note" placeholder="Reason for advance...">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COMMANDER STATUS -->
+  <div class="sec">
+    <div class="sec-title shared">Commander Status Updates</div>
+    <div class="cmd-status-rows">
+      <!-- Imperial -->
+      <div style="grid-column:1/-1;font-size:11px;color:var(--empire);letter-spacing:2px;margin-bottom:4px;margin-top:4px">IMPERIAL</div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Tarkin</span><select class="cmd-status-select" id="cs-tarkin"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Thrawn</span><select class="cmd-status-select" id="cs-thrawn"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Vader</span><select class="cmd-status-select" id="cs-vader"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Krennic</span><select class="cmd-status-select" id="cs-krennic"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Konstantine</span><select class="cmd-status-select" id="cs-konstantine"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Pryce</span><select class="cmd-status-select" id="cs-pryce"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Kallus</span><select class="cmd-status-select" id="cs-kallus"><option>Active (Imperial)</option><option>In Transit</option><option>Defected (Rebel)</option><option>Captured</option><option>KIA</option></select></div>
+      <!-- Rebel -->
+      <div style="grid-column:1/-1;font-size:11px;color:var(--rebel);letter-spacing:2px;margin-bottom:4px;margin-top:8px">REBEL ALLIANCE</div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Mon Mothma</span><select class="cmd-status-select" id="cs-mothma"><option>Active</option><option>In Transit</option><option>Underground</option><option>Wounded (2 turns)</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Bail Organa</span><select class="cmd-status-select" id="cs-bail"><option>Active</option><option>In Transit</option><option>Exposed</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Dodonna</span><select class="cmd-status-select" id="cs-dodonna"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Hera Syndulla</span><select class="cmd-status-select" id="cs-hera"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Captain Rex</span><select class="cmd-status-select" id="cs-rex"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>KIA</option></select></div>
+      <!-- Independent -->
+      <div style="grid-column:1/-1;font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:4px;margin-top:8px">INDEPENDENT</div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Saw Gerrera</span><select class="cmd-status-select" id="cs-saw"><option>Active</option><option>In Transit</option><option>Rogue</option><option>Wounded (2 turns)</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Cham Syndulla</span><select class="cmd-status-select" id="cs-cham"><option>Active</option><option>Wounded (2 turns)</option><option>Captured</option><option>KIA</option></select></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SHARED NOTES -->
+  <div class="sec">
+    <div class="sec-title shared">Session Notes</div>
+    <textarea class="notes-area" id="shared-notes" placeholder="Narrative events, decisions made, things to remember for next session..."></textarea>
+  </div>
+
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <div class="save-status" id="saveStatus">Auto-save enabled</div>
+  <div style="display:flex;gap:8px">
+    <button class="clear-btn" onclick="clearSheet()">CLEAR TURN</button>
+    <button class="save-btn" onclick="saveAll()">SAVE</button>
+  </div>
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────
+let turn = 1;
+let phase = 1;
+let impAP = 4;
+let rebAP = 3;
+let impAPSpent = 0;
+let rebAPSpent = 0;
+
+const IMP_ACTIONS = [
+  'Move Commander','Planetary Assault','Fleet Deployment','Orbital Bombardment',
+  'ISB Crackdown','Garrison Reinforcement','Sector Lockdown','Death Star Advance',
+  'Intel Operation','Blockade','Move Ground Force','Emergency Deployment','Other'
+];
+const REB_ACTIONS = [
+  'Move Commander','Raid','Full Assault','Fleet Engagement','Diplomatic Mission',
+  'Cell Insertion','Supply Run','Rescue Mission','Intel Operation','Fortify',
+  'Move Ground Force','Saw Gerrera Deploy','Other'
+];
+const AP_COSTS = {
+  'Move Commander':1,'Planetary Assault':2,'Fleet Deployment':1,'Orbital Bombardment':2,
+  'ISB Crackdown':1,'Garrison Reinforcement':1,'Sector Lockdown':1,'Death Star Advance':2,
+  'Intel Operation':1,'Blockade':1,'Move Ground Force':1,'Emergency Deployment':0,
+  'Raid':1,'Full Assault':2,'Fleet Engagement':1,'Diplomatic Mission':1,
+  'Cell Insertion':1,'Supply Run':1,'Rescue Mission':1,'Fortify':1,
+  'Saw Gerrera Deploy':0,'Other':1
+};
+
+// ── TURN / PHASE ──────────────────────────────────────────────
+function updateTurnDisplay() {
+  document.getElementById('turnNum').textContent = String(turn).padStart(2,'0');
+  const w = ((turn-1)%52)+1;
+  const yo = Math.floor((turn-1)/52);
+  document.getElementById('turnDate').textContent = `${2-yo} BBY — WEEK ${w}`;
+}
+
+function changeTurn(dir) {
+  if(dir < 0 && turn <= 1) return;
+  if(dir > 0 && !confirm('Advance to next turn? This will reset AP trackers and phase.')) return;
+  turn += dir;
+  if(dir > 0) {
+    phase = 1;
+    impAPSpent = 0;
+    rebAPSpent = 0;
+    document.getElementById('imp-tarkin').checked = false;
+    document.getElementById('imp-pw-low').checked = false;
+    document.getElementById('imp-pw-max').checked = false;
+    document.getElementById('reb-mothma').checked = false;
+    document.getElementById('reb-pw-low').checked = false;
+    document.getElementById('reb-pw-max').checked = false;
+    recalcImpAP();
+    recalcRebAP();
+  }
+  updateTurnDisplay();
+  updatePhase();
+  saveAll();
+}
+
+function setPhase(p) {
+  phase = p;
+  updatePhase();
+  saveAll();
+}
+
+function updatePhase() {
+  for(let i=1;i<=4;i++) {
+    const el = document.getElementById('ph'+i);
+    el.className = 'phase';
+    if(i < phase) el.classList.add('done');
+    else if(i === phase) el.classList.add('active');
+  }
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab.${name}`).classList.add('active');
+  document.getElementById(`tab-${name}`).classList.add('active');
+}
+
+// ── AP TRACKER ────────────────────────────────────────────────
+function recalcImpAP() {
+  impAP = 4;
+  if(document.getElementById('imp-tarkin').checked) impAP++;
+  if(document.getElementById('imp-pw-low').checked) impAP--;
+  if(document.getElementById('imp-pw-max').checked) impAP++;
+  renderAPPips('imp', impAP, impAPSpent);
+}
+
+function recalcRebAP() {
+  rebAP = 3;
+  if(document.getElementById('reb-mothma').checked) rebAP++;
+  if(document.getElementById('reb-pw-low').checked) rebAP--;
+  if(document.getElementById('reb-pw-max').checked) rebAP++;
+  renderAPPips('reb', rebAP, rebAPSpent);
+}
+
+function renderAPPips(faction, total, spent) {
+  const container = document.getElementById(`${faction}-ap-pips`);
+  const totalEl = document.getElementById(`${faction}-ap-total`);
+  container.innerHTML = '';
+  for(let i = 0; i < total; i++) {
+    const pip = document.createElement('div');
+    const isSpent = i < spent;
+    pip.className = `ap-pip ${isSpent ? 'spent' : `available ${faction}`}`;
+    pip.textContent = isSpent ? '✕' : String(i+1);
+    pip.onclick = () => toggleAP(faction, i);
+    container.appendChild(pip);
+  }
+  const remaining = total - spent;
+  totalEl.textContent = `${remaining} of ${total} remaining`;
+  totalEl.style.color = remaining <= 0 ? 'var(--red)' : remaining === 1 ? 'var(--yellow)' : 'var(--dim)';
+}
+
+function toggleAP(faction, index) {
+  if(faction === 'imp') {
+    impAPSpent = index < impAPSpent ? index : index + 1;
+    renderAPPips('imp', impAP, impAPSpent);
+  } else {
+    rebAPSpent = index < rebAPSpent ? index : index + 1;
+    renderAPPips('reb', rebAP, rebAPSpent);
+  }
+  saveAll();
+}
+
+// ── ACTION ROWS ───────────────────────────────────────────────
+function addActionRow(faction) {
+  const container = document.getElementById(`${faction}-action-rows`);
+  const actions = faction === 'imp' ? IMP_ACTIONS : REB_ACTIONS;
+  const num = container.children.length + 1;
+  const row = document.createElement('div');
+  row.className = 'action-row';
+  row.innerHTML = `
+    <div class="action-num">${num}</div>
+    <div class="action-type">
+      <select onchange="updateActionCost(this)" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none">
+        ${actions.map(a => `<option value="${a}">${a}</option>`).join('')}
+      </select>
+    </div>
+    <div class="action-detail"><input style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none" placeholder="Target sector, force, details..."></div>
+    <div style="display:flex;align-items:center;gap:4px">
+      <span style="font-size:11px;color:var(--gold);font-family:'Orbitron',monospace;font-weight:800" class="ap-cost-display">1 AP</span>
+      <button onclick="this.closest('.action-row').remove();saveAll()" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:16px">✕</button>
+    </div>`;
+  container.appendChild(row);
+  saveAll();
+}
+
+function updateActionCost(select) {
+  const cost = AP_COSTS[select.value] || 1;
+  select.closest('.action-row').querySelector('.ap-cost-display').textContent = cost + ' AP';
+}
+
+// ── MOVE ROWS ─────────────────────────────────────────────────
+function addMoveRow(faction) {
+  const container = document.getElementById(`${faction}-move-rows`);
+  const row = document.createElement('div');
+  row.className = 'move-row';
+  row.innerHTML = `
+    <input class="move-input" placeholder="Force / fleet name...">
+    <input class="move-input" placeholder="From sector...">
+    <input class="move-input" placeholder="To sector...">
+    <input class="move-input" placeholder="Fleet traveling with...">
+    <div style="display:flex;gap:4px">
+      <input class="move-input" placeholder="T-" style="width:50px">
+      <button onclick="this.closest('.move-row').remove();saveAll()" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:16px;padding:0 4px">✕</button>
+    </div>`;
+  container.appendChild(row);
+  saveAll();
+}
+
+// ── BATTLES ───────────────────────────────────────────────────
+function addBattle() {
+  const container = document.getElementById('battle-rows');
+  const num = container.children.length + 1;
+  const card = document.createElement('div');
+  card.className = 'battle-card';
+  card.innerHTML = `
+    <div style="font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:8px;display:flex;justify-content:space-between">
+      <span>BATTLE ${String(num).padStart(2,'0')}</span>
+      <button onclick="this.closest('.battle-card').remove();saveAll()" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div class="battle-grid">
+      <div class="battle-field">
+        <div class="battle-label">Sector</div>
+        <input class="battle-input" placeholder="e.g. Lothal Sector">
+      </div>
+      <div class="battle-field">
+        <div class="battle-label">Attacker</div>
+        <input class="battle-input" placeholder="Imperial / Rebel">
+      </div>
+      <div class="battle-field">
+        <div class="battle-label">Battle Scale (Entry)</div>
+        <input class="battle-input" placeholder="e.g. Entry 007">
+      </div>
+      <div class="battle-field">
+        <div class="battle-label">Imperial Forces</div>
+        <input class="battle-input" placeholder="Units committed...">
+      </div>
+      <div class="battle-field">
+        <div class="battle-label">Rebel Forces</div>
+        <input class="battle-input" placeholder="Units committed...">
+      </div>
+      <div class="battle-field">
+        <div class="battle-label">Commanders Present</div>
+        <input class="battle-input" placeholder="Named commanders...">
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:5px">OUTCOME</div>
+    <div class="battle-outcome">
+      <div class="outcome-btn" onclick="selectOutcome(this,'imperial-win')">Imperial Victory</div>
+      <div class="outcome-btn" onclick="selectOutcome(this,'rebel-win')">Rebel Victory</div>
+      <div class="outcome-btn" onclick="selectOutcome(this,'pyrrhic')">Pyrrhic / Draw</div>
+      <div class="outcome-btn" onclick="selectOutcome(this,'ongoing')">Ongoing</div>
+    </div>
+    <div style="margin-top:8px">
+      <div class="battle-label" style="margin-bottom:3px">Casualties / Notes</div>
+      <input class="battle-input" placeholder="e.g. Imperial: 1 Battalion lost. Rebel: 2 Squads KIA. Konstantine casualty roll: Shaken.">
+    </div>`;
+  container.appendChild(card);
+  saveAll();
+}
+
+function selectOutcome(btn, type) {
+  btn.closest('.battle-outcome').querySelectorAll('.outcome-btn').forEach(b => {
+    b.classList.remove('selected','imperial-win','rebel-win','pyrrhic','ongoing');
+  });
+  btn.classList.add('selected', type);
+  saveAll();
+}
+
+// ── SAVE / LOAD ───────────────────────────────────────────────
+function saveAll() {
+  const state = {
+    turn, phase, impAPSpent, rebAPSpent,
+    impTarkin: document.getElementById('imp-tarkin').checked,
+    impPWLow: document.getElementById('imp-pw-low').checked,
+    impPWMax: document.getElementById('imp-pw-max').checked,
+    rebMothma: document.getElementById('reb-mothma').checked,
+    rebPWLow: document.getElementById('reb-pw-low').checked,
+    rebPWMax: document.getElementById('reb-pw-max').checked,
+    impNotes: document.getElementById('imp-notes').value,
+    rebNotes: document.getElementById('reb-notes').value,
+    sharedNotes: document.getElementById('shared-notes').value,
+    eventId: document.getElementById('event-id').value,
+    eventName: document.getElementById('event-name').value,
+    eventEffect: document.getElementById('event-effect').value,
+    eotEPW: document.getElementById('eot-epw').value,
+    eotRPW: document.getElementById('eot-rpw').value,
+    eotSupply: document.getElementById('eot-supply').value,
+    eotSectors: document.getElementById('eot-sectors').value,
+    eotDS: document.getElementById('eot-ds').value,
+    eotDSNote: document.getElementById('eot-ds-note').value,
+    commanders: {},
+    impActions: getActionRows('imp'),
+    rebActions: getActionRows('reb'),
+    impMoves: getMoveRows('imp'),
+    rebMoves: getMoveRows('reb'),
+    battles: getBattles(),
+  };
+  ['tarkin','thrawn','vader','krennic','konstantine','pryce','kallus',
+   'mothma','bail','dodonna','hera','rex','saw','cham'].forEach(c => {
+    const el = document.getElementById('cs-'+c);
+    if(el) state.commanders[c] = el.value;
+  });
+  localStorage.setItem('sw_turn_tracker', JSON.stringify(state));
+  const status = document.getElementById('saveStatus');
+  status.textContent = 'Saved ✓';
+  status.className = 'save-status saved';
+  setTimeout(() => { status.textContent = 'Auto-save enabled'; status.className = 'save-status'; }, 2000);
+}
+
+function getActionRows(faction) {
+  const rows = [];
+  document.querySelectorAll(`#${faction}-action-rows .action-row`).forEach(row => {
+    rows.push({
+      type: row.querySelector('select')?.value || '',
+      detail: row.querySelector('input')?.value || '',
+    });
+  });
+  return rows;
+}
+
+function getMoveRows(faction) {
+  const rows = [];
+  document.querySelectorAll(`#${faction}-move-rows .move-row`).forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    rows.push([...inputs].map(i => i.value));
+  });
+  return rows;
+}
+
+function getBattles() {
+  const battles = [];
+  document.querySelectorAll('#battle-rows .battle-card').forEach(card => {
+    const inputs = [...card.querySelectorAll('.battle-input')].map(i => i.value);
+    const outcome = card.querySelector('.outcome-btn.selected')?.textContent || '';
+    battles.push({inputs, outcome});
+  });
+  return battles;
+}
+
+function loadAll() {
+  const saved = localStorage.getItem('sw_turn_tracker');
+  if(!saved) return;
+  try {
+    const s = JSON.parse(saved);
+    turn = s.turn || 1;
+    phase = s.phase || 1;
+    impAPSpent = s.impAPSpent || 0;
+    rebAPSpent = s.rebAPSpent || 0;
+    if(s.impTarkin) document.getElementById('imp-tarkin').checked = true;
+    if(s.impPWLow) document.getElementById('imp-pw-low').checked = true;
+    if(s.impPWMax) document.getElementById('imp-pw-max').checked = true;
+    if(s.rebMothma) document.getElementById('reb-mothma').checked = true;
+    if(s.rebPWLow) document.getElementById('reb-pw-low').checked = true;
+    if(s.rebPWMax) document.getElementById('reb-pw-max').checked = true;
+    document.getElementById('imp-notes').value = s.impNotes || '';
+    document.getElementById('reb-notes').value = s.rebNotes || '';
+    document.getElementById('shared-notes').value = s.sharedNotes || '';
+    document.getElementById('event-id').value = s.eventId || '';
+    document.getElementById('event-name').value = s.eventName || '';
+    document.getElementById('event-effect').value = s.eventEffect || '';
+    document.getElementById('eot-epw').value = s.eotEPW || '';
+    document.getElementById('eot-rpw').value = s.eotRPW || '';
+    document.getElementById('eot-supply').value = s.eotSupply || '';
+    document.getElementById('eot-sectors').value = s.eotSectors || '';
+    document.getElementById('eot-ds').value = s.eotDS || '';
+    document.getElementById('eot-ds-note').value = s.eotDSNote || '';
+    if(s.commanders) {
+      Object.entries(s.commanders).forEach(([k,v]) => {
+        const el = document.getElementById('cs-'+k);
+        if(el) el.value = v;
+      });
+    }
+    if(s.impActions) s.impActions.forEach(a => {
+      addActionRow('imp');
+      const rows = document.querySelectorAll('#imp-action-rows .action-row');
+      const last = rows[rows.length-1];
+      if(last) {
+        last.querySelector('select').value = a.type;
+        last.querySelector('input').value = a.detail;
+        last.querySelector('.ap-cost-display').textContent = (AP_COSTS[a.type]||1)+' AP';
+      }
+    });
+    if(s.rebActions) s.rebActions.forEach(a => {
+      addActionRow('reb');
+      const rows = document.querySelectorAll('#reb-action-rows .action-row');
+      const last = rows[rows.length-1];
+      if(last) {
+        last.querySelector('select').value = a.type;
+        last.querySelector('input').value = a.detail;
+        last.querySelector('.ap-cost-display').textContent = (AP_COSTS[a.type]||1)+' AP';
+      }
+    });
+    if(s.impMoves) s.impMoves.forEach(m => {
+      addMoveRow('imp');
+      const rows = document.querySelectorAll('#imp-move-rows .move-row');
+      const last = rows[rows.length-1];
+      if(last) last.querySelectorAll('input').forEach((inp,i) => { if(m[i]) inp.value = m[i]; });
+    });
+    if(s.rebMoves) s.rebMoves.forEach(m => {
+      addMoveRow('reb');
+      const rows = document.querySelectorAll('#reb-move-rows .move-row');
+      const last = rows[rows.length-1];
+      if(last) last.querySelectorAll('input').forEach((inp,i) => { if(m[i]) inp.value = m[i]; });
+    });
+    if(s.battles) s.battles.forEach(b => {
+      addBattle();
+      const cards = document.querySelectorAll('#battle-rows .battle-card');
+      const last = cards[cards.length-1];
+      if(last) {
+        last.querySelectorAll('.battle-input').forEach((inp,i) => { if(b.inputs[i]) inp.value = b.inputs[i]; });
+        if(b.outcome) {
+          last.querySelectorAll('.outcome-btn').forEach(btn => {
+            if(btn.textContent === b.outcome) btn.click();
+          });
+        }
+      }
+    });
+  } catch(e) { console.error('Load failed', e); }
+}
+
+function clearSheet() {
+  if(!confirm('Clear this turn sheet? All entries will be reset.')) return;
+  localStorage.removeItem('sw_turn_tracker');
+  location.reload();
+}
+
+// ── AUTO-SAVE ON INPUT ────────────────────────────────────────
+document.addEventListener('input', () => saveAll());
+document.addEventListener('change', () => saveAll());
+
+// ── INIT ─────────────────────────────────────────────────────
+loadAll();
+updateTurnDisplay();
+updatePhase();
+recalcImpAP();
+recalcRebAP();
+</script>
+
+</body>
+</html>
