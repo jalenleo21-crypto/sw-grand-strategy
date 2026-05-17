@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Naval Order of Battle — AotR — Star Wars Grand Strategy 2 BBY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05080f;--panel:#080e1a;--panel2:#0c1422;--border:#1a2e45;--border2:#243d58;
+  --text:#b8cfe0;--dim:#4a6a82;--bright:#d8eeff;--gold:#c8a84b;--gold2:#e8c86b;
+  --empire:#3a78e8;--rebel:#e83838;
+  --green:#28c868;--red:#e84848;--yellow:#e8c020;--orange:#e87820;
+  --cap:#4a8fff;--frig:#28c8a8;--corv:#e8c020;--fighter:#e87820;
+}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;line-height:1.6;min-height:100vh}
+.hdr{background:var(--panel);border-bottom:2px solid var(--border2);padding:14px 28px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-family:'Orbitron',monospace;font-size:17px;font-weight:800;color:var(--gold);letter-spacing:4px}
+.hdr-sub{font-size:14px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+.container{max-width:1100px;margin:0 auto;padding:28px 20px}
+
+.toc{background:var(--panel);border:1px solid var(--border);padding:16px 20px;margin-bottom:28px}
+.toc-title{font-family:'Orbitron',monospace;font-size:14px;color:var(--gold);letter-spacing:3px;margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.toc-a{font-size:14px;color:var(--empire);text-decoration:none;padding:2px 0;display:block;transition:color .15s}
+.toc-a:hover{color:var(--gold)}
+.toc-a.rebel{color:var(--rebel)}
+
+.section{margin-bottom:40px}
+.sec-hdr{font-family:'Orbitron',monospace;font-size:17px;font-weight:700;letter-spacing:3px;text-transform:uppercase;border-bottom:2px solid var(--border2);padding-bottom:8px;margin-bottom:20px}
+.sec-hdr.imperial{color:var(--empire)}
+.sec-hdr.rebel{color:var(--rebel)}
+.sec-hdr.shared{color:var(--gold)}
+.sub-hdr{font-family:'Orbitron',monospace;font-size:14px;color:var(--bright);letter-spacing:2px;text-transform:uppercase;margin:24px 0 10px 0;padding:6px 10px;border-left:3px solid var(--empire);background:var(--panel2)}
+.sub-hdr.rebel{border-left-color:var(--rebel)}
+.sub-hdr.fighter{border-left-color:var(--fighter)}
+.sub-hdr.shared{border-left-color:var(--gold)}
+.sec-intro{font-size:14px;color:var(--dim);margin-bottom:14px;line-height:1.7;max-width:820px}
+
+/* SHIP CARDS */
+.ship-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;margin:12px 0}
+.ship-card{border:1px solid var(--border);background:var(--panel2);padding:12px 14px}
+.ship-name{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;margin-bottom:6px}
+.ship-name.capital{color:var(--cap)}
+.ship-name.frigate{color:var(--frig)}
+.ship-name.corvette{color:var(--corv)}
+.ship-name.fighter{color:var(--fighter)}
+.ship-name.imperial{color:var(--empire)}
+.ship-name.rebel{color:var(--rebel)}
+.ship-row{display:flex;gap:8px;margin-bottom:4px;align-items:flex-start;font-size:14px}
+.ship-key{color:var(--dim);min-width:100px;flex-shrink:0;letter-spacing:1px;font-size:11px}
+.ship-val{color:var(--text)}
+.ship-val.gold{color:var(--gold)}
+.ship-val.green{color:var(--green)}
+.ship-tags{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.stag{font-size:11px;padding:1px 6px;border:1px solid;letter-spacing:1px}
+.stag-cap{color:var(--cap);border-color:var(--cap)}
+.stag-frig{color:var(--frig);border-color:var(--frig)}
+.stag-corv{color:var(--corv);border-color:var(--corv)}
+.stag-fight{color:var(--fighter);border-color:var(--fighter)}
+.stag-role{color:var(--dim);border-color:var(--border2)}
+
+/* FLEET COMP TABLES */
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+th{background:var(--panel2);color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-size:11px;padding:7px 10px;text-align:left;border:1px solid var(--border)}
+td{padding:6px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.5}
+tr:hover td{background:rgba(255,255,255,0.012)}
+.td-imp{color:var(--empire)}
+.td-reb{color:var(--rebel)}
+.td-cap{color:var(--cap)}
+.td-frig{color:var(--frig)}
+.td-corv{color:var(--corv)}
+.td-fight{color:var(--fighter)}
+
+.alert{padding:10px 14px;margin:12px 0;font-size:14px;border-left:3px solid;line-height:1.6}
+.alert-note{background:rgba(58,120,232,0.07);border-color:var(--empire);color:#88aaee}
+.alert-rebel{background:rgba(232,56,56,0.07);border-color:var(--rebel);color:#ee8888}
+.alert-gold{background:rgba(200,168,75,0.07);border-color:var(--gold);color:var(--gold)}
+.alert-title{font-weight:700;font-size:11px;letter-spacing:1px;margin-bottom:3px;text-transform:uppercase}
+
+/* CLASS LEGEND */
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;font-size:14px}
+.leg-item{display:flex;align-items:center;gap:6px}
+.leg-sq{width:12px;height:12px;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">Naval Order of Battle</div>
+    <div class="hdr-sub">Awakening of the Rebellion — Space Battle Reference — 2 BBY</div>
+  </div>
+  <div style="font-size:14px;color:var(--dim);text-align:right">
+    <span style="color:var(--empire)">■ IMPERIAL</span> &nbsp;
+    <span style="color:var(--rebel)">■ REBEL ALLIANCE</span>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">Contents</div>
+  <div class="toc-grid">
+    <a class="toc-a" href="#imp-caps">1. Imperial Capital Ships</a>
+    <a class="toc-a rebel" href="#reb-caps">5. Rebel Capital Ships</a>
+    <a class="toc-a" href="#imp-support">2. Imperial Support Ships</a>
+    <a class="toc-a rebel" href="#reb-support">6. Rebel Support Ships</a>
+    <a class="toc-a" href="#imp-fighters">3. Imperial Starfighters</a>
+    <a class="toc-a rebel" href="#reb-fighters">7. Rebel Starfighters</a>
+    <a class="toc-a" href="#imp-fleets">4. Imperial Fleet Compositions</a>
+    <a class="toc-a rebel" href="#reb-fleets">8. Rebel Fleet Compositions</a>
+    <a class="toc-a" href="#engagements">9. Engagement Scale by Fleet Tier</a>
+    <a class="toc-a" href="#setup">10. AotR Battle Setup Notes</a>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="leg-item"><div class="leg-sq" style="background:var(--cap)"></div><span style="color:var(--cap)">Capital Ship</span></div>
+  <div class="leg-item"><div class="leg-sq" style="background:var(--frig)"></div><span style="color:var(--frig)">Frigate / Cruiser</span></div>
+  <div class="leg-item"><div class="leg-sq" style="background:var(--corv)"></div><span style="color:var(--corv)">Corvette</span></div>
+  <div class="leg-item"><div class="leg-sq" style="background:var(--fighter)"></div><span style="color:var(--fighter)">Starfighter Squadron</span></div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="imp-caps">
+<div class="sec-hdr imperial">1. Imperial Capital Ships</div>
+<div class="sec-intro">Capital ships are the backbone of Imperial fleet power. At 2 BBY the ISD-I is the primary weapon. ISD-II and larger vessels are rare at this stage of the war. All confirmed present in AotR.</div>
+
+<div class="ship-grid">
+
+  <div class="ship-card">
+    <div class="ship-name capital">Imperial I-class Star Destroyer</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Imperial I-class Star Destroyer</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Ship of the Line — multi-role capital</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Heavy Turbolasers, Ion Cannons, Concussion Missiles</div></div>
+    <div class="ship-row"><div class="ship-key">Fighter Bay</div><div class="ship-val green">TIE Fighter + TIE Bomber squadrons</div></div>
+    <div class="ship-row"><div class="ship-key">Weakness</div><div class="ship-val">Bridge tower — exposed shield generators. Vulnerable to bombers without fighter escort.</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Primary Imperial capital ship. Seventh Fleet has 9. Lothal Fleet has 6. Most feared ship the Rebels face.</div></div>
+    <div class="ship-tags"><span class="stag stag-cap">CAPITAL</span><span class="stag stag-role">SHIP OF THE LINE</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name capital">Imperial II-class Star Destroyer</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Imperial II-class Star Destroyer</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Upgraded Ship of the Line — more firepower than ISD-I</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Heavier Turbolasers, Enhanced Ion Cannons, Improved point defense</div></div>
+    <div class="ship-row"><div class="ship-key">Fighter Bay</div><div class="ship-val green">TIE Fighter + TIE Bomber + TIE Interceptor squadrons</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Rare at 2 BBY — only the Home Fleet Command has ISD-IIs. Not yet widely deployed.</div></div>
+    <div class="ship-tags"><span class="stag stag-cap">CAPITAL</span><span class="stag stag-role">SHIP OF THE LINE</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name capital">Victory I-class Star Destroyer</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Victory I-class Star Destroyer</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Older capital — slower but effective against frigates</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Turbolasers, Concussion Missiles — strong vs medium ships</div></div>
+    <div class="ship-row"><div class="ship-key">Fighter Bay</div><div class="ship-val green">Small TIE complement</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Appears in Kuat, Tapani, and Home Fleet. Older design but still formidable. AotR has this in the build tree.</div></div>
+    <div class="ship-tags"><span class="stag stag-cap">CAPITAL</span><span class="stag stag-role">OLDER DESIGN</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name capital">Interdictor-class Star Destroyer</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Immobilizer 418 Cruiser</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Gravity well projector — prevents hyperspace escape</div></div>
+    <div class="ship-row"><div class="ship-key">Special</div><div class="ship-val green">Gravity Well Projectors — trapped ships cannot jump to hyperspace</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Light — not a combat ship. Needs escort.</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Seventh Fleet has 2. Critical at Battle of Atollon — traps Phoenix Squadron. Priority target for Rebels.</div></div>
+    <div class="ship-tags"><span class="stag stag-cap">CAPITAL</span><span class="stag stag-role">INTERDICTOR</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name capital">Dreadnaught-class Heavy Cruiser</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Dreadnaught-class Heavy Cruiser</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Heavy fire support — older Clone Wars era design</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Heavy Turbolasers — good vs capital ships</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Seventh Fleet has 4. Aging but still hitting hard. AotR note: can be upgraded to Alliance Assault Frigate Mk I if captured by Rebels.</div></div>
+    <div class="ship-tags"><span class="stag stag-cap">CAPITAL</span><span class="stag stag-role">HEAVY FIRE</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="imp-support">
+<div class="sec-hdr imperial">2. Imperial Support Ships</div>
+
+<div class="sub-hdr">Cruisers & Frigates</div>
+<div class="ship-grid">
+
+  <div class="ship-card">
+    <div class="ship-name frigate">Arquitens-class Light Cruiser</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Arquitens-class Light Cruiser</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Patrol / escort — fast and versatile</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Turbolasers, Laser Cannons</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Seventh Fleet has 10. Most common Imperial cruiser. Appears in almost every fleet engagement. Fast enough to chase Rebel corvettes.</div></div>
+    <div class="ship-tags"><span class="stag stag-frig">FRIGATE</span><span class="stag stag-role">PATROL</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name frigate">Nebulon-B2 Frigate</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Nebulon-B2 Frigate</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Escort / anti-fighter — upgraded Nebulon</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Turbolasers, Enhanced point defense lasers</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Appears in Home Fleet, KDY Defense, Eriadu fleets. Anti-fighter screen for larger capital ships.</div></div>
+    <div class="ship-tags"><span class="stag stag-frig">FRIGATE</span><span class="stag stag-role">ANTI-FIGHTER</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name frigate">Gladiator I-class Star Destroyer</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Gladiator I-class Star Destroyer</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Heavy escort / destroyer — fast for its size</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Concussion Missiles, Turbolasers — anti-frigate specialist</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Not in base fleet cards — can be added via sector command Add Force. Good escort for ISD formations.</div></div>
+    <div class="ship-tags"><span class="stag stag-frig">FRIGATE</span><span class="stag stag-role">DESTROYER</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name frigate">Lancer-class Frigate</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Lancer-class Frigate</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Anti-starfighter specialist — dedicated fighter screen</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">20x AG-2G Quad Laser Cannons — devastating vs fighters</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Not in base fleet cards but important in large engagements. Screens ISDs from A-wing and X-wing attacks. Add when Rebel fighter strength is high.</div></div>
+    <div class="ship-tags"><span class="stag stag-frig">FRIGATE</span><span class="stag stag-role">ANTI-FIGHTER</span></div>
+  </div>
+
+</div>
+
+<div class="sub-hdr">Corvettes & Small Craft</div>
+<div class="ship-grid">
+
+  <div class="ship-card">
+    <div class="ship-name corvette">Gozanti-class Cruiser</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Gozanti-class Cruiser</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Transport / TIE carrier — carries up to 4 TIE fighters</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Light laser cannons — not a combat vessel</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Seventh Fleet has 12. Most common Imperial small ship. Logistics and patrol. In battle acts as fighter delivery — not a frontline combatant.</div></div>
+    <div class="ship-tags"><span class="stag stag-corv">CORVETTE</span><span class="stag stag-role">TRANSPORT</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name corvette">Raider-class Corvette</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Raider-class Corvette</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Anti-fighter corvette — fast interceptor</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Laser Cannons, Concussion Missiles</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">KDY Defense Fleet and Eriadu Fleet. Fast — can chase and destroy Rebel CR90s. Good escort for larger formations.</div></div>
+    <div class="ship-tags"><span class="stag stag-corv">CORVETTE</span><span class="stag stag-role">INTERCEPTOR</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name corvette">IPV-1 System Patrol Craft</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">IPV-1 System Patrol Craft</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Light patrol — sector security</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Light Laser Cannons</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Corellian, Duro, Darpa patrol fleets. Not a combat vessel — customs and checkpoint duty. Destroyed easily in any real engagement.</div></div>
+    <div class="ship-tags"><span class="stag stag-corv">CORVETTE</span><span class="stag stag-role">PATROL</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="imp-fighters">
+<div class="sec-hdr imperial">3. Imperial Starfighters</div>
+<div class="sec-intro">AotR note — ships no longer launch full squadrons. A flight contains half the amount of fighters compared to a squadron. TIE Fighters, TIE Interceptors, and TIE Bombers always spawn as full squadrons.</div>
+
+<div class="ship-grid">
+
+  <div class="ship-card">
+    <div class="ship-name fighter">TIE/ln Fighter</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">TIE-Fighter Squadron</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Swarm interceptor — cheap, numerous, no shields</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Twin L-s1 Laser Cannons</div></div>
+    <div class="ship-row"><div class="ship-key">In Battle</div><div class="ship-val green">Primary Imperial fighter. Spawn as full squadron of 12. Overwhelming in numbers — weak individually. Screen ISDs from bombers.</div></div>
+    <div class="ship-tags"><span class="stag stag-fight">FIGHTER</span><span class="stag stag-role">SWARM</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name fighter">TIE/sa Bomber</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">TIE-Bomber Squadron</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Anti-capital ship — proton torpedoes and bombs</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Proton Torpedoes, Concussion Missiles, Bombs</div></div>
+    <div class="ship-row"><div class="ship-key">In Battle</div><div class="ship-val green">Destroys Rebel frigates and corvettes rapidly. Slow — needs TIE Fighter escort or it gets killed by A-wings before reaching target.</div></div>
+    <div class="ship-tags"><span class="stag stag-fight">BOMBER</span><span class="stag stag-role">ANTI-CAPITAL</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name fighter">TIE/in Interceptor</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">TIE-Interceptor Squadron</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Elite interceptor — faster than standard TIE</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">4x Laser Cannons — higher fire rate than TIE/ln</div></div>
+    <div class="ship-row"><div class="ship-key">In Battle</div><div class="ship-val green">Counters A-wings and X-wings effectively. Only in ISD-II and Home Fleet at 2 BBY — not yet common.</div></div>
+    <div class="ship-tags"><span class="stag stag-fight">FIGHTER</span><span class="stag stag-role">INTERCEPTOR</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name fighter">TIE/sk Scout</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">TIE-Scout Squadron</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Reconnaissance — sensor-equipped TIE variant</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Light Laser Cannons — not a combat fighter</div></div>
+    <div class="ship-row"><div class="ship-key">In Battle</div><div class="ship-val green">Appears in patrol and reconnaissance scenarios. Not effective in fleet combat. Avoid committing to direct engagements.</div></div>
+    <div class="ship-tags"><span class="stag stag-fight">FIGHTER</span><span class="stag stag-role">RECON</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="imp-fleets">
+<div class="sec-hdr imperial">4. Imperial Fleet Compositions — AotR Setup</div>
+<div class="sec-intro">How to set up each named Imperial fleet from the Sector Command document in AotR. These are the confirmed ship counts from the fleet cards — place these units on the AotR skirmish map before the battle begins.</div>
+
+<div class="sub-hdr">Seventh Fleet — Grand Admiral Thrawn</div>
+<div class="alert alert-note">
+  <div class="alert-title">Flagship</div>
+  ISD-I Chimaera — place with Thrawn hero unit attached. The Chimaera gets Thrawn's command bonuses in AotR.
+</div>
+<table>
+  <tr><th>AotR Unit</th><th>Count</th><th>Role</th><th>Placement</th></tr>
+  <tr><td class="td-cap">Imperial I-class Star Destroyer</td><td>9</td><td>Ship of the Line</td><td>Main battle line — stagger formation</td></tr>
+  <tr><td class="td-cap">Immobilizer 418 Cruiser</td><td>2</td><td>Gravity Well</td><td>Rear — PROTECT THESE. They trap Rebel ships.</td></tr>
+  <tr><td class="td-cap">Dreadnaught-class Heavy Cruiser</td><td>4</td><td>Heavy Fire Support</td><td>Second line — fire over ISD formation</td></tr>
+  <tr><td class="td-frig">Arquitens-class Light Cruiser</td><td>10</td><td>Escort / Patrol</td><td>Flanks — screen ISDs from corvettes</td></tr>
+  <tr><td class="td-corv">Gozanti-class Cruiser</td><td>12</td><td>Fighter Delivery</td><td>Rear — deploy TIEs then hold back</td></tr>
+  <tr><td class="td-fight">TIE-Fighter Squadron</td><td>6</td><td>Fighter Screen</td><td>Forward — screen against A-wings</td></tr>
+  <tr><td class="td-fight">TIE-Bomber Squadron</td><td>4</td><td>Anti-Capital</td><td>Hold in reserve — send against Rebel frigates</td></tr>
+</table>
+
+<div class="sub-hdr">Lothal Sector Fleet — Admiral Konstantine</div>
+<div class="alert alert-note">
+  <div class="alert-title">Flagship</div>
+  ISD-I Relentless — place with Konstantine hero unit. Note Konstantine's weakness: he will break formation to chase fleeing ships.
+</div>
+<table>
+  <tr><th>AotR Unit</th><th>Count</th><th>Role</th><th>Placement</th></tr>
+  <tr><td class="td-cap">Imperial I-class Star Destroyer</td><td>6</td><td>Ship of the Line</td><td>Main battle line</td></tr>
+  <tr><td class="td-frig">Arquitens-class Light Cruiser</td><td>2</td><td>Escort</td><td>ISD flanks</td></tr>
+  <tr><td class="td-fight">TIE-Fighter Squadron</td><td>4</td><td>Fighter Screen</td><td>Forward screen</td></tr>
+  <tr><td class="td-fight">TIE-Bomber Squadron</td><td>1</td><td>Anti-Capital</td><td>Reserve</td></tr>
+</table>
+
+<div class="sub-hdr">Home Fleet Command — Coruscant</div>
+<table>
+  <tr><th>AotR Unit</th><th>Count</th><th>Role</th><th>Notes</th></tr>
+  <tr><td class="td-cap">Imperial I-class Star Destroyer</td><td>6</td><td>Ship of the Line</td><td>Never deployed away from Coruscant</td></tr>
+  <tr><td class="td-cap">Imperial II-class Star Destroyer</td><td>2</td><td>Ship of the Line</td><td>Most powerful ships in the galaxy at this stage</td></tr>
+  <tr><td class="td-cap">Victory I-class Star Destroyer</td><td>4</td><td>Fire Support</td><td>Second line</td></tr>
+  <tr><td class="td-frig">Nebulon-B2 Frigate</td><td>8</td><td>Anti-Fighter Screen</td><td>Protect ISD bridge towers</td></tr>
+  <tr><td class="td-frig">Arquitens-class Light Cruiser</td><td>6</td><td>Escort</td><td>Outer screen</td></tr>
+  <tr><td class="td-corv">Gozanti-class Cruiser</td><td>12</td><td>Fighter Delivery</td><td>TIE deployment</td></tr>
+  <tr><td class="td-fight">TIE-Fighter Squadron</td><td>8</td><td>Fighter Screen</td><td>Heavy fighter complement</td></tr>
+  <tr><td class="td-fight">TIE-Bomber Squadron</td><td>4</td><td>Anti-Capital</td><td>Reserve</td></tr>
+  <tr><td class="td-fight">TIE-Interceptor Squadron</td><td>2</td><td>Elite Interceptor</td><td>Counter enemy ace fighters</td></tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="reb-caps">
+<div class="sec-hdr rebel">5. Rebel Capital Ships</div>
+<div class="sec-intro">At 2 BBY the Alliance has no Mon Calamari cruisers yet — that comes with the formal fleet assembly. Phoenix Squadron relies on smaller, faster ships. The Dreadnaught is the heaviest ship they have access to.</div>
+
+<div class="ship-grid">
+
+  <div class="ship-card">
+    <div class="ship-name capital rebel">Dreadnaught-class Heavy Cruiser</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Dreadnaught-class Heavy Cruiser</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Rebel heavy ship — can upgrade to Assault Frigate Mk I</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Heavy Turbolasers — strong vs capital ships</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Forming Alliance fleet at Dantooine has these. AotR note: can be upgraded to Alliance Assault Frigate Mk I over a planet with Alliance Medium Shipyard.</div></div>
+    <div class="ship-tags"><span class="stag stag-cap">CAPITAL</span><span class="stag stag-role">UPGRADEABLE</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name capital rebel">EF76 Nebulon-B Escort Frigate</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">EF76 Nebulon-B Escort Frigate</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Picket / escort — Rebel workhorse frigate</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Turbolasers, Laser Cannons — decent vs corvettes</div></div>
+    <div class="ship-row"><div class="ship-key">Special</div><div class="ship-val green">Missile Jamming ability — counters Imperial concussion missiles</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Forming Alliance fleet has 5. Good early Rebel frigate. Vulnerable to TIE Bombers — protect with fighters.</div></div>
+    <div class="ship-tags"><span class="stag stag-frig">FRIGATE</span><span class="stag stag-role">PICKET</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="reb-support">
+<div class="sec-hdr rebel">6. Rebel Support Ships</div>
+
+<div class="ship-grid">
+
+  <div class="ship-card">
+    <div class="ship-name frigate rebel">Sphyrna-class Hammerhead Corvette</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Hammerhead Corvette</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Fast attack corvette — ramming capability</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Turbolasers, Laser Cannons</div></div>
+    <div class="ship-row"><div class="ship-key">Special</div><div class="ship-val green">Can be used to ram and push larger ships — famous tactic from Scarif</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Phoenix Squadron has 3. Forming fleet has 4. Fast and aggressive. Use to harass ISD flanks and chase off Arquitens cruisers.</div></div>
+    <div class="ship-tags"><span class="stag stag-corv">CORVETTE</span><span class="stag stag-role">FAST ATTACK</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name corvette rebel">CR90 Corellian Corvette</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">CR90 Corellian Corvette</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Fast escort / blockade runner — hit and run</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Turbolaser Batteries, Laser Cannons</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Phoenix Squadron has 5 including flagship CR90 Liberator. Forming fleet has 8. Fast enough to escape ISDs. Use for flanking and harassment — not direct combat with Star Destroyers.</div></div>
+    <div class="ship-tags"><span class="stag stag-corv">CORVETTE</span><span class="stag stag-role">BLOCKADE RUNNER</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name corvette rebel">Quasar Fire-class Cruiser-Carrier</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Quasar Fire Carrier</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Endurance Carrier — large fighter reserve, poor armor</div></div>
+    <div class="ship-row"><div class="ship-key">Fighter Bay</div><div class="ship-val green">Large A-wing and Y-wing complement</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Light — not a combat vessel</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Phoenix Squadron has 1 (stolen from Ryloth). Forming fleet has 1. PROTECT THIS — it is the Rebel fighter base. If it dies the Alliance loses its fighter advantage.</div></div>
+    <div class="ship-tags"><span class="stag stag-frig">CARRIER</span><span class="stag stag-role">ENDURANCE</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name corvette rebel">GR-75 Medium Transport</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Action VI Transport / CR-25 Troop Carrier</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Troop transport — carries ground forces between sectors</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">None — unarmed transport</div></div>
+    <div class="ship-row"><div class="ship-key">In Campaign</div><div class="ship-val green">Phoenix Squadron has 2. Must be protected at all costs in fleet engagements — these carry the Rebel ground forces. If destroyed the troops aboard are lost.</div></div>
+    <div class="ship-tags"><span class="stag stag-corv">TRANSPORT</span><span class="stag stag-role">UNARMED</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="reb-fighters">
+<div class="sec-hdr rebel">7. Rebel Starfighters</div>
+
+<div class="ship-grid">
+
+  <div class="ship-card">
+    <div class="ship-name fighter rebel">RZ-1 A-wing Interceptor</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">A-Wing Interceptor Squadron</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Fast interceptor — fastest fighter in the Rebellion</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">2x Laser Cannons, Concussion Missiles</div></div>
+    <div class="ship-row"><div class="ship-key">In Battle</div><div class="ship-val green">Phoenix Squadron has 12 — Phoenix Leader flights. Counter TIE Bombers immediately — they will destroy the Quasar Fire carrier. A-wings outrun everything Imperial.</div></div>
+    <div class="ship-tags"><span class="stag stag-fight">FIGHTER</span><span class="stag stag-role">INTERCEPTOR</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name fighter rebel">BTL Y-wing Bomber</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Y-Wing Bomber Squadron</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Heavy bomber — anti-capital ship specialist</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Proton Torpedoes, Ion Cannons, Laser Cannons</div></div>
+    <div class="ship-row"><div class="ship-key">In Battle</div><div class="ship-val green">Phoenix Squadron has 8 (from Reklam Station). Send against ISD bridge towers and shield generators. Slow — needs A-wing escort to survive TIE swarms. Ion cannons good for disabling ships before boarding.</div></div>
+    <div class="ship-tags"><span class="stag stag-fight">BOMBER</span><span class="stag stag-role">ANTI-CAPITAL</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name fighter rebel">VCX-100 Ghost</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">VCX-100 Light Freighter</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Hero unit — Ghost crew's ship</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Laser Cannons, Dorsal Cannon Turret — surprisingly combat capable</div></div>
+    <div class="ship-row"><div class="ship-key">In Battle</div><div class="ship-val green">Appears when Ghost Crew is deployed. Treat as a hero unit in AotR — attach to the Phoenix Squadron fleet card for Lothal operations. More durable than a standard fighter but not a frontline combat ship.</div></div>
+    <div class="ship-tags"><span class="stag stag-fight">HERO SHIP</span><span class="stag stag-role">GHOST CREW</span></div>
+  </div>
+
+  <div class="ship-card">
+    <div class="ship-name fighter rebel">Z-95 Headhunter</div>
+    <div class="ship-row"><div class="ship-key">AotR Name</div><div class="ship-val gold">Z-95 Headhunter Squadron</div></div>
+    <div class="ship-row"><div class="ship-key">Role</div><div class="ship-val">Budget interceptor — older design, still effective in numbers</div></div>
+    <div class="ship-row"><div class="ship-key">Weapons</div><div class="ship-val">Laser Cannons, Missiles</div></div>
+    <div class="ship-row"><div class="ship-key">In Battle</div><div class="ship-val green">Common in early Alliance cells before X-wings are available at 2 BBY. Bulk up fighter numbers in smaller engagements.</div></div>
+    <div class="ship-tags"><span class="stag stag-fight">FIGHTER</span><span class="stag stag-role">BUDGET</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="reb-fleets">
+<div class="sec-hdr rebel">8. Rebel Fleet Compositions — AotR Setup</div>
+
+<div class="sub-hdr rebel">Phoenix Squadron Fleet — Commander Jun Sato / Hera Syndulla</div>
+<div class="alert alert-rebel">
+  <div class="alert-title">Flagship</div>
+  CR90 Liberator — place as command ship. Hera Syndulla hero unit gives fleet tier +1 in AotR when attached.
+</div>
+<table>
+  <tr><th>AotR Unit</th><th>Count</th><th>Role</th><th>Placement</th></tr>
+  <tr><td class="td-reb">CR90 Corellian Corvette</td><td>5</td><td>Fast Escort</td><td>Flanks — harass Imperial screen ships</td></tr>
+  <tr><td class="td-reb">Hammerhead Corvette</td><td>3</td><td>Fast Attack</td><td>Aggressive flanking — target Arquitens</td></tr>
+  <tr><td class="td-reb">Quasar Fire Carrier</td><td>1</td><td>Fighter Base</td><td>REAR — maximum protection. If lost fleet loses fighters.</td></tr>
+  <tr><td class="td-corv">Action VI Transport / GR-75</td><td>2</td><td>Troop Transport</td><td>Rear — keep out of combat</td></tr>
+  <tr><td class="td-fight">A-Wing Interceptor Squadron</td><td>12</td><td>Interceptor</td><td>Forward — counter TIE Bombers immediately</td></tr>
+  <tr><td class="td-fight">Y-Wing Bomber Squadron</td><td>8</td><td>Anti-Capital</td><td>Target ISD shield generators — escort with A-wings</td></tr>
+  <tr><td class="td-fight">VCX-100 Ghost</td><td>1</td><td>Hero Ship</td><td>With Phoenix Squadron as hero unit</td></tr>
+</table>
+
+<div class="sub-hdr rebel">Forming Alliance Fleet — Dantooine</div>
+<table>
+  <tr><th>AotR Unit</th><th>Count</th><th>Role</th><th>Notes</th></tr>
+  <tr><td class="td-cap">Dreadnaught-class Heavy Cruiser</td><td>1</td><td>Heavy Ship</td><td>Can upgrade to Assault Frigate Mk I</td></tr>
+  <tr><td class="td-frig">EF76 Nebulon-B Frigate</td><td>5</td><td>Escort / Picket</td><td>Screen the Dreadnaught</td></tr>
+  <tr><td class="td-reb">Hammerhead Corvette</td><td>4</td><td>Fast Attack</td><td>Flanking and harassment</td></tr>
+  <tr><td class="td-reb">CR90 Corellian Corvette</td><td>8</td><td>Fast Escort</td><td>Outer screen — hit and run</td></tr>
+  <tr><td class="td-reb">Quasar Fire Carrier</td><td>1</td><td>Fighter Base</td><td>Rear — protect at all costs</td></tr>
+  <tr><td class="td-corv">Action VI Transport</td><td>2</td><td>Transport</td><td>Rear logistics</td></tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="engagements">
+<div class="sec-hdr shared">9. Engagement Scale by Fleet Tier</div>
+<div class="sec-intro">How to translate the campaign fleet tier from the Sector Command document into an AotR battle. Use the tier to determine how many ships to place on each side.</div>
+
+<table>
+  <tr><th>Campaign Tier</th><th>Description</th><th>Imperial Setup</th><th>Rebel Setup</th></tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">Patrol Force</td>
+    <td>Sector patrol — light engagement</td>
+    <td class="td-imp">2x Arquitens + 2x Gozanti + 1x TIE Flight</td>
+    <td class="td-reb">2x CR90 + 1x Hammerhead + A-wing flight</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">Sector Squadron</td>
+    <td>Standard sector engagement</td>
+    <td class="td-imp">1x ISD-I + 2x Arquitens + 4x Gozanti + 2x TIE Sqdn</td>
+    <td class="td-reb">3x CR90 + 2x Hammerhead + 1x Nebulon-B + 4x A-wing + 4x Y-wing</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">Battle Squadron</td>
+    <td>Major sector battle</td>
+    <td class="td-imp">3x ISD-I + 1x Interdictor + 4x Arquitens + 4x Gozanti + 4x TIE Sqdn + 2x Bomber</td>
+    <td class="td-reb">Full Phoenix Squadron fleet — all ships</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">Strike Force</td>
+    <td>Rebel offensive — hit and run</td>
+    <td class="td-imp">2x ISD-I + 2x Arquitens + 3x TIE Sqdn</td>
+    <td class="td-reb">4x CR90 + 3x Hammerhead + 1x Quasar Fire + 6x A-wing + 4x Y-wing</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">Superiority Fleet</td>
+    <td>Fleet dominance — full engagement</td>
+    <td class="td-imp">Full Seventh Fleet — all ships</td>
+    <td class="td-reb">Full forming Alliance fleet + Phoenix Squadron combined</td>
+  </tr>
+  <tr>
+    <td style="color:var(--red);font-family:'Orbitron',monospace">Battle of Atollon</td>
+    <td>Mandatory Last Stand — W-01</td>
+    <td class="td-imp">Full Seventh Fleet + Konstantine's 6 ISDs + 2x Interdictor = maximum Imperial force</td>
+    <td class="td-reb">Phoenix Squadron trapped — everything they have. Damaged and desperate.</td>
+  </tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="setup">
+<div class="sec-hdr shared">10. AotR Battle Setup Notes</div>
+
+<div class="sub-hdr shared">General Setup</div>
+<table>
+  <tr><th>Setting</th><th>Recommendation</th></tr>
+  <tr><td style="color:var(--gold)">Game Mode</td><td>Skirmish — Space Battle. Set up your fleet manually before starting.</td></tr>
+  <tr><td style="color:var(--gold)">Starting Position</td><td>Place capital ships in formation before match starts. ISDs in line, escorts on flanks, carriers at rear.</td></tr>
+  <tr><td style="color:var(--gold)">Retreat Times</td><td>AotR gives Rebels shorter retreat time — reflects their hit-and-run doctrine. Don't expect Rebels to stand and fight to the death.</td></tr>
+  <tr><td style="color:var(--gold)">Fighter Flights</td><td>Ships no longer launch full squadrons — only half. TIE Fighters, Interceptors, and Bombers are the exception — they always launch full squadrons.</td></tr>
+  <tr><td style="color:var(--gold)">Capital Ship Turning</td><td>Large ships turn very slowly in AotR. ISDs cannot quickly respond to flanking attacks — use this as the Rebels.</td></tr>
+  <tr><td style="color:var(--gold)">Ion Cannons</td><td>Ion cannon hits have much bigger impact in AotR than vanilla. A Y-wing ion hit can significantly disable an ISD system temporarily.</td></tr>
+</table>
+
+<div class="sub-hdr shared">Cinematic Battle Tips</div>
+<table>
+  <tr><th>Scenario</th><th>Setup for Best Cinematic Result</th></tr>
+  <tr><td style="color:var(--gold)">ISD vs CR90 chase</td><td>Set CR90s to flee toward map edge. ISD pursues. Film TIE Fighters intercepting the fleeing corvettes.</td></tr>
+  <tr><td style="color:var(--gold)">Y-wing torpedo run</td><td>Send Y-wings in from the ISD flank. Film the torpedoes impacting shield generators. Have A-wings cover them from TIE Fighters.</td></tr>
+  <tr><td style="color:var(--gold)">Interdictor trap</td><td>Place Interdictors at map corners. Film Rebel ships attempting to jump and failing — pulling back into battle.</td></tr>
+  <tr><td style="color:var(--gold)">Hammerhead ram</td><td>Drive a Hammerhead directly into an ISD flank at full speed. The collision and resulting explosion is cinematic gold.</td></tr>
+  <tr><td style="color:var(--gold)">TIE swarm intercept</td><td>Send 12 TIE Fighters directly at the Quasar Fire carrier. Film A-wings scrambling to intercept before TIEs reach it.</td></tr>
+  <tr><td style="color:var(--gold)">Capital ship duel</td><td>One ISD vs one Dreadnaught at close range. Both slugging it out. Film from the side at medium distance for scale.</td></tr>
+</table>
+
+<div class="alert alert-gold" style="margin-top:16px">
+  <div class="alert-title">Filming Tip — Camera Distance</div>
+  For capital ship battles film at medium distance — close enough to see weapon impacts but far enough to see the full ship silhouette. For fighter engagements go close — the chaos and scale only reads at close range. Switch between the two throughout the battle for variety.
+</div>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>

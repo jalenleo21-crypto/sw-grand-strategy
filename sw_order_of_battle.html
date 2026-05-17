@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Order of Battle — Star Wars Grand Strategy 2 BBY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05080f;--panel:#080e1a;--panel2:#0c1422;--border:#1a2e45;--border2:#243d58;
+  --text:#b8cfe0;--dim:#4a6a82;--bright:#d8eeff;--gold:#c8a84b;--gold2:#e8c86b;
+  --empire:#3a78e8;--rebel:#e83838;--neutral:#607888;
+  --green:#28c868;--red:#e84848;--yellow:#e8c020;--orange:#e87820;
+}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;line-height:1.6;min-height:100vh}
+.hdr{background:var(--panel);border-bottom:2px solid var(--border2);padding:14px 28px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-family:'Orbitron',monospace;font-size:17px;font-weight:800;color:var(--gold);letter-spacing:4px}
+.hdr-sub{font-size:14px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+.container{max-width:1100px;margin:0 auto;padding:28px 20px}
+
+/* TOC */
+.toc{background:var(--panel);border:1px solid var(--border);padding:16px 20px;margin-bottom:28px}
+.toc-title{font-family:'Orbitron',monospace;font-size:14px;color:var(--gold);letter-spacing:3px;margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.toc-a{font-size:14px;color:var(--empire);text-decoration:none;padding:2px 0;display:block;transition:color .15s}
+.toc-a:hover{color:var(--gold)}
+.toc-a.rebel{color:var(--rebel)}
+
+/* SECTIONS */
+.section{margin-bottom:40px}
+.sec-hdr{font-family:'Orbitron',monospace;font-size:17px;font-weight:700;letter-spacing:3px;text-transform:uppercase;border-bottom:2px solid var(--border2);padding-bottom:8px;margin-bottom:20px}
+.sec-hdr.imperial{color:var(--empire)}
+.sec-hdr.rebel{color:var(--rebel)}
+.sec-hdr.shared{color:var(--gold)}
+.sub-hdr{font-family:'Orbitron',monospace;font-size:14px;color:var(--bright);letter-spacing:2px;text-transform:uppercase;margin:24px 0 10px 0;padding:6px 10px;border-left:3px solid var(--empire);background:var(--panel2)}
+.sub-hdr.rebel{border-left-color:var(--rebel)}
+.sub-hdr.vehicle{border-left-color:var(--yellow)}
+.sub-hdr.shared{border-left-color:var(--gold)}
+.sec-intro{font-size:14px;color:var(--dim);margin-bottom:14px;line-height:1.7;max-width:820px}
+
+/* UNIT CARDS */
+.unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin:12px 0}
+.unit-card{border:1px solid var(--border);background:var(--panel2);padding:12px 14px}
+.unit-name{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;margin-bottom:6px}
+.unit-name.imperial{color:var(--empire)}
+.unit-name.rebel{color:var(--rebel)}
+.unit-name.vehicle{color:var(--yellow)}
+.unit-name.special{color:var(--orange)}
+.unit-row{display:flex;gap:8px;margin-bottom:4px;align-items:flex-start;font-size:14px}
+.unit-key{color:var(--dim);min-width:90px;flex-shrink:0;font-size:14px;letter-spacing:1px}
+.unit-val{color:var(--text)}
+.unit-val.gold{color:var(--gold)}
+.unit-val.green{color:var(--green)}
+.unit-tags{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.utag{font-size:11px;padding:1px 6px;border:1px solid var(--border2);color:var(--dim);letter-spacing:1px}
+.utag.elite{border-color:var(--gold);color:var(--gold)}
+.utag.spec{border-color:var(--orange);color:var(--orange)}
+.utag.vehicle{border-color:var(--yellow);color:var(--yellow)}
+.utag.common{border-color:var(--dim);color:var(--dim)}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+th{background:var(--panel2);color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-size:11px;padding:7px 10px;text-align:left;border:1px solid var(--border)}
+td{padding:6px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.5}
+tr:hover td{background:rgba(255,255,255,0.012)}
+.td-name{font-family:'Orbitron',monospace;font-size:14px}
+.td-imp{color:var(--empire)}
+.td-reb{color:var(--rebel)}
+.td-veh{color:var(--yellow)}
+
+/* ALERTS */
+.alert{padding:10px 14px;margin:12px 0;font-size:14px;border-left:3px solid;line-height:1.6}
+.alert-note{background:rgba(58,120,232,0.07);border-color:var(--empire);color:#88aaee}
+.alert-rebel{background:rgba(232,56,56,0.07);border-color:var(--rebel);color:#ee8888}
+.alert-gold{background:rgba(200,168,75,0.07);border-color:var(--gold);color:var(--gold)}
+.alert-title{font-weight:700;font-size:11px;letter-spacing:1px;margin-bottom:3px;text-transform:uppercase}
+
+/* HIERARCHY */
+.hierarchy{border:1px solid var(--border);background:var(--panel2);padding:14px 16px;margin:12px 0;font-size:14px}
+.hier-title{font-family:'Orbitron',monospace;font-size:14px;color:var(--gold);letter-spacing:2px;margin-bottom:10px}
+.hier-row{display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid rgba(26,46,69,0.3)}
+.hier-row:last-child{border-bottom:none}
+.hier-indent{width:20px;flex-shrink:0;color:var(--dim)}
+.hier-name{flex:1}
+.hier-count{color:var(--gold2);min-width:80px;text-align:right;font-family:'Orbitron',monospace;font-size:14px}
+.hier-role{color:var(--dim);font-size:14px;min-width:180px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">Order of Battle</div>
+    <div class="hdr-sub">Ground Forces Reference — Galactic Civil War — 2 BBY</div>
+  </div>
+  <div style="font-size:14px;color:var(--dim);text-align:right">
+    <span style="color:var(--empire)">■ IMPERIAL</span> &nbsp;
+    <span style="color:var(--rebel)">■ REBEL ALLIANCE</span>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">Contents</div>
+  <div class="toc-grid">
+    <a class="toc-a" href="#imp-infantry">1. Imperial Infantry Units</a>
+    <a class="toc-a rebel" href="#reb-infantry">5. Rebel Infantry Units</a>
+    <a class="toc-a" href="#imp-special">2. Imperial Special Forces</a>
+    <a class="toc-a rebel" href="#reb-special">6. Rebel SpecForce Units</a>
+    <a class="toc-a" href="#imp-vehicles">3. Imperial Vehicles & Walkers</a>
+    <a class="toc-a rebel" href="#reb-vehicles">7. Rebel Vehicles</a>
+    <a class="toc-a" href="#imp-hierarchy">4. Imperial Hierarchy</a>
+    <a class="toc-a rebel" href="#reb-hierarchy">8. Rebel Hierarchy</a>
+    <a class="toc-a" href="#battle-comp">9. Battle Compositions by Scale</a>
+    <a class="toc-a" href="#commanders">10. Officer Ranks & Designations</a>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="imp-infantry">
+<div class="sec-hdr imperial">1. Imperial Infantry Units</div>
+<div class="sec-intro">The Galactic Empire fields two parallel ground forces at 2 BBY — the Imperial Army (regular infantry) and the Stormtrooper Corps (elite shock troops). Both appear in battles simultaneously. Regular Army troopers are more common in garrison duties. Stormtroopers are deployed for high-priority operations and front-line assault.</div>
+
+<div class="sub-hdr">Standard Stormtrooper Corps</div>
+<div class="unit-grid">
+
+  <div class="unit-card">
+    <div class="unit-name imperial">TK Stormtrooper</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">TK-[number] (e.g. TK-421)</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">White plastoid plates over black body glove</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">E-11 Medium Blaster Rifle</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Standard shock trooper — front line assault and garrison</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Primary infantry unit. Most common unit on the field at any scale.</div></div>
+    <div class="unit-tags"><span class="utag common">STANDARD</span><span class="utag common">FRONT LINE</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name imperial">Scout Trooper</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Scout Trooper Corps</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Lighter scout armor — partial coverage — enhanced visor</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">EC-17 Hold-out Blaster / Sniper Rifle</div></div>
+    <div class="unit-row"><div class="unit-key">Vehicle</div><div class="unit-val">74-Z Speeder Bike</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Reconnaissance, perimeter patrol, long-range sniper</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Flanking units and snipers. Appear in squads of 2-4 on speeder bikes or on foot.</div></div>
+    <div class="unit-tags"><span class="utag common">RECON</span><span class="utag common">CAVALRY</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name imperial">Imperial Army Trooper</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Imperial Army — standard infantry</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Gray/brown flak armor — not full plastoid</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">E-11 Blaster Rifle / DLT-19 Heavy Blaster</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Garrison duty, perimeter defense, occupation</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear alongside stormtroopers in large garrison battles. Less elite than TK stormtroopers — bulk up numbers.</div></div>
+    <div class="unit-tags"><span class="utag common">GARRISON</span><span class="utag common">STANDARD</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name imperial">Imperial Navy Trooper</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Imperial Navy — ship security</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Black uniform, dome helmet — exposed face</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">E-11 Blaster Rifle</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Ship security, facility interior defense</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear in base assault scenarios defending interior corridors. Not front-line fighters.</div></div>
+    <div class="unit-tags"><span class="utag common">SHIP SECURITY</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name imperial">Imperial Combat Driver</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Vehicle crew — various designations</div></div>
+    <div class="unit-row"><div class="unit-key">Variants</div><div class="unit-val">AT-AT Pilot / AT-ST Driver / Tank Commander / Tank Pilot</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Variant-specific — AT-AT pilots wear black with distinctive helmet</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">SE-14r Light Repeating Blaster (sidearm only)</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Inside vehicles only. If vehicle is destroyed and crew survives, they fight as lightly armed infantry.</div></div>
+    <div class="unit-tags"><span class="utag vehicle">VEHICLE CREW</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name imperial">Shoretrooper</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Coastal Defense Stormtrooper</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Teal/sand-colored modular plastoid — tropical environment</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">E-22 Blaster Rifle / SE-14r Pistol</div></div>
+    <div class="unit-row"><div class="unit-key">Location</div><div class="unit-val">Scarif garrison only at 2 BBY</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear only in Scarif scenarios. Beach/jungle terrain specialists.</div></div>
+    <div class="unit-tags"><span class="utag common">SCARIF ONLY</span><span class="utag common">COASTAL</span></div>
+  </div>
+
+</div>
+
+<div class="sub-hdr">Heavy Weapons</div>
+<table>
+  <tr><th>Weapon</th><th>Operator</th><th>Role in Battle</th><th>Notes</th></tr>
+  <tr><td class="td-name td-imp">DLT-19 Heavy Blaster</td><td>Stormtrooper heavy gunner</td><td>Suppression fire — crew-served or carried</td><td>Most common heavy weapon in Imperial infantry units</td></tr>
+  <tr><td class="td-name td-imp">T-21 Light Repeating Blaster</td><td>Stormtrooper heavy gunner</td><td>Anti-personnel suppression</td><td>Long range — sniper-capable</td></tr>
+  <tr><td class="td-name td-imp">RT-97C Heavy Blaster</td><td>Stormtrooper heavy gunner</td><td>Anti-personnel — high rate of fire</td><td>Common support weapon</td></tr>
+  <tr><td class="td-name td-imp">PLX-1 Portable Missile Launcher</td><td>Dedicated heavy weapons trooper</td><td>Anti-vehicle / anti-air</td><td>Appears in battalion-scale battles and above</td></tr>
+  <tr><td class="td-name td-imp">E-Web Heavy Repeating Blaster</td><td>2-man crew</td><td>Emplaced suppression — defensive positions</td><td>Must be set up before firing — immobile once deployed</td></tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="imp-special">
+<div class="sec-hdr imperial">2. Imperial Special Forces</div>
+<div class="sec-intro">Elite units attached to specific operations. Do not appear in standard garrison battles — only in high-stakes engagements or when specifically assigned by a named commander.</div>
+
+<div class="unit-grid">
+
+  <div class="unit-card">
+    <div class="unit-name special">Death Trooper</div>
+    <div class="unit-row"><div class="unit-key">Branch</div><div class="unit-val">Imperial Intelligence — Director Krennic personal guard</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">All-black plastoid armor — sensor-equipped helmet</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">E-11D Blaster Carbine / DLT-19D Heavy Blaster Rifle</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">VIP protection, high-value target elimination, covert operations</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Only appear with Krennic present or in Scarif scenarios. Small groups of 4-6. Each counts as 2 regular stormtroopers in effectiveness.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">KRENNIC ONLY</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name special">Storm Commando</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Imperial Special Forces — Shadow Scouts</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Silver/gray scout armor — low visibility</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">E-11S Sniper Rifle / Various</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Infiltration, scouting, special missions behind enemy lines</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear in Entry 004 Manhunt scenarios. Small teams. Work with Vader/ISB.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">SPECIAL OPS</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name special">Imperial Super Commando</div>
+    <div class="unit-row"><div class="unit-key">Branch</div><div class="unit-val">Saxon's Mandalorian Super Commandos</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Red/white Mandalorian armor — Imperial insignia</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">WESTAR-35 Blaster / Jetpack / Whistling Birds</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Aerial assault, rapid deployment, Mandalore sector operations</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Mandalore Sector battles only. Jetpack-equipped — can attack from above. Each worth 3 regular stormtroopers.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">MANDALORE ONLY</span><span class="utag vehicle">JETPACK</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name special">Purge Trooper</div>
+    <div class="unit-row"><div class="unit-key">Branch</div><div class="unit-val">Inquisitorius — Jedi Hunter support</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Phase III dark armor — reinforced</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">Various — electrostaff, blaster rifle, shields</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Support Inquisitors in Jedi hunts. Anti-Force-user tactics.</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Only when an Inquisitor event is triggered. Never in standard battles.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">INQUISITORIUS</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name special">Imperial Shock Trooper</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Imperial Coruscant Guard</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Red-accented stormtrooper armor</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">E-11 Blaster Rifle / Force Pike</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Coruscant security, government facility protection, VIP escort</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Coruscant Sector battles only. Appear alongside standard stormtroopers in small numbers as unit leaders.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">CORUSCANT</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="imp-vehicles">
+<div class="sec-hdr imperial">3. Imperial Vehicles & Walkers</div>
+
+<div class="sub-hdr vehicle">Walkers</div>
+<div class="unit-grid">
+
+  <div class="unit-card">
+    <div class="unit-name vehicle">AT-AT Walker</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">All Terrain Armored Transport</div></div>
+    <div class="unit-row"><div class="unit-key">Crew</div><div class="unit-val">AT-AT Pilot (Commander) + Gunner + Driver</div></div>
+    <div class="unit-row"><div class="unit-key">Capacity</div><div class="unit-val">40 stormtroopers in troop bay</div></div>
+    <div class="unit-row"><div class="unit-key">Weapons</div><div class="unit-val gold">2x MS-1 Heavy Laser Cannons (chin) / 2x Medium Repeating Blasters (cheeks)</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Heavy assault, troop delivery, psychological warfare</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appears in Entry 007+ battles. Devastating against infantry. Weakness: legs. Harpoon + tow cable or aimed ion cannon shot can bring it down.</div></div>
+    <div class="unit-tags"><span class="utag vehicle">HEAVY ARMOR</span><span class="utag vehicle">TROOP CARRIER</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name vehicle">AT-ST Walker</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">All Terrain Scout Transport</div></div>
+    <div class="unit-row"><div class="unit-key">Crew</div><div class="unit-val">AT-ST Driver + Gunner</div></div>
+    <div class="unit-row"><div class="unit-key">Weapons</div><div class="unit-val gold">2x AT-ST Medium Laser Cannons / Concussion Grenade Launcher / Blaster Cannon</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Infantry support, perimeter patrol, anti-vehicle fire support</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appears in Entry 004+ battles. More agile than AT-AT. Common in garrison patrol scenarios. Vulnerable to heavy blasters aimed at the head.</div></div>
+    <div class="unit-tags"><span class="utag vehicle">MEDIUM ARMOR</span><span class="utag vehicle">RECON</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name vehicle">AT-ACT Walker</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">All Terrain Armored Cargo Transport</div></div>
+    <div class="unit-row"><div class="unit-key">Crew</div><div class="unit-val">AT-ACT Driver + Gunner</div></div>
+    <div class="unit-row"><div class="unit-key">Weapons</div><div class="unit-val gold">2x Heavy Laser Turrets</div></div>
+    <div class="unit-row"><div class="unit-key">Location</div><div class="unit-val">Scarif only at 2 BBY</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Scarif scenarios only. Cargo variant — not as agile as AT-AT in combat but heavily armored. Targeting leg joints is the same weakness.</div></div>
+    <div class="unit-tags"><span class="utag vehicle">HEAVY ARMOR</span><span class="utag spec">SCARIF ONLY</span></div>
+  </div>
+
+</div>
+
+<div class="sub-hdr vehicle">Ground Vehicles</div>
+<div class="unit-grid">
+
+  <div class="unit-card">
+    <div class="unit-name vehicle">TX-225 GAVw Occupier Tank</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">TX-225 GAVw Combat Assault Tank</div></div>
+    <div class="unit-row"><div class="unit-key">Crew</div><div class="unit-val">Tank Commander + Tank Pilot</div></div>
+    <div class="unit-row"><div class="unit-key">Weapons</div><div class="unit-val gold">Twin Heavy Laser Cannons / Anti-personnel Blasters</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Urban patrol, heavy fire support, cargo escort</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appears in urban and city scenarios. Repulsorlift — not a walker. Effective against barricades and infantry in the open.</div></div>
+    <div class="unit-tags"><span class="utag vehicle">REPULSORLIFT</span><span class="utag vehicle">URBAN</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name vehicle">74-Z Speeder Bike</div>
+    <div class="unit-row"><div class="unit-key">Crew</div><div class="unit-val">1 Scout Trooper</div></div>
+    <div class="unit-row"><div class="unit-key">Weapons</div><div class="unit-val gold">2x Laser Cannons</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Fast recon, pursuit, rapid flanking</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear in pairs or single. Extremely fast. Lightly armored — a single hit can destroy. Used to flank Rebel positions or cut off retreating forces.</div></div>
+    <div class="unit-tags"><span class="utag vehicle">FAST ATTACK</span><span class="utag vehicle">RECON</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name vehicle">HAVw A6 Juggernaut</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">Heavy Assault Vehicle/Wheeled</div></div>
+    <div class="unit-row"><div class="unit-key">Crew</div><div class="unit-val">Driver + Gunners + up to 50 troops</div></div>
+    <div class="unit-row"><div class="unit-key">Weapons</div><div class="unit-val gold">Heavy laser cannon / Medium laser cannons / Anti-personnel</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Heavy troop transport, assault support</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appears in Entry 009+ planetary invasion scenarios. Carries infantry into battle under fire. Massive — hard to stop without heavy weapons.</div></div>
+    <div class="unit-tags"><span class="utag vehicle">HEAVY ARMOR</span><span class="utag vehicle">TROOP CARRIER</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="imp-hierarchy">
+<div class="sec-hdr imperial">4. Imperial Ground Force Hierarchy</div>
+
+<div class="hierarchy">
+  <div class="hier-title">Imperial Army — Chain of Command (2 BBY)</div>
+  <div class="hier-row"><div class="hier-indent">▸</div><div class="hier-name" style="color:var(--empire)">Squad</div><div class="hier-count">9 men</div><div class="hier-role">Sergeant commanding</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸</div><div class="hier-name" style="color:var(--empire)">Platoon</div><div class="hier-count">36 men</div><div class="hier-role">Lieutenant commanding (4 squads)</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸</div><div class="hier-name" style="color:var(--empire)">Company</div><div class="hier-count">144 men</div><div class="hier-role">Captain commanding (4 platoons)</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸▸</div><div class="hier-name" style="color:var(--empire)">Battalion</div><div class="hier-count">576 men</div><div class="hier-role">Major commanding (4 companies)</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸▸▸</div><div class="hier-name" style="color:var(--empire)">Regiment</div><div class="hier-count">2,304 men</div><div class="hier-role">Colonel commanding (4 battalions)</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸▸▸▸</div><div class="hier-name" style="color:var(--empire)">Battlegroup</div><div class="hier-count">9,216 men</div><div class="hier-role">General commanding (4 regiments)</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸▸▸▸▸</div><div class="hier-name" style="color:var(--empire)">Corps</div><div class="hier-count">36,864 men</div><div class="hier-role">Lieutenant General (4 battlegroups)</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸▸▸▸▸▸</div><div class="hier-name" style="color:var(--empire)">Army</div><div class="hier-count">73,728 men</div><div class="hier-role">General / Moff (2 corps)</div></div>
+</div>
+
+<div class="alert alert-note">
+  <div class="alert-title">Stormtrooper Legion</div>
+  The Stormtrooper Corps uses the term Legion instead of Battlegroup. A Legion = 9,216 stormtroopers commanded by a Legion Commander. The 501st Legion is the most famous — Vader's Fist. Deployed as independent units attached to Army formations.
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="reb-infantry">
+<div class="sec-hdr rebel">5. Rebel Alliance Infantry Units</div>
+<div class="sec-intro">The Rebel Alliance fields a diverse mix of unit types — regular rebel troopers form the bulk, SpecForce specialists handle high-priority operations, and irregular resistance fighters swell numbers in contested sectors. At 2 BBY the Alliance is still building — Phoenix Squadron's forces are predominantly SpecForce with minimal heavy armor.</div>
+
+<div class="sub-hdr rebel">Standard Rebel Troopers</div>
+<div class="unit-grid">
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Rebel Trooper</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Alliance Army — standard infantry</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Varied civilian-grade armor — no standardization</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">A280 Blaster Rifle (preferred) / Various captured Imperial weapons</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">General infantry — base defense, sector holding</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Primary infantry. Equipment is inconsistent — some have better gear than others. Use terrain effectively to compensate for lighter armor.</div></div>
+    <div class="unit-tags"><span class="utag common">STANDARD</span><span class="utag common">IRREGULAR</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Rebel Commando</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Alliance SpecForce — Commando</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Camouflaged battle armor — better than standard trooper</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">A280C Blaster Rifle / Grenades / Demolition charges</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Assault operations, demolitions, forward operations</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Better trained than standard rebel troopers. Appear in Entry 004+ battles. Focus on objective-based assault — not prolonged firefights.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag common">ASSAULT</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Rebel Marine</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Alliance SpecForce — Marine Corps</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Heavy armor — more protection than standard rebels</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">Heavy Blaster Rifle / Grenades</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Ship boarding, zero-gravity combat, heavy assault</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear in base assault scenarios. More durable than standard rebels. Zero-gravity training doesn't help in standard ground battles but they are tough fighters.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">HEAVY ASSAULT</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Sector Force Trooper</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Alliance Sector Forces — local garrison</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Light civilian-grade — some captured Imperial gear</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">Various — blasters, slugthrowers, anything available</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Local sector defense, resistance network support</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear in contested sector battles — local fighters defending their home. Less trained than SpecForce but motivated. Excellent terrain knowledge.</div></div>
+    <div class="unit-tags"><span class="utag common">MILITIA</span><span class="utag common">LOCAL DEFENSE</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="reb-special">
+<div class="sec-hdr rebel">6. Rebel SpecForce Units</div>
+<div class="sec-intro">Alliance Special Forces — handpicked for skill, dedication, and hatred of the Empire. Seven specialized branches, each with distinct tactics and equipment. At 2 BBY these are the Alliance's sharpest weapon.</div>
+
+<div class="unit-grid">
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Pathfinder</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">SpecForce Pathfinders / Special Forces Trackers Unit</div></div>
+    <div class="unit-row"><div class="unit-key">Nickname</div><div class="unit-val">TrekSpecs / Trekkers</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Camouflage pattern — terrain-appropriate</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">A280 Blaster Rifle / Grenades / Demolition charges</div></div>
+    <div class="unit-row"><div class="unit-key">Tactics</div><div class="unit-val">Infiltration, reconnaissance, hit-and-run. Finesse over brute force. Work with Infiltrators and Wilderness Fighters.</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">First in, last out. Appear in Entry 001 raids and forward assault in larger battles. Small teams — 4-6 per squad. Lethal in cover.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">INFILTRATION</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Infiltrator</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">SpecForce Infiltrators</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Minimal — light flexible suit for mobility</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">Sniper Rifle / Thermal Detonators / Light Blaster Pistol</div></div>
+    <div class="unit-row"><div class="unit-key">Tactics</div><div class="unit-val">Sabotage, assassination, slipping through enemy lines. Chosen specifically for hatred of the Empire.</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear as snipers and saboteurs in Entry 001-005 scale battles. Rarely seen in open firefights — they operate from concealment. If spotted their effectiveness drops sharply.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">SABOTAGE</span><span class="utag spec">SNIPER</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Wilderness Fighter</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">SpecForce Wilderness Fighters / Rangers</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Survival-rated field armor — camouflaged</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">Blaster Rifle / Heavy Weapons / Speeder Bikes</div></div>
+    <div class="unit-row"><div class="unit-key">Tactics</div><div class="unit-val">Terrain exploitation, guerrilla warfare, hit-and-run from cover. Only SpecForce branch with organic repulsorlift units.</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear in jungle, forest, and wilderness scenarios. Extraordinarily effective in broken terrain. Less effective in urban environments. Ryloth and Kashyyyk natural environment.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">WILDERNESS</span><span class="utag vehicle">MOBILE</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Urban Combat Specialist</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">SpecForce Urban Combat Specialists (UCS) / Urban Guerrillas</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Gray flexible jumpsuit — shock-absorbing — visor helmet</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">Light blasters / Demolition charges / Hand-to-hand</div></div>
+    <div class="unit-row"><div class="unit-key">Tactics</div><div class="unit-val">Street combat, barricades, building-to-building fighting, hit-and-run in urban environments.</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear in city and base interior scenarios. Extremely effective in tight quarters. Cover from buildings negates Imperial firepower advantage.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">URBAN</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Heavy Weapons Specialist</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">SpecForce Heavy Weapons Specialists (HWS)</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Heavy reinforced — extra protection for the most exposed role</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">PLX-1 Missile Launcher / Crew-served Ion Cannon / Heavy Repeating Blaster</div></div>
+    <div class="unit-row"><div class="unit-key">Tactics</div><div class="unit-val">Anti-vehicle, anti-air, suppression fire support. Trained in starship gunnery. High casualty rates — position is revealed when firing.</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Critical in battles with AT-ATs or AT-STs. Position carefully — once they fire their location is known. 1-2 per squad maximum.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">ANTI-VEHICLE</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Wookiee Warrior</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Alliance Army — Wookiee Freedom Fighters</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">None — natural Wookiee physiology provides resilience</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">Kashyyyk Ryyk Blade / Bowcaster / Captured Heavy Weapons</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Heavy assault — each Wookiee is as strong as 3 men in close combat</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear when Kashyyyk is liberated or in specific scenarios. Terrifying in close quarters. Bowcaster fire is devastating to unarmored targets. Vulnerable to heavy vehicle weapons.</div></div>
+    <div class="unit-tags"><span class="utag elite">ELITE</span><span class="utag spec">CLOSE COMBAT</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Free Ryloth Fighter</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Free Ryloth Movement — Cham Syndulla's Liberation Army</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Varied — scavenged and captured Imperial gear</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">Various — blasters, captured E-11s, hunting weapons</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Guerrilla liberation of Ryloth — unbreakable on homeworld</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Ryloth scenarios only — but unbreakable morale on their home terrain. Excellent use of the highland geography. Off Ryloth they fight as standard irregular infantry.</div></div>
+    <div class="unit-tags"><span class="utag spec">RYLOTH ONLY</span><span class="utag common">GUERRILLA</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name rebel">Saw's Partisan</div>
+    <div class="unit-row"><div class="unit-key">Designation</div><div class="unit-val">Saw Gerrera's Partisans — Independent Extremists</div></div>
+    <div class="unit-row"><div class="unit-key">Armor</div><div class="unit-val">Heavy scavenged armor — often captured Imperial gear painted dark</div></div>
+    <div class="unit-row"><div class="unit-key">Weapon</div><div class="unit-val gold">Various — anything they can get — explosives specialist</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Brutal direct action — no target restrictions, maximum damage</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Appear when Saw is deployed (costs 1 PW). Deal damage as one tier higher — but trigger Rogue Roll when Shaken. Assign to Player 2 in F2 if Rogue Roll result is Friendly Fire.</div></div>
+    <div class="unit-tags"><span class="utag spec">INDEPENDENT</span><span class="utag spec">ROGUE RISK</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="reb-vehicles">
+<div class="sec-hdr rebel">7. Rebel Vehicles</div>
+<div class="sec-intro">The Alliance lacks dedicated military vehicle production at 2 BBY. Their vehicles are stolen Imperial equipment, Clone Wars-era surplus, or civilian vehicles converted for combat. Phoenix Squadron has almost no heavy armor — their strength is infantry, terrain, and speed.</div>
+
+<div class="unit-grid">
+
+  <div class="unit-card">
+    <div class="unit-name vehicle">AT-TE Walker (Clone Wars)</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">All Terrain Tactical Enforcer — Republic surplus</div></div>
+    <div class="unit-row"><div class="unit-key">Crew</div><div class="unit-val">Driver + Gunners</div></div>
+    <div class="unit-row"><div class="unit-key">Weapons</div><div class="unit-val gold">6x Anti-personnel Laser Cannons / 1x Mass Driver Cannon (top)</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Only appears when specifically noted in a force card. Old and unreliable but a massive psychological asset. Rebels rarely have access at 2 BBY.</div></div>
+    <div class="unit-tags"><span class="utag vehicle">CLONE WARS ERA</span><span class="utag vehicle">RARE</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name vehicle">A-A5 Speeder Truck</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">A-A5 Speeder Truck — converted civilian transport</div></div>
+    <div class="unit-row"><div class="unit-key">Crew</div><div class="unit-val">Driver + mounted gunner</div></div>
+    <div class="unit-row"><div class="unit-key">Weapons</div><div class="unit-val gold">Mounted Blaster Cannon (converted)</div></div>
+    <div class="unit-row"><div class="unit-key">Role</div><div class="unit-val">Troop transport, rapid deployment</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Common Rebel transport. Fast but lightly armored. Used to move infantry rapidly across the battlefield. Not a fighting vehicle — dismount troops before engaging.</div></div>
+    <div class="unit-tags"><span class="utag vehicle">TRANSPORT</span><span class="utag common">COMMON</span></div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-name vehicle">Fang Fighter</div>
+    <div class="unit-row"><div class="unit-key">Full Name</div><div class="unit-val">Mandalorian Fang Fighter — Fenn Rau's Protectors</div></div>
+    <div class="unit-row"><div class="unit-key">Crew</div><div class="unit-val">1 Mandalorian Pilot</div></div>
+    <div class="unit-row"><div class="unit-key">Weapons</div><div class="unit-val gold">Laser Cannons / Concussion Missiles</div></div>
+    <div class="unit-row"><div class="unit-key">Location</div><div class="unit-val">Concord Dawn scenarios only</div></div>
+    <div class="unit-row"><div class="unit-key">In Battle</div><div class="unit-val green">Concord Dawn and Mandalore scenarios only. Fast and agile. Mandalorian pilots are elite — one Fang is worth 2 standard fighters.</div></div>
+    <div class="unit-tags"><span class="utag vehicle">FIGHTER</span><span class="utag spec">MANDALORE</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="reb-hierarchy">
+<div class="sec-hdr rebel">8. Rebel Alliance Ground Force Hierarchy</div>
+
+<div class="hierarchy">
+  <div class="hier-title">Alliance Army — Chain of Command (2 BBY)</div>
+  <div class="hier-row"><div class="hier-indent">▸</div><div class="hier-name" style="color:var(--rebel)">Strike Team</div><div class="hier-count">4-6 fighters</div><div class="hier-role">Team Leader / Sergeant</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸</div><div class="hier-name" style="color:var(--rebel)">Squad</div><div class="hier-count">9 fighters</div><div class="hier-role">Corporal / Sergeant commanding</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸</div><div class="hier-name" style="color:var(--rebel)">Platoon</div><div class="hier-count">36 fighters</div><div class="hier-role">Lieutenant commanding (4 squads)</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸▸</div><div class="hier-name" style="color:var(--rebel)">Company</div><div class="hier-count">144 fighters</div><div class="hier-role">Captain commanding (4 platoons)</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸▸▸</div><div class="hier-name" style="color:var(--rebel)">Battalion</div><div class="hier-count">576 fighters</div><div class="hier-role">Major / SpecForce Captain (4 companies)</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸▸▸▸</div><div class="hier-name" style="color:var(--rebel)">Regiment</div><div class="hier-count">2,304 fighters</div><div class="hier-role">Colonel commanding (4 battalions)</div></div>
+  <div class="hier-row"><div class="hier-indent">▸▸▸▸▸▸▸</div><div class="hier-name" style="color:var(--rebel)">Division / Task Force</div><div class="hier-count">Varies</div><div class="hier-role">General — assigned per operation</div></div>
+</div>
+
+<div class="alert alert-rebel">
+  <div class="alert-title">Rebel Organization Note</div>
+  The Rebel Alliance does not maintain rigid military hierarchy like the Empire. Units are often formed ad-hoc for specific operations. A "Company" might be 100 fighters rather than a precise 144. The numbers above are the intended structure — actual headcounts fluctuate based on losses and recruitment. Phoenix Squadron at 2 BBY operates closer to the battalion level with SpecForce Company attachments.
+</div>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="battle-comp">
+<div class="sec-hdr shared">9. Battle Compositions by Force Scaling Entry</div>
+<div class="sec-intro">What unit types appear on the Men of War battlefield for each Force Scaling Guide entry. These are the lore-accurate names — adapt to your available Galaxy at War mod units.</div>
+
+<table>
+  <tr><th>Entry</th><th>Scale</th><th>Imperial Units</th><th>Rebel Units</th><th>Vehicles</th></tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">001</td>
+    <td>Rebel Raid<br><span style="color:var(--dim);font-size:11px">Squad vs Squad</span></td>
+    <td class="td-imp">1 Squad TK Stormtroopers (9)<br>1 Scout Trooper pair</td>
+    <td class="td-reb">1 Pathfinder Strike Team (4-6)<br>or 1 Infiltrator Squad</td>
+    <td style="color:var(--dim)">None</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">002</td>
+    <td>Imperial Assault<br><span style="color:var(--dim);font-size:11px">Company vs Platoon</span></td>
+    <td class="td-imp">1 Company TK Stormtroopers (144)<br>+ 1 Platoon Army Troopers<br>+ 2 Scout Trooper squads</td>
+    <td class="td-reb">1 Platoon Rebel Commandos (36)<br>+ 1 Platoon Sector Force Troopers</td>
+    <td class="td-veh">Imperial: 2x AT-ST</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">003</td>
+    <td>Ambush<br><span style="color:var(--dim);font-size:11px">Platoon vs squad</span></td>
+    <td class="td-imp">1 Platoon TK Stormtroopers (36)<br>+ 1 Scout Trooper pair</td>
+    <td class="td-reb">1 Pathfinder Platoon (36)<br>+ 1 Infiltrator squad</td>
+    <td style="color:var(--dim)">None</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">004</td>
+    <td>Manhunt<br><span style="color:var(--dim);font-size:11px">Specialist vs cell</span></td>
+    <td class="td-imp">1 Platoon TK Stormtroopers<br>+ 1 ISB Agent (tagged)<br>+ 2 Storm Commandos</td>
+    <td class="td-reb">1 Infiltrator squad (6)<br>+ 1 Pathfinder team (4)</td>
+    <td style="color:var(--dim)">None</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">005</td>
+    <td>Extraction<br><span style="color:var(--dim);font-size:11px">Small / covert</span></td>
+    <td class="td-imp">1 Garrison Platoon Army Troopers<br>+ 1 Navy Trooper squad (interior)</td>
+    <td class="td-reb">1 Pathfinder team (4-6)<br>+ 1 VIP target</td>
+    <td style="color:var(--dim)">None</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">006</td>
+    <td>Convoy<br><span style="color:var(--dim);font-size:11px">Company escort</span></td>
+    <td class="td-imp">1 Company TK Stormtroopers<br>+ 2 Platoons Army Troopers<br>+ Imperial Combat Drivers</td>
+    <td class="td-reb">2 Platoons Wilderness Fighters<br>+ 1 HWS squad</td>
+    <td class="td-veh">Imperial: 2x AT-ST, TX-225 Tank<br>Rebel: A-A5 Speeder Trucks</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">007</td>
+    <td>Base Defense<br><span style="color:var(--dim);font-size:11px">Battalion scale</span></td>
+    <td class="td-imp">1 Battalion TK Stormtroopers (576)<br>+ 1 Company Army Troopers<br>+ Scout Trooper recon element</td>
+    <td class="td-reb">1 Battalion SpecForce mix:<br>Pathfinders + Commandos + HWS<br>+ Wilderness Fighters</td>
+    <td class="td-veh">Imperial: 4x AT-ST, 1x AT-AT<br>Rebel: Ion cannons (emplaced)</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">008</td>
+    <td>Siege<br><span style="color:var(--dim);font-size:11px">Battalion assault</span></td>
+    <td class="td-imp">2 Battalions TK Stormtroopers (1,152)<br>+ 1 Battalion Army Troopers<br>+ Shock Troopers (if Coruscant)</td>
+    <td class="td-reb">1 Battalion Rebel Troopers<br>+ 1 Company SpecForce Commandos<br>+ UCS squad (if urban)</td>
+    <td class="td-veh">Imperial: 2x AT-AT, 6x AT-ST<br>Rebel: Captured AT-TE (if available)</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">009</td>
+    <td>Planetary Invasion<br><span style="color:var(--dim);font-size:11px">Regiment / 3 phases</span></td>
+    <td class="td-imp">Phase 1: 2 Companies landing force<br>Phase 2: 1 Regiment + armor<br>Phase 3: Full complement</td>
+    <td class="td-reb">Phase 1: SpecForce forward teams<br>Phase 2: Alliance Army battalions<br>Phase 3: Full garrison defense</td>
+    <td class="td-veh">Imperial: 4x AT-AT, 12x AT-ST, HAVw<br>Rebel: All available heavy weapons</td>
+  </tr>
+  <tr>
+    <td style="color:var(--gold);font-family:'Orbitron',monospace">011</td>
+    <td>Last Stand — Atollon<br><span style="color:var(--dim);font-size:11px">Full scale</span></td>
+    <td class="td-imp">Full Seventh Fleet ground component:<br>TK Stormtroopers + Army Troopers<br>+ Death Troopers (if Krennic present)<br>+ Scout Trooper recon</td>
+    <td class="td-reb">Full Phoenix Squadron ground force:<br>Rex's Veterans + SpecForce Company<br>+ Pathfinders + Wilderness Fighters<br>+ All available HWS</td>
+    <td class="td-veh">Imperial: Maximum AT-AT/AT-ST<br>Rebel: Ion cannons + all vehicles</td>
+  </tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<div class="section" id="commanders">
+<div class="sec-hdr shared">10. Officer Ranks & Designations</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+<div>
+<div class="sub-hdr">Imperial Officer Ranks</div>
+<table>
+  <tr><th>Rank</th><th>Commands</th><th>Designation</th></tr>
+  <tr><td class="td-imp">Sergeant</td><td>Squad (9 men)</td><td>Ground forces</td></tr>
+  <tr><td class="td-imp">Lieutenant</td><td>Platoon (36 men)</td><td>Ground forces</td></tr>
+  <tr><td class="td-imp">Captain</td><td>Company (144 men)</td><td>Ground forces</td></tr>
+  <tr><td class="td-imp">Major</td><td>Battalion (576 men)</td><td>Ground forces</td></tr>
+  <tr><td class="td-imp">Colonel</td><td>Regiment (2,304 men)</td><td>Ground forces</td></tr>
+  <tr><td class="td-imp">General</td><td>Battlegroup+ (9,216+)</td><td>Ground forces</td></tr>
+  <tr><td class="td-imp">Commander</td><td>Ship / base</td><td>Navy</td></tr>
+  <tr><td class="td-imp">Captain</td><td>Capital ship</td><td>Navy</td></tr>
+  <tr><td class="td-imp">Admiral</td><td>Fleet formation</td><td>Navy</td></tr>
+  <tr><td class="td-imp">Moff</td><td>Sector</td><td>Political/Military</td></tr>
+  <tr><td class="td-imp">Grand Moff</td><td>Oversector</td><td>Political/Military</td></tr>
+  <tr><td class="td-imp">Grand Admiral</td><td>Multi-sector fleet</td><td>Navy — highest</td></tr>
+</table>
+</div>
+
+<div>
+<div class="sub-hdr rebel">Rebel Officer Ranks</div>
+<table>
+  <tr><th>Rank</th><th>Commands</th><th>Notes</th></tr>
+  <tr><td class="td-reb">Corporal</td><td>Strike team (4-6)</td><td>SpecForce teams</td></tr>
+  <tr><td class="td-reb">Sergeant</td><td>Squad (9)</td><td>Ground forces</td></tr>
+  <tr><td class="td-reb">Lieutenant</td><td>Platoon (36)</td><td>Ground forces</td></tr>
+  <tr><td class="td-reb">Captain</td><td>Company (144)</td><td>Ground / SpecForce</td></tr>
+  <tr><td class="td-reb">Major</td><td>Battalion (576)</td><td>Ground forces</td></tr>
+  <tr><td class="td-reb">Colonel</td><td>Regiment (2,304)</td><td>Ground forces</td></tr>
+  <tr><td class="td-reb">General</td><td>Division / Task Force</td><td>Senior command</td></tr>
+  <tr><td class="td-reb">Commander</td><td>Ship / squadron</td><td>Navy</td></tr>
+  <tr><td class="td-reb">Admiral</td><td>Fleet</td><td>Navy — senior</td></tr>
+  <tr><td class="td-reb">Senator</td><td>Political authority</td><td>Non-military</td></tr>
+  <tr><td class="td-reb">Commander in Chief</td><td>Alliance Military</td><td>Mon Mothma only</td></tr>
+</table>
+</div>
+
+</div>
+
+<div class="alert alert-gold" style="margin-top:16px">
+  <div class="alert-title">ISB Designations</div>
+  Imperial Security Bureau agents use Agent, Senior Agent, and Section Chief designations — not military ranks. Agent Kallus is ISB Agent, not Lieutenant. ISB agents outrank military officers in intelligence matters regardless of their technical seniority. An ISB Agent can countermand a General's orders in their operational domain.
+</div>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>
