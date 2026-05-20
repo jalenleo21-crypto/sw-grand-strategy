@@ -70,6 +70,7 @@ body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monosp
 #screen-tracker .save-bar{position:sticky;bottom:0}
 #screen-events,#screen-commanders,#screen-ground,#screen-naval,#screen-engagement,#screen-gem{overflow-y:auto}
 .ref-wrap{padding:24px 28px}
+.battle-modal-overlay{z-index:600}
 
 
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;800&display=swap');
@@ -249,6 +250,48 @@ textarea.fi{resize:vertical;min-height:55px}
 .adj-label-txt{font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;flex-shrink:0}
 .adj-link{font-size:11px;color:var(--gold);cursor:pointer;padding:2px 8px;border:1px solid var(--border2);background:transparent;transition:all .15s;letter-spacing:1px;text-decoration:none;display:inline-block}
 .adj-link:hover{border-color:var(--gold);background:rgba(200,168,75,0.08);color:var(--gold2)}
+
+/* BATTLE MODAL */
+.battle-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:400;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto}
+.battle-modal-overlay.open{display:flex}
+.battle-modal{background:var(--panel);border:1px solid var(--border2);width:700px;max-width:96vw;margin-bottom:40px}
+.battle-modal-hdr{padding:12px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--panel2)}
+.battle-modal-title{font-family:'Orbitron',monospace;font-size:12px;color:var(--gold);letter-spacing:2px}
+.battle-modal-tabs{display:flex;border-bottom:1px solid var(--border)}
+.battle-tab{flex:1;padding:8px;text-align:center;font-size:11px;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent;transition:all .15s;font-family:'Orbitron',monospace;letter-spacing:1px}
+.battle-tab.active{color:var(--gold2);border-bottom-color:var(--gold)}
+.battle-tab-content{display:none;padding:16px}
+.battle-tab-content.active{display:block}
+.battle-section{margin-bottom:16px}
+.battle-section-title{font-size:9px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.battle-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.battle-field{display:flex;flex-direction:column;gap:4px}
+.battle-field label{font-size:9px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+.battle-field select,.battle-field input,.battle-field textarea{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:6px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;transition:border-color .15s}
+.battle-field select:focus,.battle-field input:focus,.battle-field textarea:focus{border-color:var(--gold)}
+.battle-field textarea{resize:vertical;min-height:60px}
+.battle-info-box{background:var(--panel2);border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;font-size:11px;line-height:1.8}
+.battle-info-row{display:flex;gap:8px;margin-bottom:4px}
+.battle-info-key{color:var(--dim);min-width:140px;font-size:11px}
+.battle-info-val{color:var(--text)}
+.battle-info-val.good{color:var(--green)}
+.battle-info-val.warn{color:var(--yellow)}
+.battle-info-val.bad{color:var(--red)}
+.battle-info-val.gold{color:var(--gold2)}
+.battle-submit-btn{width:100%;padding:10px;background:transparent;border:1px solid var(--green);color:var(--green);font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;transition:background .15s;margin-top:8px}
+.battle-submit-btn:hover{background:rgba(40,200,104,0.1)}
+.battle-cancel-btn{width:100%;padding:8px;background:transparent;border:1px solid var(--border2);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s;margin-top:6px}
+.battle-cancel-btn:hover{border-color:var(--red);color:var(--red)}
+.morale-badge{display:inline-block;padding:2px 8px;border:1px solid;font-size:9px;letter-spacing:1px;margin-left:8px}
+.morale-HIGH{border-color:var(--green);color:var(--green)}
+.morale-STEADY{border-color:#28c8a8;color:#28c8a8}
+.morale-SHAKEN{border-color:var(--yellow);color:var(--yellow)}
+.morale-BATTERED{border-color:var(--orange);color:var(--orange)}
+.morale-BROKEN{border-color:var(--red);color:var(--red)}
+.pw-change{font-size:11px;padding:4px 10px;border:1px solid var(--border2);background:var(--panel2);margin-top:6px}
+.roll-result{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.roll-btn{padding:6px;background:transparent;border:1px solid var(--border2);color:var(--dim);font-size:10px;cursor:pointer;text-align:center;transition:all .15s}
+.roll-btn.selected{border-color:var(--gold);color:var(--gold);background:rgba(200,168,75,0.08)}
 
 
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;800&display=swap');
@@ -906,7 +949,6 @@ tr:hover td{background:rgba(255,255,255,0.015)}
 </style>
 </head>
 <body>
-
 <div class="app-sidebar">
   <div class="app-sidebar-brand">
     <div class="app-brand-title">SW GRAND<br>STRATEGY</div>
@@ -920,7 +962,7 @@ tr:hover td{background:rgba(255,255,255,0.015)}
   </div>
   <div class="app-nav-group">
     <div class="app-nav-group-label">Reference</div>
-    <div class="app-nav-item" id="nav-commanders" onclick="showScreen('commanders')"><span class="app-nav-icon">★</span>Named Commanders</div>
+    <div class="app-nav-item" id="nav-commanders" onclick="showScreen('commanders');setTimeout(refreshCmdStatusUI,300)"><span class="app-nav-icon">★</span>Named Commanders</div>
     <div class="app-nav-item" id="nav-ground" onclick="showScreen('ground')"><span class="app-nav-icon">⚔</span>Ground OOB</div>
     <div class="app-nav-item" id="nav-naval" onclick="showScreen('naval')"><span class="app-nav-icon">◈</span>Naval OOB</div>
     <div class="app-nav-item" id="nav-engagement" onclick="showScreen('engagement')"><span class="app-nav-icon">📖</span>Engagement Rules</div>
@@ -930,7 +972,6 @@ tr:hover td{background:rgba(255,255,255,0.015)}
     <div class="app-nav-item app-nav-danger" onclick="resetCampaign()"><span class="app-nav-icon">⚠</span>Reset Campaign</div>
   </div>
 </div>
-
 <div class="app-hdr">
   <div class="app-hdr-left">
     <div class="app-screen-title" id="appTitle">STRATEGIC COMMAND</div>
@@ -976,7 +1017,6 @@ tr:hover td{background:rgba(255,255,255,0.015)}
     </div>
   </div>
 </div>
-
 <div class="app-main">
   <div class="app-screen active" id="screen-sector"><div class="main">
 <div class="nav" id="navPanel"></div>
@@ -1005,7 +1045,11 @@ tr:hover td{background:rgba(255,255,255,0.015)}
       <button class="save-btn" onclick="saveModal()">SAVE CHANGES</button>
     </div>
   </div>
-</div></div>
+</div>
+
+
+
+</div>
   <div class="app-screen" id="screen-tracker"><div class="phase-bar">
   <div class="phase" id="ph1" onclick="setPhase(1)">
     <span class="phase-num">01</span>Strategic Planning
@@ -1256,24 +1300,24 @@ tr:hover td{background:rgba(255,255,255,0.015)}
     <div class="cmd-status-rows">
       <!-- Imperial -->
       <div style="grid-column:1/-1;font-size:11px;color:var(--empire);letter-spacing:2px;margin-bottom:4px;margin-top:4px">IMPERIAL</div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Tarkin</span><select class="cmd-status-select" id="cs-tarkin"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Thrawn</span><select class="cmd-status-select" id="cs-thrawn"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Vader</span><select class="cmd-status-select" id="cs-vader"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Krennic</span><select class="cmd-status-select" id="cs-krennic"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Konstantine</span><select class="cmd-status-select" id="cs-konstantine"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Pryce</span><select class="cmd-status-select" id="cs-pryce"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Kallus</span><select class="cmd-status-select" id="cs-kallus"><option>Active (Imperial)</option><option>In Transit</option><option>Defected (Rebel)</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Tarkin</span><select class="cmd-status-select" id="cs-tarkin" onchange="syncCsToGS('tarkin', this.value)"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Thrawn</span><select class="cmd-status-select" id="cs-thrawn" onchange="syncCsToGS('thrawn', this.value)"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Vader</span><select class="cmd-status-select" id="cs-vader" onchange="syncCsToGS('vader', this.value)"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Krennic</span><select class="cmd-status-select" id="cs-krennic" onchange="syncCsToGS('krennic', this.value)"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Konstantine</span><select class="cmd-status-select" id="cs-konstantine" onchange="syncCsToGS('konstantine', this.value)"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Pryce</span><select class="cmd-status-select" id="cs-pryce" onchange="syncCsToGS('pryce', this.value)"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Kallus</span><select class="cmd-status-select" id="cs-kallus" onchange="syncCsToGS('kallus', this.value)"><option>Active (Imperial)</option><option>In Transit</option><option>Defected (Rebel)</option><option>Captured</option><option>KIA</option></select></div>
       <!-- Rebel -->
       <div style="grid-column:1/-1;font-size:11px;color:var(--rebel);letter-spacing:2px;margin-bottom:4px;margin-top:8px">REBEL ALLIANCE</div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Mon Mothma</span><select class="cmd-status-select" id="cs-mothma"><option>Active</option><option>In Transit</option><option>Underground</option><option>Wounded (2 turns)</option><option>Captured</option><option>KIA</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Bail Organa</span><select class="cmd-status-select" id="cs-bail"><option>Active</option><option>In Transit</option><option>Exposed</option><option>Captured</option><option>KIA</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Dodonna</span><select class="cmd-status-select" id="cs-dodonna"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Hera Syndulla</span><select class="cmd-status-select" id="cs-hera"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Captain Rex</span><select class="cmd-status-select" id="cs-rex"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Mon Mothma</span><select class="cmd-status-select" id="cs-mothma" onchange="syncCsToGS('mothma', this.value)"><option>Active</option><option>In Transit</option><option>Underground</option><option>Wounded (2 turns)</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Bail Organa</span><select class="cmd-status-select" id="cs-bail" onchange="syncCsToGS('bail', this.value)"><option>Active</option><option>In Transit</option><option>Exposed</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Dodonna</span><select class="cmd-status-select" id="cs-dodonna" onchange="syncCsToGS('dodonna', this.value)"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Hera Syndulla</span><select class="cmd-status-select" id="cs-hera" onchange="syncCsToGS('hera', this.value)"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Captain Rex</span><select class="cmd-status-select" id="cs-rex" onchange="syncCsToGS('rex', this.value)"><option>Active</option><option>In Transit</option><option>Wounded (2 turns)</option><option>Shaken</option><option>KIA</option></select></div>
       <!-- Independent -->
       <div style="grid-column:1/-1;font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:4px;margin-top:8px">INDEPENDENT</div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Saw Gerrera</span><select class="cmd-status-select" id="cs-saw"><option>Active</option><option>In Transit</option><option>Rogue</option><option>Wounded (2 turns)</option><option>KIA</option></select></div>
-      <div class="cmd-status-row"><span class="cmd-name-label">Cham Syndulla</span><select class="cmd-status-select" id="cs-cham"><option>Active</option><option>Wounded (2 turns)</option><option>Captured</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Saw Gerrera</span><select class="cmd-status-select" id="cs-saw" onchange="syncCsToGS('saw', this.value)"><option>Active</option><option>In Transit</option><option>Rogue</option><option>Wounded (2 turns)</option><option>KIA</option></select></div>
+      <div class="cmd-status-row"><span class="cmd-name-label">Cham Syndulla</span><select class="cmd-status-select" id="cs-cham" onchange="syncCsToGS('cham', this.value)"><option>Active</option><option>Wounded (2 turns)</option><option>Captured</option><option>KIA</option></select></div>
     </div>
   </div>
 
@@ -1940,25 +1984,297 @@ tr:hover td{background:rgba(255,255,255,0.015)}
 </div><!-- /container --></div></div>
   <div class="app-screen" id="screen-commanders"><div class="ref-wrap"><div class="container">
 
+<div id="cmdStatusPanel" style="background:var(--panel);border:1px solid var(--border2);padding:16px 20px;margin-bottom:24px">
+  <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:12px">COMMANDER STATUS — CURRENT CAMPAIGN</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px" id="cmdStatusGrid">
+
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Grand Moff Tarkin</div>
+        <div style="font-size:9px;color:#3a78e8;letter-spacing:1px">Empire — Rating 5</div>
+      </div>
+      <select onchange="setCmdStatus('Grand Moff Wilhuff Tarkin', this.value)"
+              id="cmdsel_grandmofftarkin"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Grand Admiral Thrawn</div>
+        <div style="font-size:9px;color:#3a78e8;letter-spacing:1px">Empire — Rating 5</div>
+      </div>
+      <select onchange="setCmdStatus('Grand Admiral Thrawn', this.value)"
+              id="cmdsel_grandadmiralthrawn"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Darth Vader</div>
+        <div style="font-size:9px;color:#3a78e8;letter-spacing:1px">Empire — Rating 5</div>
+      </div>
+      <select onchange="setCmdStatus('Darth Vader', this.value)"
+              id="cmdsel_darthvader"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Director Krennic</div>
+        <div style="font-size:9px;color:#3a78e8;letter-spacing:1px">Empire — Rating 4</div>
+      </div>
+      <select onchange="setCmdStatus('Director Krennic', this.value)"
+              id="cmdsel_directorkrennic"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">ISB Director Yularen</div>
+        <div style="font-size:9px;color:#3a78e8;letter-spacing:1px">Empire — Rating 4</div>
+      </div>
+      <select onchange="setCmdStatus('ISB Director Yularen', this.value)"
+              id="cmdsel_isbdirectoryularen"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Admiral Konstantine</div>
+        <div style="font-size:9px;color:#3a78e8;letter-spacing:1px">Empire — Rating 3</div>
+      </div>
+      <select onchange="setCmdStatus('Admiral Kassius Konstantine', this.value)"
+              id="cmdsel_admiralkonstantine"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Governor Pryce</div>
+        <div style="font-size:9px;color:#3a78e8;letter-spacing:1px">Empire — Rating 3</div>
+      </div>
+      <select onchange="setCmdStatus('Governor Arihnda Pryce', this.value)"
+              id="cmdsel_governorpryce"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Agent Kallus</div>
+        <div style="font-size:9px;color:#c8a84b;letter-spacing:1px">Empire/Rebel — Rating 2</div>
+      </div>
+      <select onchange="setCmdStatus('Agent Kallus', this.value)"
+              id="cmdsel_agentkallus"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Mon Mothma</div>
+        <div style="font-size:9px;color:#e83838;letter-spacing:1px">Rebel — Rating 4</div>
+      </div>
+      <select onchange="setCmdStatus('Mon Mothma', this.value)"
+              id="cmdsel_monmothma"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Senator Bail Organa</div>
+        <div style="font-size:9px;color:#e83838;letter-spacing:1px">Rebel — Rating 4</div>
+      </div>
+      <select onchange="setCmdStatus('Senator Bail Organa', this.value)"
+              id="cmdsel_senatorbailorgana"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">General Dodonna</div>
+        <div style="font-size:9px;color:#e83838;letter-spacing:1px">Rebel — Rating 4</div>
+      </div>
+      <select onchange="setCmdStatus('General Dodonna', this.value)"
+              id="cmdsel_generaldodonna"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Commander Hera Syndulla</div>
+        <div style="font-size:9px;color:#e83838;letter-spacing:1px">Rebel — Rating 3</div>
+      </div>
+      <select onchange="setCmdStatus('Commander Hera Syndulla', this.value)"
+              id="cmdsel_commanderherasyndulla"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Captain Rex</div>
+        <div style="font-size:9px;color:#e83838;letter-spacing:1px">Rebel — Rating 2</div>
+      </div>
+      <select onchange="setCmdStatus('Captain Rex', this.value)"
+              id="cmdsel_captainrex"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+    <div style="background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--bright)">Saw Gerrera</div>
+        <div style="font-size:9px;color:#c8a84b;letter-spacing:1px">Independent — Rating 1</div>
+      </div>
+      <select onchange="setCmdStatus('Saw Gerrera', this.value)"
+              id="cmdsel_sawgerrera"
+              style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:3px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;min-width:120px">
+        <option value="active">Active</option>
+        <option value="wounded">Wounded — 2 turns</option>
+        <option value="wounded1">Wounded — 1 turn</option>
+        <option value="shaken">Shaken</option>
+        <option value="captured">Captured</option>
+        <option value="kia">KIA</option>
+      </select>
+    </div>
+  </div>
+  <div style="font-size:9px;color:var(--dim);margin-top:8px">Changes sync to Supabase automatically — all players see updated status in real time.</div>
+</div>
+<script>
+// Populate commander status dropdowns from GS when screen loads
+function refreshCmdStatusUI() {
+  if(typeof GS === 'undefined' || !GS.cmdStatus) return;
+  document.querySelectorAll('[id^="cmdsel_"]').forEach(sel => {
+    const cmdName = sel.getAttribute('onchange').match(/'([^']+)'/)[1];
+    const key = cmdName.toLowerCase().replace(/[^a-z]/g,'');
+    if(GS.cmdStatus[key]) {
+      sel.value = GS.cmdStatus[key];
+      // Also sync back into cs- Turn Tracker dropdown
+      if(typeof CMDSEL_TO_CS !== 'undefined' && typeof VAL_TO_CS !== 'undefined') {
+        const csKey = CMDSEL_TO_CS[key];
+        if(csKey) {
+          const csEl = document.getElementById('cs-' + csKey);
+          if(csEl) {
+            const csVal = VAL_TO_CS[GS.cmdStatus[key]] || 'Active';
+            const opts = Array.from(csEl.options).map(o=>o.value||o.text);
+            if(opts.includes(csVal)) csEl.value = csVal;
+          }
+        }
+      }
+    }
+  });
+  // Re-render active sector so badges show
+  if(typeof activeSec !== 'undefined' && activeSec && typeof renderSector === 'function') {
+    renderSector(activeSec);
+  }
+}
+// Refresh when Named Commanders screen becomes active
+const origShowScreen = window.showScreen;
+if(typeof showScreen !== 'undefined') {
+  // Hook into showScreen
+}
+// Also refresh on GS load
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(refreshCmdStatusUI, 1500);
+});
+</script>
+
+
+
 <!-- TOC -->
 <div class="toc">
   <div class="toc-title">Contents</div>
   <div class="toc-grid">
-    <a class="toc-a" href="#s1">1. How Commanders Work</a>
-    <a class="toc-a" href="#s2">2. Command Rating System</a>
-    <a class="toc-a" href="#s3">3. Movement Rules</a>
-    <a class="toc-a" href="#s4">4. Death / Wound / Capture</a>
-    <a class="toc-a" href="#s5">5. Imperial Commanders</a>
-    <a class="toc-a" href="#s6">6. Rebel Commanders</a>
-    <a class="toc-a" href="#s7">7. Independent Commanders</a>
-    <a class="toc-a" href="#s8">8. Specialty Effects</a>
-    <a class="toc-a" href="#s9">9. Political Will & Commanders</a>
-    <a class="toc-a" href="#s10">10. Location Tracker</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-commanders','cmd-s1')">1. How Commanders Work</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-commanders','cmd-s2')">2. Command Rating System</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-commanders','cmd-s3')">3. Movement Rules</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-commanders','cmd-s4')">4. Death / Wound / Capture</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-commanders','cmd-s5')">5. Imperial Commanders</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-commanders','cmd-s6')">6. Rebel Commanders</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-commanders','cmd-s7')">7. Independent Commanders</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-commanders','cmd-s8')">8. Specialty Effects</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-commanders','cmd-s9')">9. Political Will & Commanders</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-commanders','cmd-s10')">10. Location Tracker</a>
   </div>
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s1">
+<div class="section" id="cmd-s1">
 <div class="sec-hdr">1. How Commanders Work</div>
 <div class="sec-intro">
 Named commanders are individuals with enough personal authority, skill, or reputation to meaningfully change the outcome of battles and campaign actions. They are not abstract bonuses — they are real people who can be in only one place at a time, can be killed, and whose presence or absence changes everything around them.
@@ -1978,7 +2294,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s2">
+<div class="section" id="cmd-s2">
 <div class="sec-hdr">2. Command Rating System</div>
 <div class="sec-intro">Command Rating reflects a commander's overall military and political authority. It affects their survival odds on the casualty roll and the strength of their specialty effect.</div>
 
@@ -1998,7 +2314,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s3">
+<div class="section" id="cmd-s3">
 <div class="sec-hdr">3. Movement Rules</div>
 
 <table>
@@ -2013,7 +2329,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s4">
+<div class="section" id="cmd-s4">
 <div class="sec-hdr">4. Death / Wound / Capture</div>
 <div class="sec-intro">After any battle in which a named commander was present, roll 1d6 and apply the modifier based on their Command Rating. The battle outcome also affects the roll.</div>
 
@@ -2078,7 +2394,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s5">
+<div class="section" id="cmd-s5">
 <div class="sec-hdr">5. Imperial Commanders</div>
 
 <div class="sub-hdr">Top Level — Rating 5</div>
@@ -2314,7 +2630,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s6">
+<div class="section" id="cmd-s6">
 <div class="sec-hdr">6. Rebel Commanders</div>
 
 <div class="sub-hdr rebel">Alliance Leadership — Rating 4-5</div>
@@ -2458,7 +2774,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s7">
+<div class="section" id="cmd-s7">
 <div class="sec-hdr">7. Independent Commanders</div>
 
 <div class="cmd-grid">
@@ -2520,7 +2836,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s8">
+<div class="section" id="cmd-s8">
 <div class="sec-hdr">8. Specialty Effects Summary</div>
 
 <table>
@@ -2543,7 +2859,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s9">
+<div class="section" id="cmd-s9">
 <div class="sec-hdr">9. Political Will & Commanders</div>
 <div class="sec-intro">Named commanders interact with Political Will in two ways — their death costs PW, and their specialties can reduce the PW cost of actions.</div>
 
@@ -2562,7 +2878,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s10">
+<div class="section" id="cmd-s10">
 <div class="sec-hdr">10. Location Tracker</div>
 <div class="sec-intro">Current locations of all named commanders at campaign start (Turn 1, 2 BBY). Update this table after each turn.</div>
 
@@ -2684,16 +3000,16 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 <div class="toc">
   <div class="toc-title">Contents</div>
   <div class="toc-grid">
-    <a class="toc-a" href="#imp-infantry">1. Imperial Infantry Units</a>
-    <a class="toc-a rebel" href="#reb-infantry">5. Rebel Infantry Units</a>
-    <a class="toc-a" href="#imp-special">2. Imperial Special Forces</a>
-    <a class="toc-a rebel" href="#reb-special">6. Rebel SpecForce Units</a>
-    <a class="toc-a" href="#imp-vehicles">3. Imperial Vehicles & Walkers</a>
-    <a class="toc-a rebel" href="#reb-vehicles">7. Rebel Vehicles</a>
-    <a class="toc-a" href="#imp-hierarchy">4. Imperial Hierarchy</a>
-    <a class="toc-a rebel" href="#reb-hierarchy">8. Rebel Hierarchy</a>
-    <a class="toc-a" href="#battle-comp">9. Battle Compositions by Scale</a>
-    <a class="toc-a" href="#commanders">10. Officer Ranks & Designations</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-ground','imp-infantry')">1. Imperial Infantry Units</a>
+    <a class="toc-a rebel" href="javascript:void(0)" onclick="scrollInScreen('screen-ground','reb-infantry')">5. Rebel Infantry Units</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-ground','imp-special')">2. Imperial Special Forces</a>
+    <a class="toc-a rebel" href="javascript:void(0)" onclick="scrollInScreen('screen-ground','reb-special')">6. Rebel SpecForce Units</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-ground','imp-vehicles')">3. Imperial Vehicles & Walkers</a>
+    <a class="toc-a rebel" href="javascript:void(0)" onclick="scrollInScreen('screen-ground','reb-vehicles')">7. Rebel Vehicles</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-ground','imp-hierarchy')">4. Imperial Hierarchy</a>
+    <a class="toc-a rebel" href="javascript:void(0)" onclick="scrollInScreen('screen-ground','reb-hierarchy')">8. Rebel Hierarchy</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-ground','battle-comp')">9. Battle Compositions by Scale</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-ground','commanders')">10. Officer Ranks & Designations</a>
   </div>
 </div>
 
@@ -3275,16 +3591,16 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 <div class="toc">
   <div class="toc-title">Contents</div>
   <div class="toc-grid">
-    <a class="toc-a" href="#imp-caps">1. Imperial Capital Ships</a>
-    <a class="toc-a rebel" href="#reb-caps">5. Rebel Capital Ships</a>
-    <a class="toc-a" href="#imp-support">2. Imperial Support Ships</a>
-    <a class="toc-a rebel" href="#reb-support">6. Rebel Support Ships</a>
-    <a class="toc-a" href="#imp-fighters">3. Imperial Starfighters</a>
-    <a class="toc-a rebel" href="#reb-fighters">7. Rebel Starfighters</a>
-    <a class="toc-a" href="#imp-fleets">4. Imperial Fleet Compositions</a>
-    <a class="toc-a rebel" href="#reb-fleets">8. Rebel Fleet Compositions</a>
-    <a class="toc-a" href="#engagements">9. Engagement Scale by Fleet Tier</a>
-    <a class="toc-a" href="#setup">10. AotR Battle Setup Notes</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-naval','imp-caps')">1. Imperial Capital Ships</a>
+    <a class="toc-a rebel" href="javascript:void(0)" onclick="scrollInScreen('screen-naval','reb-caps')">5. Rebel Capital Ships</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-naval','imp-support')">2. Imperial Support Ships</a>
+    <a class="toc-a rebel" href="javascript:void(0)" onclick="scrollInScreen('screen-naval','reb-support')">6. Rebel Support Ships</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-naval','imp-fighters')">3. Imperial Starfighters</a>
+    <a class="toc-a rebel" href="javascript:void(0)" onclick="scrollInScreen('screen-naval','reb-fighters')">7. Rebel Starfighters</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-naval','imp-fleets')">4. Imperial Fleet Compositions</a>
+    <a class="toc-a rebel" href="javascript:void(0)" onclick="scrollInScreen('screen-naval','reb-fleets')">8. Rebel Fleet Compositions</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-naval','engagements')">9. Engagement Scale by Fleet Tier</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-naval','setup')">10. AotR Battle Setup Notes</a>
   </div>
 </div>
 
@@ -3765,23 +4081,23 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 <div class="toc">
   <div class="toc-title">Contents</div>
   <div class="toc-grid">
-    <a class="toc-a" href="#s1">1. What is a Sector</a>
-    <a class="toc-a" href="#s6">6. Transport Rules</a>
-    <a class="toc-a" href="#s2">2. Turn Structure</a>
-    <a class="toc-a" href="#s7">7. Retreat Rules</a>
-    <a class="toc-a" href="#s3">3. Declaring an Attack</a>
-    <a class="toc-a" href="#s8">8. Morale & Battle Setup</a>
-    <a class="toc-a" href="#s4">4. Action Priority</a>
-    <a class="toc-a" href="#s9">9. After the Battle</a>
-    <a class="toc-a" href="#s5">5. Space Battle Rules</a>
-    <a class="toc-a" href="#s10">10. Commander Rules</a>
-    <a class="toc-a ex" href="#ex">Examples 1-10</a>
-    <a class="toc-a ex" href="#s11">11. Quick Reference</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s1')">1. What is a Sector</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s6')">6. Transport Rules</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s2')">2. Turn Structure</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s7')">7. Retreat Rules</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s3')">3. Declaring an Attack</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s8')">8. Morale & Battle Setup</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s4')">4. Action Priority</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s9')">9. After the Battle</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s5')">5. Space Battle Rules</a>
+    <a class="toc-a" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s10')">10. Commander Rules</a>
+    <a class="toc-a ex" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','ex')">Examples 1-10</a>
+    <a class="toc-a ex" href="javascript:void(0)" onclick="scrollInScreen('screen-engagement','eng-s11')">11. Quick Reference</a>
   </div>
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s1">
+<div class="section" id="eng-s1">
 <div class="sec-hdr">1. What is a Sector</div>
 <div class="sec-intro">The galaxy is divided into 29 sectors across 7 regions. Each sector contains planets and force cards — ground forces and fleets assigned to that sector. Everything that happens in the campaign happens within or between sectors.</div>
 
@@ -3806,7 +4122,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s2">
+<div class="section" id="eng-s2">
 <div class="sec-hdr">2. Turn Structure</div>
 
 <div class="phase-flow">
@@ -3839,7 +4155,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s3">
+<div class="section" id="eng-s3">
 <div class="sec-hdr">3. Declaring an Attack</div>
 
 <div class="rule-block">
@@ -3881,7 +4197,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s4">
+<div class="section" id="eng-s4">
 <div class="sec-hdr">4. Action Priority</div>
 
 <div class="rule-block">
@@ -3909,7 +4225,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s5">
+<div class="section" id="eng-s5">
 <div class="sec-hdr">5. Space Battle Rules</div>
 
 <div class="rule-block">
@@ -3942,7 +4258,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s6">
+<div class="section" id="eng-s6">
 <div class="sec-hdr">6. Transport Rules</div>
 
 <div class="transport-grid">
@@ -3986,7 +4302,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s7">
+<div class="section" id="eng-s7">
 <div class="sec-hdr">7. Retreat Rules</div>
 
 <div class="rule-block">
@@ -4019,7 +4335,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s8">
+<div class="section" id="eng-s8">
 <div class="sec-hdr">8. Morale & Battle Setup</div>
 
 <div class="rule-block">
@@ -4044,7 +4360,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s9">
+<div class="section" id="eng-s9">
 <div class="sec-hdr">9. After the Battle</div>
 
 <div class="rule-block">
@@ -4082,7 +4398,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s10">
+<div class="section" id="eng-s10">
 <div class="sec-hdr">10. Commander Rules</div>
 
 <div class="rule-block">
@@ -4357,7 +4673,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ================================================================ -->
-<div class="section" id="s11">
+<div class="section" id="eng-s11">
 <div class="sec-hdr">11. Quick Reference</div>
 
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -4429,23 +4745,23 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 <div class="toc">
   <div class="toc-title">Contents</div>
   <div class="toc-list">
-    <a class="toc-item" href="#s1">1. Editor Quick Reference</a>
-    <a class="toc-item" href="#s2">2. Core Commands Reference</a>
-    <a class="toc-item" href="#s3">3. Tag System & Groups</a>
-    <a class="toc-item" href="#s4">4. Entities Condition</a>
-    <a class="toc-item" href="#s5">5. Actor State Parameters</a>
-    <a class="toc-item" href="#s6">6. Actor to Waypoint</a>
-    <a class="toc-item" href="#s7">7. Cinematic Setup</a>
-    <a class="toc-item" href="#s8">8. Morale System</a>
-    <a class="toc-item" href="#s9">9. Morale Break Triggers</a>
-    <a class="toc-item" href="#s10">10. Saw Gerrera Rogue Trigger</a>
-    <a class="toc-item" href="#s11">11. Commander Count Per Battle</a>
-    <a class="toc-item" href="#s12">12. Known Issues & Warnings</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s1')">1. Editor Quick Reference</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s2')">2. Core Commands Reference</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s3')">3. Tag System & Groups</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s4')">4. Entities Condition</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s5')">5. Actor State Parameters</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s6')">6. Actor to Waypoint</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s7')">7. Cinematic Setup</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s8')">8. Morale System</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s9')">9. Morale Break Triggers</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s10')">10. Saw Gerrera Rogue Trigger</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s11')">11. Commander Count Per Battle</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s12')">12. Known Issues & Warnings</a>
   </div>
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s1">
+<div class="section" id="gem-s1">
 <div class="section-hdr">1. Editor Quick Reference</div>
 <div class="section-intro">Essential keyboard shortcuts for working in the GEM Editor. ALT+G crashes the editor — never press it.</div>
 
@@ -4471,7 +4787,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s2">
+<div class="section" id="gem-s2">
 <div class="section-hdr">2. Core Commands Reference</div>
 
 <table>
@@ -4490,7 +4806,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s3">
+<div class="section" id="gem-s3">
 <div class="section-hdr">3. Tag System & Groups</div>
 <div class="section-intro">Tags are assigned to units in F3 mode using CTRL+T. Tags are the primary way to select units in triggers. A unit can have multiple tags. Tags float above units as green text when assigned.</div>
 
@@ -4536,7 +4852,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s4">
+<div class="section" id="gem-s4">
 <div class="section-hdr">4. Entities Condition</div>
 <div class="section-intro">The entities condition checks the count or state of tagged units. Used to detect deaths, alive counts, and trigger thresholds. This is the primary condition for morale break triggers.</div>
 
@@ -4570,7 +4886,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s5">
+<div class="section" id="gem-s5">
 <div class="section-hdr">5. Actor State Parameters</div>
 <div class="section-intro">actor_state changes AI behavior for tagged units mid-mission. You can overwrite a previous actor_state at any time. Only include parameters you want to change — unspecified parameters retain their current values.</div>
 
@@ -4649,7 +4965,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s6">
+<div class="section" id="gem-s6">
 <div class="section-hdr">6. Actor to Waypoint</div>
 <div class="section-intro">Sends tagged units to move toward a specific waypoint. Used to direct retreating units to fallback positions.</div>
 
@@ -4703,7 +5019,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s7">
+<div class="section" id="gem-s7">
 <div class="section-hdr">7. Cinematic Setup</div>
 <div class="section-intro">How to configure the editor for filming battles with no UI.</div>
 
@@ -4735,7 +5051,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s8">
+<div class="section" id="gem-s8">
 <div class="section-hdr">8. Morale System</div>
 <div class="section-intro">Morale is not a tracked number. It is a state determined by three campaign-layer conditions that are checked BEFORE the battle is set up in the editor. The morale state determines which trigger set you build into the mission.</div>
 
@@ -4801,7 +5117,7 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s9">
+<div class="section" id="gem-s9">
 <div class="section-hdr">9. Morale Break Triggers</div>
 <div class="section-intro">
 Build ONLY the trigger set that matches the force's morale state before the battle. Do not include both sets in the same mission — pick one based on the campaign state.
@@ -4935,7 +5251,7 @@ Each trigger fires only once (Trigger off). Delays are intentional — staggered
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s10">
+<div class="section" id="gem-s10">
 <div class="section-hdr">10. Saw Gerrera Rogue Trigger</div>
 <div class="section-intro">
 Fires when Saw's Partisans are in a joint operation AND have taken heavy casualties. The result is determined by a dice roll BEFORE the battle is set up — the result determines how Saw's player assignment is configured in F2.
@@ -4992,7 +5308,7 @@ Fires when Saw's Partisans are in a joint operation AND have taken heavy casualt
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s11">
+<div class="section" id="gem-s11">
 <div class="section-hdr">11. Commander Count Per Battle</div>
 <div class="section-intro">How many lieutenants, captains, and commanders to place and tag based on the Force Scaling Guide entry. Scale = number of commanders present who need death triggers.</div>
 
@@ -5079,7 +5395,7 @@ Fires when Saw's Partisans are in a joint operation AND have taken heavy casualt
 </div>
 
 <!-- ============================================================ -->
-<div class="section" id="s12">
+<div class="section" id="gem-s12">
 <div class="section-hdr">12. Known Issues & Warnings</div>
 
 <table>
@@ -5124,7 +5440,7 @@ Fires when Saw's Partisans are in a joint operation AND have taken heavy casualt
 
 
 <!-- ============================================================ -->
-<div class="section" id="s13">
+<div class="section" id="gem-s13">
 <div class="section-hdr">13. Vehicle Transport & Crew Scripting</div>
 
 <div class="sub-hdr">Pre-Mission Vehicle Crewing — Setup Method</div>
@@ -5208,19 +5524,229 @@ Fires when Saw's Partisans are in a joint operation AND have taken heavy casualt
 
 </div><!-- /container --></div></div>
 </div>
+<!-- BATTLE MODALS — outside all screen divs so visibility:hidden doesn't clip them -->
+<!-- ============================================================ -->
+<!-- BATTLE SETUP MODAL -->
+<!-- ============================================================ -->
+<div class="battle-modal-overlay" id="battleSetupOverlay" onclick="if(event.target===this)closeBattleSetup()">
+  <div class="battle-modal">
+    <div class="battle-modal-hdr">
+      <div class="battle-modal-title">⚔ PRE-BATTLE SETUP BRIEF</div>
+      <button onclick="closeBattleSetup()" style="background:transparent;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px" id="battleSetupContent"></div>
+  </div>
+</div>
 
+<!-- ============================================================ -->
+<!-- BATTLE RESULT MODAL -->
+<!-- ============================================================ -->
+<div class="battle-modal-overlay" id="battleResultOverlay" onclick="if(event.target===this)closeBattleResult()">
+  <div class="battle-modal">
+    <div class="battle-modal-hdr">
+      <div class="battle-modal-title" id="battleResultTitle">📋 BATTLE RESULT</div>
+      <button onclick="closeBattleResult()" style="background:transparent;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button>
+    </div>
+
+    <div id="battleResultBody">
+      <!-- Section 1: Battle Info -->
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:var(--panel2);display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div class="battle-field">
+          <label>Battle Type</label>
+          <select id="br-type" onchange="updateBattleResult()">
+            <option value="raid">Raid</option>
+            <option value="assault" selected>Full Assault</option>
+            <option value="planetary">Planetary Assault</option>
+            <option value="fleet">Fleet Engagement</option>
+            <option value="meeting">Meeting Engagement</option>
+          </select>
+        </div>
+        <div class="battle-field">
+          <label>Attacker</label>
+          <select id="br-attacker">
+            <option value="empire">Empire</option>
+            <option value="rebel">Rebel Alliance</option>
+          </select>
+        </div>
+        <div class="battle-field">
+          <label>Outcome</label>
+          <select id="br-outcome" onchange="updateBattleResult()">
+            <option value="imperial_decisive">Imperial Victory — Decisive</option>
+            <option value="imperial_moderate">Imperial Victory — Moderate</option>
+            <option value="rebel_decisive">Rebel Victory — Decisive</option>
+            <option value="rebel_moderate">Rebel Victory — Moderate</option>
+            <option value="pyrrhic">Pyrrhic / Draw</option>
+            <option value="ongoing">Ongoing — No Result</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Space Battle Section -->
+      <div id="br-space-section" style="padding:12px 16px;border-bottom:1px solid var(--border)">
+        <div class="battle-section-title">Space Battle Results</div>
+        <div class="battle-grid">
+          <div class="battle-field">
+            <label>Surviving Gozantis / GR-75s</label>
+            <input type="number" id="br-transports" min="0" max="20" value="0" onchange="updateBattleResult()">
+          </div>
+          <div class="battle-field">
+            <label>Landing Force (auto)</label>
+            <input type="text" id="br-landing" readonly style="color:var(--gold2)">
+          </div>
+          <div class="battle-field">
+            <label>Imperial Ships Lost</label>
+            <input type="text" id="br-imp-ships" placeholder="e.g. 2x ISD-I, 4x Arquitens">
+          </div>
+          <div class="battle-field">
+            <label>Rebel Ships Lost</label>
+            <input type="text" id="br-reb-ships" placeholder="e.g. 3x CR90, 1x Hammerhead">
+          </div>
+        </div>
+      </div>
+
+      <!-- Ground Battle Section -->
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+        <div class="battle-section-title">Ground Battle Results</div>
+        <div class="battle-grid">
+          <div class="battle-field">
+            <label>Imperial Ground Force Involved</label>
+            <select id="br-imp-force"><option value="">None</option></select>
+          </div>
+          <div class="battle-field">
+            <label>Imperial Casualties %</label>
+            <input type="number" id="br-imp-cas" min="0" max="100" value="0" placeholder="0-100" onchange="updateBattleResult()">
+          </div>
+          <div class="battle-field">
+            <label>Rebel Ground Force Involved</label>
+            <select id="br-reb-force"><option value="">None</option></select>
+          </div>
+          <div class="battle-field">
+            <label>Rebel Casualties %</label>
+            <input type="number" id="br-reb-cas" min="0" max="100" value="0" placeholder="0-100" onchange="updateBattleResult()">
+          </div>
+        </div>
+        <div class="battle-field" style="margin-top:8px">
+          <label>Battle Notes</label>
+          <textarea id="br-notes" placeholder="Key events, narrative notes for the video..."></textarea>
+        </div>
+      </div>
+
+      <!-- Commander Casualty -->
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+        <div class="battle-section-title">Commander Casualty Rolls</div>
+        <div class="battle-grid">
+          <div class="battle-field">
+            <label>Imperial Commander Present</label>
+            <select id="br-imp-cmd">
+              <option value="">None</option>
+              <option value="tarkin">Grand Moff Tarkin</option>
+              <option value="thrawn">Grand Admiral Thrawn</option>
+              <option value="vader">Darth Vader</option>
+              <option value="krennic">Director Krennic</option>
+              <option value="yularen">ISB Director Yularen</option>
+              <option value="konstantine">Admiral Konstantine</option>
+              <option value="pryce">Governor Pryce</option>
+              <option value="kallus">Agent Kallus</option>
+            </select>
+          </div>
+          <div class="battle-field">
+            <label>Imperial Commander Result</label>
+            <select id="br-imp-cmd-result">
+              <option value="">No Roll</option>
+              <option value="kia">KIA — Commander lost, -1 PW</option>
+              <option value="captured">Captured — Enemy +2 PW</option>
+              <option value="wounded">Wounded — Out 2 turns</option>
+              <option value="shaken">Shaken — -1 Rating next battle</option>
+              <option value="unharmed">Unharmed</option>
+              <option value="heroic">Heroic — +1 PW</option>
+            </select>
+          </div>
+          <div class="battle-field">
+            <label>Rebel Commander Present</label>
+            <select id="br-reb-cmd">
+              <option value="">None</option>
+              <option value="mothma">Mon Mothma</option>
+              <option value="bail">Senator Bail Organa</option>
+              <option value="dodonna">General Dodonna</option>
+              <option value="hera">Commander Hera Syndulla</option>
+              <option value="rex">Captain Rex</option>
+              <option value="saw">Saw Gerrera</option>
+              <option value="cham">Cham Syndulla</option>
+            </select>
+          </div>
+          <div class="battle-field">
+            <label>Rebel Commander Result</label>
+            <select id="br-reb-cmd-result">
+              <option value="">No Roll</option>
+              <option value="kia">KIA — Commander lost, -1 PW</option>
+              <option value="captured">Captured — Enemy +2 PW</option>
+              <option value="wounded">Wounded — Out 2 turns</option>
+              <option value="shaken">Shaken — -1 Rating next battle</option>
+              <option value="unharmed">Unharmed</option>
+              <option value="heroic">Heroic — +1 PW</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sector Control + PW Preview -->
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+        <div class="battle-section-title">Sector Control & Political Will</div>
+        <div class="battle-grid">
+          <div class="battle-field">
+            <label>Sector Control Changes?</label>
+            <select id="br-ctrl-change" onchange="updateBattleResult()">
+              <option value="no">No Change</option>
+              <option value="empire">Changes to IMPERIAL</option>
+              <option value="rebel">Changes to REBEL</option>
+              <option value="contested">Changes to CONTESTED</option>
+              <option value="neutral">Changes to NEUTRAL</option>
+            </select>
+          </div>
+          <div class="battle-field">
+            <label>Supply Change</label>
+            <select id="br-supply-change">
+              <option value="none">No Change</option>
+              <option value="imp_down">Imperial Force Supply ↓ one tier</option>
+              <option value="reb_down">Rebel Force Supply ↓ one tier</option>
+              <option value="both_down">Both ↓ one tier</option>
+            </select>
+          </div>
+        </div>
+        <div class="pw-change" id="br-pw-preview">
+          PW Changes will appear here after selecting outcome
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div style="padding:12px 16px">
+        <button class="battle-submit-btn" onclick="submitBattleResult()">✓ APPLY BATTLE RESULTS — UPDATE ALL FORCE CARDS</button>
+        <button class="battle-cancel-btn" onclick="closeBattleResult()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SCREEN_TITLES={sector:'STRATEGIC COMMAND',tracker:'TURN TRACKER',events:'EVENT CARDS',commanders:'NAMED COMMANDERS',ground:'GROUND ORDER OF BATTLE',naval:'NAVAL ORDER OF BATTLE',engagement:'ENGAGEMENT RULES',gem:'GEM SCRIPTING'};
 function showScreen(name){
-  document.querySelectorAll('.app-screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.app-screen').forEach(s=>{s.classList.remove('active');s.scrollTop=0;});
   document.querySelectorAll('.app-nav-item[id^="nav-"]').forEach(n=>n.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
   const nav=document.getElementById('nav-'+name);
   if(nav)nav.classList.add('active');
   document.getElementById('appTitle').textContent=SCREEN_TITLES[name]||name.toUpperCase();
 }
-let appPhase=1;
+function scrollInScreen(screenId,anchorId){
+  const screen=document.getElementById(screenId);
+  const target=document.getElementById(anchorId);
+  if(!screen||!target)return;
+  // Walk up the offsetParent chain to get offset relative to screen div
+  let offset=0;
+  let el=target;
+  while(el&&el!==screen){offset+=el.offsetTop;el=el.offsetParent;}
+  screen.scrollTop=offset-12;
+}let appPhase=1;
 function appSetPhase(p){
   appPhase=p;
   for(let i=1;i<=4;i++){
@@ -5918,18 +6444,18 @@ const ADJACENCY={
   'duro_sec':['coruscant_sec','corellian_sec','tapani_sec','bajic_sec'],
   'tapani_sec':['corellian_sec','kuat_sec','duro_sec','sesswenna_sec','sern_sec'],
   'darpa_sec':['coruscant_sec','kuat_sec','bormea_sec','bajic_sec','sern_sec'],
-  'sesswenna_sec':['tapani_sec','sern_sec','ryloth_sec','chommel_sec'],
-  'sern_sec':['sesswenna_sec','tapani_sec','darpa_sec','chommel_sec','bajic_sec'],
-  'chommel_sec':['sesswenna_sec','sern_sec','halla_sec','doldur_sec'],
+  'sesswenna_sec':['tapani_sec','sern_sec','ryloth_sec','chommell_sec'],
+  'sern_sec':['sesswenna_sec','tapani_sec','darpa_sec','chommell_sec','bajic_sec'],
+  'chommell_sec':['sesswenna_sec','sern_sec','halla_sec','doldur_sec'],
   'lothal_sec':['atollon_sec','ryloth_sec','halla_sec','mandalore_sec','kessel_sec'],
   'bajic_sec':['duro_sec','darpa_sec','sern_sec','doldur_sec','bothan_sec'],
-  'doldur_sec':['chommel_sec','bajic_sec','halla_sec','bothan_sec'],
+  'doldur_sec':['chommell_sec','bajic_sec','halla_sec','bothan_sec'],
   'bothan_sec':['bajic_sec','doldur_sec','halla_sec','kashyyyk_sec','gordian_sec'],
-  'halla_sec':['bothan_sec','chommel_sec','doldur_sec','lothal_sec','ryloth_sec'],
-  'ryloth_sec':['sesswenna_sec','arkanis_sec','lothal_sec','halla_sec','hutt_sec'],
-  'kashyyyk_sec':['sullust_sec','bothan_sec','halla_sec','kessel_sec','hutt_sec'],
+  'halla_sec':['bothan_sec','chommell_sec','doldur_sec','lothal_sec','ryloth_sec'],
+  'ryloth_sec':['sesswenna_sec','arkanis_sec','lothal_sec','halla_sec','hutt_space'],
+  'kashyyyk_sec':['sullust_sec','bothan_sec','halla_sec','kessel_sec','hutt_space'],
   'atollon_sec':['lothal_sec','ryloth_sec','mandalore_sec','atrivis_sec','gordian_sec'],
-  'arkanis_sec':['ryloth_sec','sullust_sec','hutt_sec','gordian_sec'],
+  'arkanis_sec':['ryloth_sec','sullust_sec','hutt_space','gordian_sec'],
   'gordian_sec':['bothan_sec','arkanis_sec','moddell_sec','quelli_sec','atollon_sec'],
   'sullust_sec':['arkanis_sec','kashyyyk_sec','moddell_sec','atrivis_sec'],
   'moddell_sec':['gordian_sec','sullust_sec','quelli_sec','lahara_sec'],
@@ -5939,13 +6465,13 @@ const ADJACENCY={
   'mandalore_sec':['lothal_sec','atollon_sec','raioballo_sec','kessel_sec','quelli_sec'],
   'quelli_sec':['gordian_sec','atrivis_sec','raioballo_sec','moddell_sec','mandalore_sec'],
   'lahara_sec':['moddell_sec','raioballo_sec','quelli_sec'],
-  'hutt_sec':['ryloth_sec','kashyyyk_sec','arkanis_sec','kessel_sec']
+  'hutt_space':['ryloth_sec','kashyyyk_sec','arkanis_sec','kessel_sec']
 };
 
 // ============================================================
 // GAME STATE
 // ============================================================
-let GS={turn:1,ePW:15,rPW:20,dsStep:0,sectors:{}};
+let GS={turn:1,ePW:15,rPW:20,dsStep:0,sectors:{},pendingActions:[],pendingBattles:[],cmdStatus:{}};
 
 async function initGS(){
   // Init Supabase client (safely - CDN must be loaded first)
@@ -5969,8 +6495,9 @@ async function initGS(){
     sec.planets.forEach(p=>{
       GS.sectors[sec.id].planets[p.name]={ctrl:p.ctrl,gov:p.gov,force:p.force,sup:p.sup,notes:p.notes};
     });
-    sec.forces.forEach(f=>{
+    sec.forces.forEach((f,fi)=>{
       const saved_f={...f};
+      if(!saved_f.id) saved_f.id = sec.id + '_f' + fi;
       GS.sectors[sec.id].forces.push(saved_f);
     });
   });
@@ -6001,6 +6528,7 @@ function updateTurnDisplay(){
 
 function advanceTurn(dir){
   if(dir<0&&GS.turn<=1)return;
+  if(dir>0) executeActions();
   GS.turn+=dir;
   updateTurnDisplay();
   updateCounts();
@@ -6120,14 +6648,18 @@ function renderSector(id){
     <div style="display:flex;align-items:center;gap:10px">
       <span class="ctrl-badge ${cc}">${cl}</span>
       <button class="edit-btn" onclick="openSecEdit('${id}')">EDIT SECTOR</button>
+      <button class="edit-btn" style="border-color:var(--yellow);color:var(--yellow);margin-left:6px" onclick="openBattleSetup('${id}')">⚔ BATTLE SETUP</button>
+      <button class="edit-btn" style="border-color:var(--rebel);color:var(--rebel);margin-left:6px" onclick="openBattleResult('${id}')">📋 BATTLE RESULT</button>
     </div>
   </div>
 
   <div class="ov-grid">
     <div class="ov-block">
       <div class="ov-label">Sector Commander</div>
-      <div class="ov-val" style="color:var(--gold)">${st.commander}</div>
-      <div class="ov-sub">${st.cmd_role}</div>
+      <div class="ov-val" style="color:var(--gold);display:flex;align-items:center;flex-wrap:wrap;gap:4px">
+        ${st.commander||sec.commander||''}${getCmdStatusBadge(st.commander||sec.commander||'')}
+      </div>
+      <div class="ov-sub">${st.cmd_role||sec.cmd_role||''}</div>
     </div>
     <div class="ov-block">
       <div class="ov-label">Supply Status</div>
@@ -6191,7 +6723,7 @@ function renderSector(id){
       const tag=f.type==='G'?'GROUND':'FLEET';
       h+=`<div class="force-card">
         <div class="force-name" style="color:${fc}">[${tag}] ${f.name}</div>
-        <div class="force-row"><div class="force-key">Commander</div><div class="force-val gold">${f.commander}</div></div>
+        <div class="force-row"><div class="force-key">Commander</div><div class="force-val gold" style="display:flex;align-items:center;gap:4px">${f.commander}${f.commander?getCmdStatusBadge(f.commander):''}</div></div>
         <div class="force-row"><div class="force-key">Home Base</div><div class="force-val">${f.home}</div></div>
         <div class="force-row"><div class="force-key">Deployed To</div><div class="force-val" style="color:${f.location!==f.home?'var(--contested)':'inherit'}">${f.location}</div></div>
         <div class="force-row"><div class="force-key">Strength</div><div class="force-val"><span class="str-tag ${sc2}">${sl2}</span></div></div>`;
@@ -6467,7 +6999,7 @@ function openAddForce(sid){
   openModal('ADD NEW FORCE',b,()=>{
     const st=GS.sectors[sid];
     const t=document.getElementById('af_t').value;
-    const newForce={
+    const newForce={id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
       type:t,
       name:document.getElementById('af_n').value||'New Force',
       faction:document.getElementById('af_f').value,
@@ -6506,6 +7038,681 @@ async function resetCampaign(){
     catch(e){console.log('Supabase clear:',e);}
   }
   location.reload();
+}
+
+
+// ============================================================
+// BATTLE SETUP
+// ============================================================
+function getMoraleState(secId, faction) {
+  const st = GS.sectors[secId];
+  if (!st) return 'UNKNOWN';
+  const sec = SECTORS.find(s => s.id === secId);
+
+  // Find forces of this faction in sector
+  const forces = (st.forces || []).filter(f => {
+    if (faction === 'empire') return f.name && (f.name.includes('GROUND') || f.name.includes('FLEET')) && !f.name.includes('REBEL');
+    return true;
+  });
+
+  const supply = st.supply_st;
+  // Morale determination
+  let morale = 'STEADY';
+  if (supply === 'C') morale = 'BATTERED';
+  else if (supply === 'L') morale = 'SHAKEN';
+  return morale;
+}
+
+function getMoraleScript(morale) {
+  if (morale === 'HIGH' || morale === 'STEADY') return 'STEADY trigger set — units hold on LT death';
+  if (morale === 'SHAKEN') return 'BROKEN trigger set — units rout on LT death';
+  if (morale === 'BATTERED') return 'BROKEN trigger set — units rout on any commander death';
+  return 'AUTO-RETREAT — force cannot initiate attack';
+}
+
+function getEntryFromType(type) {
+  const entries = {
+    'raid': 'Entry 001-003 (Squad/Platoon scale)',
+    'assault': 'Entry 007-008 (Battalion scale)',
+    'planetary': 'Entry 009-011 (Regiment scale)',
+    'fleet': 'AotR only — no Men of War ground battle',
+    'meeting': 'Entry 007-008 (Meeting Engagement — no attacker advantage)',
+  };
+  return entries[type] || 'Entry TBD';
+}
+
+let activeBattleSecId = null;
+
+
+// Ship display name lookup
+const SHIP_NAMES = {
+  ISD_I:'ISD-I',ISD_II:'ISD-II',Victory_I:'Victory-I',Victory_II:'Victory-II',
+  Venator:'Venator',Interdictor:'Interdictor',Gladiator:'Gladiator',
+  Arquitens:'Arquitens LC',Raider:'Raider Corvette',Gozanti:'Gozanti',
+  Immobilizer:'Immobilizer 418',
+  TIE_Fighter:'TIE/ln Fighter',TIE_Bomber:'TIE Bomber',
+  TIE_Interceptor:'TIE Interceptor',TIE_Advanced:'TIE Advanced',
+  CR90:'CR90 Corvette',Hammerhead:'Hammerhead Corvette',
+  Nebulon_B:'Nebulon-B Frigate',Nebulon_B2:'Nebulon-B2 Frigate',
+  Assault_Frigate:'Assault Frigate Mk I',Assault_Frigate_II:'Assault Frigate Mk II',
+  Dreadnaught:'Dreadnaught HC',MC80:'MC80 Star Cruiser',
+  GR75:'GR-75 Transport',Consular:'Consular-class',
+  ARC170:'ARC-170',Y_Wing:'Y-Wing',X_Wing:'X-Wing',A_Wing:'A-Wing',
+  B_Wing:'B-Wing',Z95:'Z-95 Headhunter',
+};
+
+function formatShipList(ships) {
+  if (!ships) return 'No ship data';
+  return Object.entries(ships)
+    .filter(([k,v]) => v > 0)
+    .map(([k,v]) => `${v}x ${SHIP_NAMES[k]||k}`)
+    .join(', ');
+}
+
+function getHWSCount(headcount) {
+  if (!headcount) return 0;
+  const num = parseInt(headcount.toString().replace(/[^0-9]/g,'')) || 0;
+  const companies = Math.floor(num / 144);
+  return companies * 2;
+}
+
+function getGEMScript(morale, faction) {
+  if (morale === 'HIGH' || morale === 'STEADY') return 'Load: STEADY trigger set — units hold on LT death';
+  if (morale === 'SHAKEN') return 'Load: BROKEN trigger set — units rout on LT death';
+  if (morale === 'BATTERED') return 'Load: BROKEN trigger set — units rout on any commander death';
+  return 'Load: ROUT trigger set — force auto-retreats when engaged';
+}
+
+function openBattleSetup(secId) {
+  activeBattleSecId = secId;
+  const sec = SECTORS.find(s => s.id === secId);
+  const st = GS.sectors[secId];
+  if (!sec || !st) return;
+
+  const impMorale = getMoraleState(secId, 'empire');
+  const rebMorale = getMoraleState(secId, 'rebel');
+
+  // Get forces in sector
+  const forces = st.forces || [];
+  const impForces = forces.filter(f => f.faction === 'empire' || (!f.faction && f.name && f.name.includes('GROUND')));
+  const rebForces = forces.filter(f => f.faction === 'rebel' || (!f.faction && f.name && f.name.includes('REBEL')));
+  const fleets = forces.filter(f => f.name && f.name.includes('FLEET'));
+
+  // Find Gozantis in any fleet
+  let gozantiCount = 0;
+  let gr75Count = 0;
+  forces.forEach(f => {
+    if (f.composition) {
+      const goz = f.composition.match(/(\d+)x?\s*Gozanti/i);
+      const gr = f.composition.match(/(\d+)x?\s*GR-75/i);
+      if (goz) gozantiCount += parseInt(goz[1]);
+      if (gr) gr75Count += parseInt(gr[1]);
+    }
+  });
+
+  const totalTransports = gozantiCount + gr75Count;
+  let landingForce = 'No ground forces can land';
+  if (totalTransports >= 9) landingForce = 'Full assault — Battalion+';
+  else if (totalTransports >= 5) landingForce = `${totalTransports} Platoons (~2 Companies)`;
+  else if (totalTransports >= 3) landingForce = `${totalTransports} Platoons (~1 Company)`;
+  else if (totalTransports >= 1) landingForce = `${totalTransports} Platoon(s)`;
+
+  const html = `
+    <div class="battle-section">
+      <div class="battle-section-title" style="color:var(--yellow)">Sector: ${sec.name} — ${sec.region}</div>
+    </div>
+
+    <div class="battle-section">
+      <div class="battle-section-title">Step 1 — Select Battle Type</div>
+      <div class="battle-field">
+        <label>Action Type</label>
+        <select id="setup-type" onchange="updateSetupBrief()">
+          <option value="raid">Raid (Entry 001-003)</option>
+          <option value="assault">Full Assault (Entry 007-008)</option>
+          <option value="planetary">Planetary Assault (Entry 009-011)</option>
+          <option value="fleet">Fleet Engagement (AotR only)</option>
+          <option value="meeting">Meeting Engagement</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="battle-info-box" id="setup-brief">
+      <div style="font-family:'Orbitron',monospace;font-size:10px;color:var(--gold);margin-bottom:10px">BATTLE BRIEF</div>
+
+      <div class="battle-section-title">Forces Present</div>
+      ${forces.length === 0 ? '<div style="color:var(--dim);font-size:11px">No force cards in this sector</div>' : forces.map(f => `
+        <div class="battle-info-row">
+          <span class="battle-info-key">${f.name}</span>
+          <span class="battle-info-val">${f.headcount || f.tier || '?'} — ${{F:'Full Strength',R:'Reduced',D:'Depleted',X:'Destroyed'}[f.str] || f.str || 'Full Strength'}</span>
+        </div>`).join('')}
+
+      <div class="battle-section-title" style="margin-top:10px">Morale State</div>
+      <div class="battle-info-row">
+        <span class="battle-info-key">Supply Status</span>
+        <span class="battle-info-val ${st.supply_st === 'O' ? 'good' : st.supply_st === 'L' ? 'warn' : 'bad'}">${st.supply_st === 'O' ? 'NOMINAL' : st.supply_st === 'L' ? 'REDUCED' : 'CRITICAL'}</span>
+      </div>
+      <div class="battle-info-row">
+        <span class="battle-info-key">Imperial Morale</span>
+        <span class="battle-info-val morale-badge morale-${impMorale}">${impMorale}</span>
+        <span class="battle-info-val" style="margin-left:8px;font-size:10px;color:var(--dim)">${getMoraleScript(impMorale)}</span>
+      </div>
+      <div class="battle-info-row">
+        <span class="battle-info-key">Rebel Morale</span>
+        <span class="battle-info-val morale-badge morale-${rebMorale}">${rebMorale}</span>
+        <span class="battle-info-val" style="margin-left:8px;font-size:10px;color:var(--dim)">${getMoraleScript(rebMorale)}</span>
+      </div>
+
+      <div class="battle-section-title" style="margin-top:10px">Transport Capacity</div>
+      <div class="battle-info-row">
+        <span class="battle-info-key">Gozantis</span>
+        <span class="battle-info-val gold">${gozantiCount}</span>
+      </div>
+      <div class="battle-info-row">
+        <span class="battle-info-key">GR-75s</span>
+        <span class="battle-info-val gold">${gr75Count}</span>
+      </div>
+      <div class="battle-info-row">
+        <span class="battle-info-key">Max Landing Force</span>
+        <span class="battle-info-val good">${landingForce}</span>
+      </div>
+
+      <div class="battle-section-title" style="margin-top:10px">Men of War Setup</div>
+      <div class="battle-info-row" id="setup-entry">
+        <span class="battle-info-key">Force Scaling Entry</span>
+        <span class="battle-info-val gold">Entry 007-008 (Battalion scale)</span>
+      </div>
+      <div class="battle-info-row">
+        <span class="battle-info-key">Heavy Weapons</span>
+        <span class="battle-info-val">2 HWS per Company automatically included</span>
+      </div>
+      <div class="battle-info-row">
+        <span class="battle-info-key">Saw Rogue Roll</span>
+        <span class="battle-info-val warn">${forces.some(f => f.name && f.name.includes('Saw')) ? '⚠ SAW IS PRESENT — Roll 1d6 before battle. 1-2: Friendly Fire. 3-4: Withdrawal. 5-6: Holds.' : 'Not required'}</span>
+      </div>
+
+      <div class="battle-section-title" style="margin-top:10px">GEM Script Reference</div>
+      ${forces.filter(f=>f.headcount).map(f=>{
+        const morale = f.faction==='rebel'||f.name.includes('REBEL') ? rebMorale : impMorale;
+        const faction = f.faction==='rebel'||f.name.includes('REBEL') ? 'rebel' : 'empire';
+        const hws = getHWSCount(f.headcount);
+        return `
+        <div class="battle-info-row">
+          <span class="battle-info-key">${f.name.replace('[GROUND] ','')}</span>
+          <span class="battle-info-val gold" style="font-family:'Orbitron',monospace;font-size:10px">${getGEMScript(morale,faction)}</span>
+        </div>
+        ${hws > 0 ? `<div class="battle-info-row">
+          <span class="battle-info-key" style="padding-left:8px">↳ Heavy Weapons</span>
+          <span class="battle-info-val">${hws} HWS (${hws*3} E-Web crew, ${hws*3} missile teams, ${hws*3} DLT-19 teams)</span>
+        </div>` : ''}`;
+      }).join('')}
+
+      <div class="battle-section-title" style="margin-top:10px">AotR Ship List</div>
+      ${forces.filter(f=>f.ships).map(f=>`
+        <div class="battle-info-row">
+          <span class="battle-info-key">${f.name.replace('[FLEET] ','')}</span>
+          <span class="battle-info-val">${formatShipList(f.ships)}</span>
+        </div>
+        ${f.ships && f.ships.Gozanti ? `<div class="battle-info-row">
+          <span class="battle-info-key" style="padding-left:8px">↳ Transport config</span>
+          <span class="battle-info-val warn">${f.ships.Gozanti}x Gozanti — place at rear of formation</span>
+        </div>` : ''}
+        ${f.ships && f.ships.GR75 ? `<div class="battle-info-row">
+          <span class="battle-info-key" style="padding-left:8px">↳ Transport config</span>
+          <span class="battle-info-val warn">${f.ships.GR75}x GR-75 — place at rear of formation</span>
+        </div>` : ''}
+        ${f.ships && f.ships.Interdictor ? `<div class="battle-info-row">
+          <span class="battle-info-key" style="padding-left:8px">↳ Interdictor</span>
+          <span class="battle-info-val bad">⚠ GRAVITY WELLS ACTIVE — Rebels cannot escape to hyperspace</span>
+        </div>` : ''}
+      `).join('')}
+    </div>
+
+    <button class="battle-cancel-btn" onclick="closeBattleSetup()">Close</button>
+  `;
+
+  document.getElementById('battleSetupContent').innerHTML = html;
+  document.getElementById('battleSetupOverlay').classList.add('open');
+}
+
+function updateSetupBrief() {
+  const type = document.getElementById('setup-type')?.value;
+  const entryEl = document.getElementById('setup-entry');
+  if (entryEl && type) {
+    entryEl.querySelector('span:last-child').textContent = getEntryFromType(type);
+  }
+}
+
+function closeBattleSetup() {
+  document.getElementById('battleSetupOverlay').classList.remove('open');
+}
+
+// ============================================================
+// BATTLE RESULT
+// ============================================================
+function openBattleResult(secId) {
+  activeBattleSecId = secId;
+  const sec = SECTORS.find(s => s.id === secId);
+  const st = GS.sectors[secId];
+  if (!sec || !st) return;
+
+  document.getElementById('battleResultTitle').textContent = `📋 BATTLE RESULT — ${sec.name}`;
+
+  // Build sector options for attacker sector selector
+  const secOpts = '<option value="">— Defending Sector (current) —</option>' +
+    SECTORS.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  
+  const atkSel = document.getElementById('br-attacker-sec');
+  if(atkSel) { atkSel.innerHTML = secOpts; atkSel.value = secId; }
+
+  // Populate force dropdowns from current sector
+  populateBattleForces(secId);
+
+  updateBattleResult();
+  document.getElementById('battleResultOverlay').classList.add('open');
+}
+
+function populateBattleForces(secId) {
+  const st = GS.sectors[secId];
+  const forces = st ? (st.forces || []) : [];
+  const impSel = document.getElementById('br-imp-force');
+  const rebSel = document.getElementById('br-reb-force');
+  // Combine forces from current sector AND attacker sector
+  const atkSecId = document.getElementById('br-attacker-sec')?.value;
+  const atkSt = atkSecId && atkSecId !== secId ? GS.sectors[atkSecId] : null;
+  const atkForces = atkSt ? (atkSt.forces || []) : [];
+  const allForces = [...forces, ...atkForces];
+  // Use "secId::index" as stable key since forces may lack IDs in old saves
+  const opts = '<option value="">None</option>' + 
+    allForces.map((f, i) => {
+      const sid = i < forces.length ? secId : (atkSecId||secId);
+      const idx = i < forces.length ? i : i - forces.length;
+      return `<option value="${sid}::${idx}">${f.name}</option>`;
+    }).join('');
+  if(impSel) impSel.innerHTML = opts;
+  if(rebSel) rebSel.innerHTML = opts;
+}
+
+function updateBattleResult() {
+  const type = document.getElementById('br-type')?.value;
+  const outcome = document.getElementById('br-outcome')?.value;
+  const transports = parseInt(document.getElementById('br-transports')?.value || 0);
+
+  // Show/hide space section
+  const spaceSection = document.getElementById('br-space-section');
+  if (spaceSection) {
+    spaceSection.style.display = (type === 'fleet' || type === 'planetary') ? 'block' : 'none';
+  }
+
+  // Landing force calculation
+  const landingEl = document.getElementById('br-landing');
+  if (landingEl) {
+    if (transports === 0) landingEl.value = 'No ground forces land';
+    else if (transports <= 2) landingEl.value = `${transports} Platoon(s) — Entry 002-003`;
+    else if (transports <= 4) landingEl.value = `${transports} Platoons ~1 Company — Entry 004-006`;
+    else if (transports <= 8) landingEl.value = `${transports} Platoons ~2 Companies — Entry 007-008`;
+    else landingEl.value = 'Full assault force — Entry 009-011';
+  }
+
+  // PW preview
+  const pwEl = document.getElementById('br-pw-preview');
+  if (pwEl && outcome) {
+    let empireChange = 0, rebelChange = 0;
+    if (outcome === 'imperial_decisive') { empireChange = 2; rebelChange = -2; }
+    else if (outcome === 'imperial_moderate') { empireChange = 1; rebelChange = -1; }
+    else if (outcome === 'rebel_decisive') { empireChange = -2; rebelChange = 2; }
+    else if (outcome === 'rebel_moderate') { empireChange = -1; rebelChange = 1; }
+
+    const eSign = empireChange >= 0 ? '+' : '';
+    const rSign = rebelChange >= 0 ? '+' : '';
+    pwEl.innerHTML = `
+      <span style="color:var(--empire)">Empire PW: ${eSign}${empireChange}</span> &nbsp;|&nbsp;
+      <span style="color:var(--rebel)">Alliance PW: ${rSign}${rebelChange}</span>
+      <span style="color:var(--dim);margin-left:8px">Commander results applied on submit</span>
+    `;
+  }
+}
+
+function submitBattleResult() {
+  const secId = activeBattleSecId;
+  const st = GS.sectors[secId];
+  if (!st) return;
+
+  const outcome = document.getElementById('br-outcome').value;
+  const impCas = parseInt(document.getElementById('br-imp-cas').value || 0);
+  const rebCas = parseInt(document.getElementById('br-reb-cas').value || 0);
+  const ctrlChange = document.getElementById('br-ctrl-change').value;
+  const supplyChange = document.getElementById('br-supply-change').value;
+  const impCmdResult = document.getElementById('br-imp-cmd-result').value;
+  const rebCmdResult = document.getElementById('br-reb-cmd-result').value;
+
+  // Apply casualties to force cards
+  const impForceId = document.getElementById('br-imp-force').value;
+  const rebForceId = document.getElementById('br-reb-force').value;
+
+  // forceKey format: "secId::index"
+  function findForceAnywhere(forceKey) {
+    if (!forceKey || !forceKey.includes('::')) return null;
+    const [sid, idxStr] = forceKey.split('::');
+    const sec = GS.sectors[sid];
+    if (!sec || !sec.forces) return null;
+    return sec.forces[parseInt(idxStr)] || null;
+  }
+
+  // Parse only the first number in a headcount string
+  // e.g. "2,304 front-line troops + 8,000 KDY" -> 2304
+  function parseHeadcount(hc) {
+    const m = hc.toString().match(/[\d,]+/);
+    return m ? parseInt(m[0].replace(/,/g, '')) || 0 : 0;
+  }
+
+  function applyCasualties(forceId, casPct) {
+    if (!forceId || casPct <= 0) return;
+    const force = findForceAnywhere(forceId);
+    if (!force || !force.headcount) return;
+    const current = parseHeadcount(force.headcount);
+    if (!current) return;
+    const losses = Math.floor(current * casPct / 100);
+    const remaining = current - losses;
+    force.headcount = remaining.toLocaleString() + ' men (after ' + casPct + '% casualties)';
+    const pct = remaining / current * 100;
+    if (pct > 75) force.str = 'F';
+    else if (pct > 50) force.str = 'R';
+    else if (pct > 25) force.str = 'D';
+    else force.str = 'X';
+  }
+
+  applyCasualties(impForceId, impCas);
+  applyCasualties(rebForceId, rebCas);
+
+  // Apply PW changes
+  let empireChange = 0, rebelChange = 0;
+  if (outcome === 'imperial_decisive') { empireChange = 2; rebelChange = -2; }
+  else if (outcome === 'imperial_moderate') { empireChange = 1; rebelChange = -1; }
+  else if (outcome === 'rebel_decisive') { empireChange = -2; rebelChange = 2; }
+  else if (outcome === 'rebel_moderate') { empireChange = -1; rebelChange = 1; }
+
+  // Commander results affect PW
+  [impCmdResult, rebCmdResult].forEach((result, idx) => {
+    const isImp = idx === 0;
+    if (result === 'kia') { if(isImp) empireChange -= 1; else rebelChange -= 1; }
+    else if (result === 'captured') { if(isImp) { empireChange -= 1; rebelChange += 2; } else { rebelChange -= 1; empireChange += 2; } }
+    else if (result === 'heroic') { if(isImp) empireChange += 1; else rebelChange += 1; }
+  });
+
+  GS.ePW = Math.max(0, Math.min(20, GS.ePW + empireChange));
+  GS.rPW = Math.max(0, Math.min(20, GS.rPW + rebelChange));
+
+  // Apply sector control change
+  if (ctrlChange !== 'no') {
+    st.ctrl = ctrlChange;
+  }
+
+  // Apply supply change
+  const supplyTiers = {O:'O', L:'L', C:'C'};
+  const downTier = {O:'L', L:'C', C:'C'};
+  if (supplyChange === 'imp_down' || supplyChange === 'both_down') {
+    st.supply_st = downTier[st.supply_st] || 'C';
+  }
+  if (supplyChange === 'reb_down' || supplyChange === 'both_down') {
+    st.supply_st = downTier[st.supply_st] || 'C';
+  }
+
+  // Save everything
+  saveGS();
+  updatePW();
+  updateCounts();
+  buildNav();
+  // Re-render the battle sector plus currently viewed sector
+  renderSector(secId);
+  if (activeSec && activeSec !== secId) renderSector(activeSec);
+
+  closeBattleResult();
+  alert(`Battle results applied.\nEmpire PW: ${GS.ePW} | Alliance PW: ${GS.rPW}\nAll force cards updated.`);
+}
+
+function closeBattleResult() {
+  document.getElementById('battleResultOverlay').classList.remove('open');
+}
+
+
+
+// ============================================================
+// EXECUTE PENDING ACTIONS ON TURN ADVANCE
+// ============================================================
+function executeActions(){
+  // Read action rows from turn tracker localStorage if not already in GS
+  if(!GS.pendingActions || !GS.pendingActions.length) {
+    try {
+      const trackerSaved = localStorage.getItem('sw_turn_tracker');
+      if(trackerSaved) {
+        const ts = JSON.parse(trackerSaved);
+        const imp = (ts.impActions||[]).map(a=>({...a,faction:'empire'}));
+        const reb = (ts.rebActions||[]).map(a=>({...a,faction:'rebel'}));
+        GS.pendingActions = [...imp,...reb].filter(a=>a.type&&a.type!=='Other'&&a.type!=='');
+      }
+    } catch(e) { console.error('Failed to read tracker actions:', e); }
+  }
+  const actions = GS.pendingActions || [];
+  if(!actions.length) return;
+
+  const supplyUp = {C:'L',L:'O',O:'O'};
+  const supplyDown = {O:'L',L:'C',C:'C'};
+
+  actions.forEach(action => {
+    if(!action || action.status === 'executed') return;
+    const {type, fromSec, toSec, detail, isBattle, faction} = action;
+
+    // BATTLE TYPES — flag as pending battle, don't auto-execute
+    if(isBattle) {
+      if(!GS.pendingBattles) GS.pendingBattles = [];
+      GS.pendingBattles.push({...action, status:'pending'});
+      action.status = 'executed';
+      return;
+    }
+
+    // MOVE FLEET or MOVE GROUND FORCE
+    if(type === 'Move Fleet' || type === 'Fleet Deployment' || type === 'Move Ground Force') {
+      const srcSt = GS.sectors[fromSec];
+      const dstSt = GS.sectors[toSec];
+      if(!srcSt || !dstSt) { action.status='error:sector_not_found'; return; }
+
+      // Find force to move — match by detail text (force name) or faction
+      const isFleet = type === 'Move Fleet' || type === 'Fleet Deployment';
+      const forces = srcSt.forces || [];
+      let forceIdx = -1;
+
+      if(detail) {
+        // Try to match by name
+        forceIdx = forces.findIndex(f =>
+          f.name && f.name.toLowerCase().includes(detail.toLowerCase())
+        );
+      }
+      if(forceIdx === -1) {
+        // Fall back: move first fleet or first ground force
+        forceIdx = forces.findIndex(f =>
+          isFleet ? (f.name && f.name.includes('FLEET')) : (f.name && f.name.includes('GROUND'))
+        );
+      }
+
+      if(forceIdx > -1) {
+        const force = forces.splice(forceIdx, 1)[0];
+        force.location = toSec;
+        if(!dstSt.forces) dstSt.forces = [];
+        dstSt.forces.push(force);
+        action.status = 'executed';
+        console.log(`Moved ${force.name} from ${fromSec} to ${toSec}`);
+      } else {
+        action.status = 'error:force_not_found';
+      }
+    }
+
+    // SUPPLY RUN — restore supply one tier in toSec
+    else if(type === 'Supply Run') {
+      const st = GS.sectors[toSec];
+      if(st) { st.supply_st = supplyUp[st.supply_st] || 'O'; action.status='executed'; }
+    }
+
+    // BLOCKADE — set supply to degrading in toSec
+    else if(type === 'Blockade') {
+      const st = GS.sectors[toSec];
+      if(st) { st.supply_st = supplyDown[st.supply_st] || 'C'; action.status='executed'; }
+    }
+
+    // GARRISON REINFORCEMENT — drop supply one tier in fromSec
+    else if(type === 'Garrison Reinforcement') {
+      const st = GS.sectors[fromSec];
+      if(st) { st.supply_st = supplyDown[st.supply_st] || 'C'; action.status='executed'; }
+    }
+
+    // DEATH STAR ADVANCE
+    else if(type === 'Death Star Advance') {
+      GS.dsStep = Math.min(5, (GS.dsStep||0) + 1);
+      action.status = 'executed';
+    }
+
+    // DIPLOMATIC MISSION — change sector control to contested/rebel
+    else if(type === 'Diplomatic Mission') {
+      const st = GS.sectors[toSec];
+      if(st && st.ctrl === 'N') { st.ctrl = 'C'; action.status='executed'; }
+      else if(st) { action.status='executed'; }
+    }
+
+    // CELL INSERTION — add a rebel cell force card to toSec
+    else if(type === 'Cell Insertion') {
+      const st = GS.sectors[toSec];
+      if(st) {
+        if(!st.forces) st.forces = [];
+        st.forces.push({
+          id: 'cell_'+Date.now(),
+          name: '[GROUND] Rebel Cell — ' + (detail || 'Covert'),
+          faction: 'rebel',
+          str: 'F',
+          headcount: '~50 operatives',
+          composition: 'Covert rebel cell — inserted this turn',
+        });
+        action.status='executed';
+      }
+    }
+
+    // ALL OTHER TYPES — mark executed (no auto-update needed)
+    else {
+      action.status = 'executed';
+    }
+  });
+
+  // Clear executed actions, keep errors for GM review
+  GS.pendingActions = actions.filter(a => a.status !== 'executed');
+}
+
+// Called by turn tracker when player presses NEXT TURN
+// Packages action rows as pendingActions in GS
+function receivePendingActions(impActions, rebActions) {
+  GS.pendingActions = [
+    ...(impActions||[]).map(a => ({...a, faction:'empire'})),
+    ...(rebActions||[]).map(a => ({...a, faction:'rebel'})),
+  ].filter(a => a.type && a.type !== 'Other');
+  saveGS();
+}
+
+
+// ============================================================
+// COMMANDER STATUS
+// ============================================================
+const CMD_STATUSES = [
+  {val:'active',   label:'Active',              color:'var(--green)'},
+  {val:'wounded',  label:'Wounded — Out 2 turns', color:'var(--yellow)'},
+  {val:'wounded1', label:'Wounded — Out 1 turn',  color:'var(--yellow)'},
+  {val:'shaken',   label:'Shaken — -1 Rating',    color:'var(--orange)'},
+  {val:'captured', label:'Captured',              color:'var(--red)'},
+  {val:'kia',      label:'KIA',                   color:'var(--red)'},
+];
+
+function getCmdStatus(name) {
+  if(!GS.cmdStatus || !name) return CMD_STATUSES[0];
+  const key = name.toLowerCase().replace(/[^a-z]/g,'');
+  // Try exact match first
+  if(GS.cmdStatus[key]) return CMD_STATUSES.find(c=>c.val===GS.cmdStatus[key]) || CMD_STATUSES[0];
+  // Try partial match — sector cards may use full name while dropdown uses short name
+  for(const [k, v] of Object.entries(GS.cmdStatus)) {
+    if(key.includes(k) || k.includes(key)) {
+      return CMD_STATUSES.find(c=>c.val===v) || CMD_STATUSES[0];
+    }
+  }
+  // Surname fallback — match by last word of name
+  const lastName = name.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,'');
+  for(const [k, v] of Object.entries(GS.cmdStatus)) {
+    if(k.endsWith(lastName) || k.includes(lastName)) {
+      return CMD_STATUSES.find(c=>c.val===v) || CMD_STATUSES[0];
+    }
+  }
+  return CMD_STATUSES[0];
+}
+
+// Maps between Turn Tracker text values (cs- dropdowns) and Supabase val keys (cmdsel_ dropdowns)
+const CS_TO_VAL = {
+  'Active':'active','Active (Imperial)':'active',
+  'In Transit':'active',
+  'Wounded (2 turns)':'wounded','Wounded (1 turn)':'wounded1',
+  'Shaken':'shaken',
+  'Captured':'captured',
+  'KIA':'kia',
+  'Defected (Rebel)':'active',
+  'Rogue':'active','Underground':'active','Exposed':'active'
+};
+const VAL_TO_CS = {
+  'active':'Active','wounded':'Wounded (2 turns)','wounded1':'Wounded (1 turn)',
+  'shaken':'Shaken','captured':'Captured','kia':'KIA'
+};
+// Maps cmdsel_ key suffix to cs- id suffix
+const CMDSEL_TO_CS = {
+  'grandmoffwilhufftarkin':'tarkin','grandadmiralthrawn':'thrawn','darthvader':'vader',
+  'directorkrennic':'krennic','isbdirectoryularen':'yularen',
+  'admiralkassiuskonstantine':'konstantine','governorarihndapryce':'pryce',
+  'agentkallus':'kallus','monmothma':'mothma','senatorbailorgana':'bail',
+  'generaldodonna':'dodonna','commanderherasyndulla':'hera',
+  'captainrex':'rex','sawgerrera':'saw'
+};
+
+function setCmdStatus(name, val) {
+  const key = name.toLowerCase().replace(/[^a-z]/g,'');
+  if(!GS.cmdStatus) GS.cmdStatus = {};
+  GS.cmdStatus[key] = val;
+  saveGS();
+  // Re-render sector card if visible
+  if(activeSec) renderSector(activeSec);
+  // Sync cmdsel_ dropdown (Named Commanders screen)
+  const sel = document.getElementById('cmdsel_' + key);
+  if(sel && sel.value !== val) sel.value = val;
+  // Sync cs- dropdown (Turn Tracker screen)
+  const csKey = CMDSEL_TO_CS[key];
+  if(csKey) {
+    const csEl = document.getElementById('cs-' + csKey);
+    if(csEl) {
+      const csVal = VAL_TO_CS[val] || 'Active';
+      const opts = Array.from(csEl.options).map(o=>o.value||o.text);
+      if(opts.includes(csVal)) csEl.value = csVal;
+    }
+  }
+}
+
+// Called when a cs- Turn Tracker dropdown changes — syncs into GS.cmdStatus
+function syncCsToGS(csKey, textVal) {
+  const valKey = CS_TO_VAL[textVal] || 'active';
+  const cmdselKey = Object.entries(CMDSEL_TO_CS).find(([k,v])=>v===csKey)?.[0];
+  if(!cmdselKey) return;
+  if(!GS.cmdStatus) GS.cmdStatus = {};
+  GS.cmdStatus[cmdselKey] = valKey;
+  saveGS();
+  if(activeSec) renderSector(activeSec);
+  // Sync cmdsel_ dropdown
+  const sel = document.getElementById('cmdsel_' + cmdselKey);
+  if(sel && sel.value !== valKey) sel.value = valKey;
+}
+
+function getCmdStatusBadge(commanderName) {
+  const s = getCmdStatus(commanderName);
+  if(s.val === 'active') return '';
+  return `<span style="font-size:9px;padding:1px 6px;border:1px solid ${s.color};color:${s.color};margin-left:6px;letter-spacing:1px">${s.label.toUpperCase()}</span>`;
 }
 
 // ============================================================
@@ -6554,14 +7761,15 @@ let impAPSpent = 0;
 let rebAPSpent = 0;
 
 const IMP_ACTIONS = [
-  'Move Commander','Planetary Assault','Fleet Deployment','Orbital Bombardment',
+  'Move Commander','Move Fleet','Move Ground Force','Planetary Assault',
+  'Fleet Deployment','Fleet Engagement','Orbital Bombardment',
   'ISB Crackdown','Garrison Reinforcement','Sector Lockdown','Death Star Advance',
-  'Intel Operation','Blockade','Move Ground Force','Emergency Deployment','Other'
+  'Intel Operation','Blockade','Emergency Deployment','Other'
 ];
 const REB_ACTIONS = [
-  'Move Commander','Raid','Full Assault','Fleet Engagement','Diplomatic Mission',
-  'Cell Insertion','Supply Run','Rescue Mission','Intel Operation','Fortify',
-  'Move Ground Force','Saw Gerrera Deploy','Other'
+  'Move Commander','Move Fleet','Move Ground Force','Raid','Full Assault',
+  'Fleet Engagement','Diplomatic Mission','Cell Insertion','Supply Run',
+  'Rescue Mission','Intel Operation','Fortify','Saw Gerrera Deploy','Other'
 ];
 const AP_COSTS = {
   'Move Commander':1,'Planetary Assault':2,'Fleet Deployment':1,'Orbital Bombardment':2,
@@ -6671,6 +7879,9 @@ function toggleAP(faction, index) {
 }
 
 // ── ACTION ROWS ───────────────────────────────────────────────
+
+
+
 function addActionRow(faction) {
   const container = document.getElementById(`${faction}-action-rows`);
   const actions = faction === 'imp' ? IMP_ACTIONS : REB_ACTIONS;
@@ -6680,11 +7891,13 @@ function addActionRow(faction) {
   row.innerHTML = `
     <div class="action-num">${num}</div>
     <div class="action-type">
-      <select onchange="updateActionCost(this)" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none">
+      <select class="action-type-sel" onchange="updateActionCost(this);saveAll()" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none">
         ${actions.map(a => `<option value="${a}">${a}</option>`).join('')}
       </select>
     </div>
-    <div class="action-detail"><input style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none" placeholder="Target sector, force, details..."></div>
+    <div class="action-detail">
+      <input class="action-detail-inp" onchange="saveAll()" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none" placeholder="Target sector, force, details...">
+    </div>
     <div style="display:flex;align-items:center;gap:4px">
       <span style="font-size:11px;color:var(--gold);font-family:'Orbitron',monospace;font-weight:800" class="ap-cost-display">1 AP</span>
       <button onclick="this.closest('.action-row').remove();saveAll()" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:16px">✕</button>
@@ -6821,8 +8034,8 @@ function getActionRows(faction) {
   const rows = [];
   document.querySelectorAll(`#${faction}-action-rows .action-row`).forEach(row => {
     rows.push({
-      type: row.querySelector('select')?.value || '',
-      detail: row.querySelector('input')?.value || '',
+      type: row.querySelector('.action-type-sel')?.value || row.querySelector('select')?.value || '',
+      detail: row.querySelector('.action-detail-inp')?.value || row.querySelector('input')?.value || '',
     });
   });
   return rows;
@@ -6878,6 +8091,8 @@ function loadAll() {
       Object.entries(s.commanders).forEach(([k,v]) => {
         const el = document.getElementById('cs-'+k);
         if(el) el.value = v;
+        // Also sync into GS.cmdStatus so badges reflect localStorage state
+        syncCsToGS(k, v);
       });
     }
     if(s.impActions) s.impActions.forEach(a => {
@@ -6885,9 +8100,12 @@ function loadAll() {
       const rows = document.querySelectorAll('#imp-action-rows .action-row');
       const last = rows[rows.length-1];
       if(last) {
-        last.querySelector('select').value = a.type;
-        last.querySelector('input').value = a.detail;
-        last.querySelector('.ap-cost-display').textContent = (AP_COSTS[a.type]||1)+' AP';
+        const typeSel = last.querySelector('.action-type-sel') || last.querySelector('select');
+        if(typeSel) typeSel.value = a.type;
+        const detInp = last.querySelector('.action-detail-inp') || last.querySelector('input');
+        if(detInp) detInp.value = a.detail || '';
+        const apEl = last.querySelector('.ap-cost-display');
+        if(apEl) apEl.textContent = (AP_COSTS[a.type]||1)+' AP';
       }
     });
     if(s.rebActions) s.rebActions.forEach(a => {
@@ -6895,9 +8113,12 @@ function loadAll() {
       const rows = document.querySelectorAll('#reb-action-rows .action-row');
       const last = rows[rows.length-1];
       if(last) {
-        last.querySelector('select').value = a.type;
-        last.querySelector('input').value = a.detail;
-        last.querySelector('.ap-cost-display').textContent = (AP_COSTS[a.type]||1)+' AP';
+        const typeSel = last.querySelector('.action-type-sel') || last.querySelector('select');
+        if(typeSel) typeSel.value = a.type;
+        const detInp = last.querySelector('.action-detail-inp') || last.querySelector('input');
+        if(detInp) detInp.value = a.detail || '';
+        const apEl = last.querySelector('.ap-cost-display');
+        if(apEl) apEl.textContent = (AP_COSTS[a.type]||1)+' AP';
       }
     });
     if(s.impMoves) s.impMoves.forEach(m => {
