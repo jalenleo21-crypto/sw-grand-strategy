@@ -998,6 +998,7 @@ tr:hover td{background:rgba(255,255,255,0.015)}
     <div class="app-nav-item" id="nav-gem" onclick="showScreen('gem')"><span class="app-nav-icon">🔧</span>GEM Scripting</div>
   </div>
   <div style="margin-top:auto">
+    <div class="app-nav-item" id="reloadNavBtn" onclick="reloadSectors()" style="color:var(--dim)"><span class="app-nav-icon">⟳</span>Reload Sectors</div>
     <div class="app-nav-item app-nav-danger" onclick="resetCampaign()"><span class="app-nav-icon">⚠</span>Reset Campaign</div>
   </div>
 </div>
@@ -6687,16 +6688,53 @@ const ADJACENCY={
 // ============================================================
 let GS={turn:1,ePW:15,rPW:20,dsStep:0,sectors:{},pendingActions:[],pendingBattles:[],cmdStatus:{}};
 
+async function fetchFromSupabase(){
+  const {data,error}=await supa.from('campaign_state').select('data').eq('id',1).single();
+  if(!error&&data&&data.data){
+    const parsed=JSON.parse(data.data);
+    if(parsed.sectors&&Object.keys(parsed.sectors).length>0) return parsed;
+  }
+  return null;
+}
+
+async function reloadSectors(){
+  const btn=document.getElementById('reloadNavBtn');
+  if(btn){btn.textContent='⟳ Loading...';btn.style.color='var(--gold)';}
+  try{
+    if(!supa) supa=supabase.createClient(SUPA_URL,SUPA_KEY);
+    const parsed=await fetchFromSupabase();
+    if(parsed){
+      GS=parsed;
+      buildNav();
+      updateTurnDisplay();
+      updatePW();
+      buildDS();
+      updateCounts();
+      if(activeSec) renderSector(activeSec);
+      if(btn){btn.textContent='⟳ Reload Sectors';btn.style.color='';}
+      console.log('Sectors reloaded');
+    } else {
+      if(btn){btn.textContent='⟳ Retry Failed';btn.style.color='var(--red)';}
+      setTimeout(()=>{if(btn){btn.textContent='⟳ Reload Sectors';btn.style.color='';}},2000);
+    }
+  }catch(e){
+    console.error('Reload failed',e);
+    if(btn){btn.textContent='⟳ Retry Failed';btn.style.color='var(--red)';}
+    setTimeout(()=>{if(btn){btn.textContent='⟳ Reload Sectors';btn.style.color='';}},2000);
+  }
+}
+
 async function initGS(){
   // Init Supabase client (safely - CDN must be loaded first)
   try{
     supa=supabase.createClient(SUPA_URL,SUPA_KEY);
-    const {data,error}=await supa.from('campaign_state').select('data').eq('id',1).single();
-    if(!error&&data&&data.data){
-      GS=JSON.parse(data.data);
-      console.log('Loaded from Supabase');
-      return;
-    }
+    let parsed=await fetchFromSupabase();
+    if(parsed){GS=parsed;console.log('Loaded from Supabase');return;}
+    // Retry once after 1.5s if sectors empty
+    console.log('Supabase returned empty sectors — retrying...');
+    await new Promise(r=>setTimeout(r,1500));
+    parsed=await fetchFromSupabase();
+    if(parsed){GS=parsed;console.log('Loaded from Supabase (retry)');return;}
   }catch(e){console.log('Supabase unavailable, using defaults:',e);}
   SECTORS.forEach(sec=>{
     GS.sectors[sec.id]={
