@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rebel Alliance — Fleet Registry — 2 BBY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0300;--panel:#100500;--panel2:#150700;--border:#2a0e00;--border2:#3d1800;
+  --text:#c87050;--dim:#5a2510;--bright:#ffb890;
+  --gold:#c8a84b;--gold2:#e8c86b;--gold3:#f8d87b;
+  --rebel:#c84820;--rebel2:#e85830;--rebel-dim:#3a1208;
+  --green:#1a9848;--red:#c83838;--orange:#c87028;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow-x:hidden}
+
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.stars canvas{width:100%;height:100%}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:999}
+
+.corner{position:fixed;width:60px;height:60px;pointer-events:none;z-index:2}
+.corner-tl{top:20px;left:20px;border-top:1px solid var(--border2);border-left:1px solid var(--border2)}
+.corner-tr{top:20px;right:20px;border-top:1px solid var(--border2);border-right:1px solid var(--border2)}
+.corner-bl{bottom:20px;left:20px;border-bottom:1px solid var(--border2);border-left:1px solid var(--border2)}
+.corner-br{bottom:20px;right:20px;border-bottom:1px solid var(--border2);border-right:1px solid var(--border2)}
+
+/* HEADER */
+.site-hdr{position:relative;z-index:10;text-align:center;padding:52px 24px 32px;border-bottom:1px solid var(--border)}
+.site-pre{font-size:11px;letter-spacing:6px;color:var(--dim);text-transform:uppercase;margin-bottom:12px}
+.site-title{font-family:'Orbitron',monospace;font-size:clamp(22px,4vw,42px);font-weight:900;color:var(--gold2);letter-spacing:4px;text-transform:uppercase;line-height:1.1;margin-bottom:6px}
+.site-sub{font-size:11px;color:var(--dim);letter-spacing:4px;text-transform:uppercase;margin-bottom:24px}
+.site-divider{width:160px;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:0 auto 24px}
+
+.hdr-stats{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
+.hdr-stat{display:flex;flex-direction:column;align-items:center;gap:3px}
+.hdr-stat-val{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;color:var(--gold2)}
+.hdr-stat-label{font-size:9px;letter-spacing:3px;color:var(--dim);text-transform:uppercase}
+
+/* STATUS DOTS */
+.status-bar{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:20px;flex-wrap:wrap}
+.status-item{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:2px;color:var(--dim)}
+.status-dot{width:6px;height:6px;border-radius:50%;animation:pulse 2s infinite}
+.sd-green{background:var(--green);box-shadow:0 0 8px var(--green)}
+.sd-rebel{background:var(--rebel2);box-shadow:0 0 8px var(--rebel2);animation-delay:.5s}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* FILTER BAR */
+.filter-bar{position:relative;z-index:10;display:flex;flex-wrap:wrap;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(12,3,0,0.9);align-items:center}
+.filter-label{font-size:9px;letter-spacing:4px;color:var(--dim);text-transform:uppercase;margin-right:4px}
+.filter-btn{background:transparent;border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:5px 14px;cursor:pointer;text-transform:uppercase;transition:all .2s}
+.filter-btn:hover,.filter-btn.active{color:var(--gold2);border-color:var(--gold);background:rgba(200,168,75,0.05)}
+
+/* SECTION LABEL */
+.sec-label{position:relative;z-index:10;font-size:9px;letter-spacing:4px;color:var(--dim);text-transform:uppercase;padding:20px 24px 10px;display:flex;align-items:center;gap:12px;background:var(--bg)}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* SHIP GRID */
+.ship-grid{position:relative;z-index:10;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--border);margin:0 0 1px}
+
+/* SHIP CARD */
+.ship-card{background:var(--panel);position:relative;overflow:hidden;cursor:pointer;transition:background .2s,border-color .2s}
+.ship-card:hover{background:var(--panel2)}
+.ship-card:hover .card-arrow{color:var(--gold);transform:translateX(3px)}
+.ship-card:hover .ship-name{color:var(--gold2)}
+.ship-card.hidden{display:none}
+
+.ship-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--rebel2),transparent);opacity:0;transition:opacity .2s}
+.ship-card:hover::before{opacity:1}
+
+/* IMAGE */
+.ship-image-wrap{position:relative;width:100%;height:170px;overflow:hidden;background:#080200;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+.ship-image-wrap::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--panel) 0%,transparent 30%,transparent 70%,var(--panel) 100%);pointer-events:none}
+.ship-img{width:100%;height:100%;object-fit:contain;padding:12px;filter:brightness(0.88) saturate(0.6) hue-rotate(340deg) sepia(0.3);transition:filter .3s,transform .3s}
+.ship-card:hover .ship-img{filter:brightness(1) saturate(0.8) hue-rotate(340deg) sepia(0.15);transform:scale(1.03)}
+.ship-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--dim);opacity:0.4;position:relative}
+.ph-icon{font-size:36px;line-height:1}
+.ph-text{font-size:9px;letter-spacing:3px;text-transform:uppercase}
+.ship-placeholder::before{content:'';position:absolute;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--rebel2),transparent);animation:scan 3s ease-in-out infinite;opacity:.2}
+@keyframes scan{0%{top:0}100%{top:100%}}
+
+/* CLASS BADGE */
+.class-badge{position:absolute;top:8px;left:8px;background:rgba(12,3,0,.9);border:1px solid var(--border);padding:2px 8px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);z-index:5}
+.class-badge.dreadnought{border-color:rgba(200,40,40,.4);color:rgba(220,100,100,.9)}
+.class-badge.capital{border-color:rgba(200,168,75,.3);color:var(--gold)}
+.class-badge.frigate{border-color:rgba(200,88,32,.35);color:rgba(255,160,100,.9)}
+.class-badge.corvette{border-color:rgba(26,152,72,.3);color:rgba(80,210,120,.9)}
+.class-badge.starfighter{border-color:rgba(200,100,40,.3);color:rgba(255,180,120,.9)}
+.class-badge.transport{border-color:rgba(160,100,40,.3);color:rgba(210,150,80,.9)}
+
+/* UPLOAD */
+.upload-zone{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;z-index:10}
+.ship-card:hover .upload-zone{opacity:1}
+.upload-btn{background:rgba(12,3,0,.95);border:1px solid var(--gold);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;padding:6px 16px;cursor:pointer;text-transform:uppercase;transition:all .2s}
+.upload-btn:hover{background:rgba(200,168,75,.1);color:var(--gold2)}
+.upload-input{display:none}
+
+/* CARD BODY */
+.card-body{padding:14px 16px 16px;position:relative}
+.card-top-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.ship-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--bright);letter-spacing:2px;line-height:1.35;transition:color .2s;flex:1;margin-right:8px}
+.card-arrow{font-size:12px;color:var(--dim);transition:color .2s,transform .2s;margin-top:2px;flex-shrink:0}
+.ship-designation{font-size:9px;color:var(--dim);letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}
+
+.role-bar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.role-tag{font-size:8px;padding:1px 6px;border:1px solid var(--border);color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;margin-bottom:10px}
+.stat-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(42,14,0,.8)}
+.stat-row:last-child{border-bottom:none}
+.stat-k{font-size:8px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+.stat-v{font-size:9px;color:var(--text);text-align:right}
+.stat-v.gold{color:var(--gold)}
+.stat-v.green{color:#33dd77}
+.stat-v.red{color:#dd4444}
+
+.ship-desc{font-size:9px;line-height:1.7;color:var(--dim);border-top:1px solid var(--border);padding-top:8px}
+
+/* FOOTER */
+.footer{position:relative;z-index:10;text-align:center;padding:20px;border-top:1px solid var(--border);margin-top:1px}
+.footer-title{font-family:'Orbitron',monospace;font-size:10px;color:var(--dim);letter-spacing:3px;margin-bottom:6px}
+.footer-text{font-size:9px;color:var(--dim);line-height:1.8}
+
+@media(max-width:480px){.ship-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+<div class="stars"><canvas id="starCanvas"></canvas></div>
+
+<div class="site-hdr">
+  <div class="site-pre">Rebel Alliance — Classified — Alliance High Command</div>
+  <div class="site-title">Rebel Fleet Registry</div>
+  <div class="site-sub">Fleet Assets — Awakening of the Rebellion Mod</div>
+  <div class="site-divider"></div>
+  <div class="hdr-stats">
+    <div class="hdr-stat"><div class="hdr-stat-val" id="total-count">0</div><div class="hdr-stat-label">Vessel Classes</div></div>
+    <div class="hdr-stat"><div class="hdr-stat-val" id="imaged-count">0</div><div class="hdr-stat-label">Imaged</div></div>
+    <div class="hdr-stat"><div class="hdr-stat-val">2 BBY</div><div class="hdr-stat-label">Campaign Date</div></div>
+  </div>
+  <div class="status-bar">
+    <div class="status-item"><div class="status-dot sd-rebel"></div>Alliance Fleet Active</div>
+    <div class="status-item"><div class="status-dot sd-green"></div>Registry Online</div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">Filter //</span>
+  <button class="filter-btn active" onclick="filterCards('all',this)">All</button>
+  <button class="filter-btn" onclick="filterCards('capital',this)">Capital</button>
+  <button class="filter-btn" onclick="filterCards('frigate',this)">Frigates</button>
+  <button class="filter-btn" onclick="filterCards('corvette',this)">Corvettes</button>
+  <button class="filter-btn" onclick="filterCards('starfighter',this)">Starfighters</button>
+  <button class="filter-btn" onclick="filterCards('transport',this)">Transports</button>
+</div>
+
+<div id="ship-grid-root"></div>
+
+<div class="footer">
+  <div class="footer-title">Rebel Alliance Fleet Registry — 2 BBY</div>
+  <div class="footer-text">Alliance High Command — For the Rebellion</div>
+</div>
+
+<script>
+const SHIPS = [
+  // CAPITAL SHIPS
+  { id:'mc80a',       name:'MC80a Star Cruiser',            designation:'Mon Calamari Star Cruiser',          class:'capital',     length:'1200m',    crew:'5000+',             role:['Fleet Flagship','Line Vessel','Carrier'],               weapons:'48 turbolasers, 20 ion cannons, tractor beams',      fighters:'~72',                      desc:'The backbone of the Rebel fleet. Each ship is unique — Mon Calamari design philosophy produces individual vessels rather than mass-produced hulls. Heavily shielded and capable of facing ISDs directly.' },
+  { id:'mc80b',       name:'MC80B Star Cruiser',            designation:'Mon Calamari Heavy Cruiser',         class:'capital',     length:'1300m',    crew:'5400+',             role:['Fleet Flagship','Heavy Line','Carrier'],                weapons:'Enhanced turbolasers, ion cannons, tractor beams',   fighters:'~80',                      desc:'Improved Mon Calamari cruiser variant with enhanced weapons and shielding over the MC80a. Fewer in service but more capable ship-to-ship.' },
+  { id:'mc75',        name:'MC75 Star Cruiser',             designation:'Mon Calamari Star Cruiser',          class:'capital',     length:'1155m',    crew:'3500+',             role:['Line Vessel','Command Ship'],                           weapons:'Turbolasers, ion cannons, point defense',            fighters:'~72',                      desc:'Modified Mon Calamari ocean liner converted to a warship. Used as a command vessel. The Profundity, Admiral Raddus\'s flagship at Scarif, was an MC75.' },
+  { id:'mc40a',       name:'MC40a Light Cruiser',           designation:'Mon Calamari Light Cruiser',         class:'frigate',     length:'500m',     crew:'1000+',             role:['Light Capital','Escort Carrier','Patrol'],              weapons:'Turbolasers, laser cannons',                         fighters:'~36',                      desc:'Lighter Mon Calamari cruiser used for patrol and escort duties. More numerous than the MC80 and forms the backbone of smaller Alliance task forces.' },
+  { id:'nebulon',     name:'EF76 Nebulon-B Escort Frigate', designation:'Escort Frigate',                     class:'frigate',     length:'300m',     crew:'854',               role:['Escort','Medical Ship','Patrol'],                       weapons:'12 turbolasers, 12 laser cannons',                   fighters:'24',                       desc:'Originally an Imperial design, captured hulls serve the Alliance as escort frigates and medical ships. The iconic shape — head connected to engines by a spine — is immediately recognizable. The Redemption was a medical Nebulon-B.' },
+  { id:'mc30c',       name:'MC30c Frigate',                 designation:'Mon Calamari Torpedo Frigate',       class:'frigate',     length:'580m',     crew:'700+',              role:['Torpedo Frigate','Anti-Capital','Fast Attack'],         weapons:'Turbolasers, proton torpedo banks',                  fighters:'None',                     desc:'Fast torpedo frigate built around proton torpedo salvoes. Designed to dash in, unleash torpedoes at close range, and disengage. High damage ceiling, fragile if caught.' },
+  { id:'assault_frigate', name:'Assault Frigate Mk.II',    designation:'Converted Bulk Cruiser',             class:'frigate',     length:'750m',     crew:'4000',              role:['Line Frigate','Anti-Fighter','Carrier Support'],        weapons:'15 turbolasers, 15 laser cannons',                   fighters:'~36',                      desc:'Heavily modified bulk cruiser rebuilt as a line frigate. Cheap to build by Alliance standards — converted from civilian hulls. Good anti-fighter coverage, adequate capital ship armament.' },
+  { id:'quasar',      name:'Quasar Fire-class Carrier',     designation:'Light Carrier',                      class:'frigate',     length:'340m',     crew:'250',               role:['Carrier','Fighter Deployment','Logistics'],             weapons:'4 turbolaser cannons',                               fighters:'72',                       desc:'Dedicated carrier providing forward fighter deployment. Lightly armed and poorly shielded — must stay behind the battle line. Phoenix Home was a Quasar Fire.' },
+  { id:'cr90',        name:'CR90 Corellian Corvette',       designation:'Multipurpose Corvette',              class:'corvette',    length:'150m',     crew:'30-165',            role:['Blockade Runner','Fast Attack','Command'],              weapons:'2 turbolaser turrets, 4 single laser cannons',       fighters:'None',                     desc:'The iconic Rebel corvette. Fast, versatile, and relatively cheap. Tantive IV was a CR90. Used for everything from command ships to blockade runners to armed transports.' },
+  { id:'hammerhead',  name:'Hammerhead Corvette',           designation:'Support Corvette',                   class:'corvette',    length:'315m',     crew:'Unknown',           role:['Support','Ram Attack','Escort'],                        weapons:'6 point-defense cannons',                            fighters:'None',                     desc:'Support corvette notable for its ramming capability. Used to push disabled or drifting vessels during fleet engagements. Seen at Scarif ramming a disabled ISD into another.' },
+  { id:'dp20',        name:'DP20 Gunship',                  designation:'Corellian Gunship',                  class:'corvette',    length:'120m',     crew:'91',                role:['Anti-Fighter','Escort','Fast Attack'],                  weapons:'8 turbolasers, 6 laser cannons',                     fighters:'None',                     desc:'Fast gunship with heavy anti-fighter armament. Used for escort duties and hit-and-run raids. Can outrun larger warships and evade pursuit.' },
+  { id:'corellian_carrier', name:'Corellian Carrier',       designation:'Light Carrier / Corvette',           class:'corvette',    length:'~200m',    crew:'Medium',            role:['Light Carrier','Fighter Support'],                      weapons:'Light weapons',                                      fighters:'Fighter wing',             desc:'Light carrier providing forward fighter deployment. Used to put fighters in position before the main fleet arrives.' },
+  { id:'corellian_heavy',   name:'Corellian Heavy Frigate', designation:'Heavy Corvette / Frigate',           class:'corvette',    length:'~250m',    crew:'Medium',            role:['Heavy Corvette','Escort','Line Support'],               weapons:'Turbolasers, laser cannons',                         fighters:'None',                     desc:'Heavier Corellian design bridging corvette and frigate categories. Used for convoy escort and sector patrol duties.' },
+  { id:'interceptor', name:'Interceptor-class Frigate',     designation:'Fast Frigate / Interceptor',         class:'corvette',    length:'~90m',     crew:'Small',             role:['Interceptor','Fast Attack','Patrol'],                   weapons:'Laser cannons, missiles',                            fighters:'None',                     desc:'Fast-attack frigate used for rapid response and harassment. Can outrun most larger Imperial vessels.' },
+  { id:'gr75',        name:'GR-75 Medium Transport',        designation:'Medium Transport',                   class:'transport',   length:'90m',      crew:'6',                 role:['Logistics','Evacuation','Supply'],                      weapons:'Minimal',                                            fighters:'None',                     desc:'The standard Rebel Alliance transport. Used for evacuations (Hoth), supply runs, and troop movements. Not a warship — needs heavy escort.' },
+  // STARFIGHTERS
+  { id:'xwing',       name:'T-65B X-Wing Starfighter',      designation:'Strike Fighter',                     class:'starfighter', length:'12.5m',    crew:'1 + R2 unit',       role:['Strike Fighter','Space Superiority','Multi-Role'],      weapons:'4 laser cannons, 2 proton torpedo launchers',        fighters:'N/A',                      desc:'The iconic Rebel fighter. Balanced multi-role platform. Shields and hyperdrive make it far superior to TIE fighters in sustained operations. Destroyed the Death Star.' },
+  { id:'ywing',       name:'BTL-A4 Y-Wing Bomber',          designation:'Bomber / Heavy Fighter',             class:'starfighter', length:'16m',      crew:'1-2',               role:['Bomber','Anti-Capital','Ion Attack'],                   weapons:'2 laser cannons, 2 ion cannons, 2 proton torpedo launchers', fighters:'N/A',           desc:'Primary Rebel bomber. Slower than X-Wing but carries heavy ordnance. Ion cannons strip capital ship shields. Longprobe variant used for reconnaissance.' },
+  { id:'awing',       name:'RZ-1 A-Wing Interceptor',       designation:'Interceptor',                        class:'starfighter', length:'9.6m',     crew:'1',                 role:['Interceptor','Space Superiority','Scout'],              weapons:'2 laser cannons, 2 concussion missile launchers',   fighters:'N/A',                      desc:'Fastest fighter in the Rebel fleet — faster than TIE interceptors. Pure dogfighter. Fragile but devastating at speed.' },
+  { id:'bwing',       name:'A/SF-01 B-Wing Starfighter',    designation:'Heavy Assault Starfighter',          class:'starfighter', length:'16.9m',    crew:'1',                 role:['Heavy Assault','Anti-Capital','Bomber'],                weapons:'3 laser cannons, 1 ion cannon, proton torpedoes, proton bombs', fighters:'N/A',       desc:'Heavy assault fighter. Massive weapons payload for a single-seat fighter. Effective against capital ships. Slow and awkward — needs fighter escort.' },
+  { id:'uwing',       name:'UT-60D U-Wing',                 designation:'Starfighter Support / Transport',    class:'starfighter', length:'25m',      crew:'2 + 8 troops',      role:['Close Air Support','Troop Insertion','Support'],        weapons:'2 laser cannons (fixed forward)',                    fighters:'N/A',                      desc:'Armed troop transport / close air support ship. Deploys SpecForce operatives into hot landing zones. Can provide covering fire during insertion.' },
+  { id:'hwing',       name:'H-Wing Bomber',                 designation:'Heavy Bomber',                       class:'starfighter', length:'Unknown',  crew:'1-2',               role:['Heavy Bomber','Anti-Capital'],                          weapons:'Laser cannons, heavy ordnance',                      fighters:'N/A',                      desc:'Heavy bomber variant providing maximum ordnance delivery against capital ships and installations.' },
+  { id:'z95',         name:'Z-95 Headhunter',               designation:'Light Fighter',                      class:'starfighter', length:'11.8m',    crew:'1',                 role:['Patrol','Light Fighter','Early War'],                   weapons:"2 triple blaster cannons, 2 concussion missile launchers", fighters:'N/A',              desc:"Older design, predecessor to the X-Wing. Cheaper and easier to maintain. Used by Rebel cells that can't source X-Wings. Outclassed by TIE Interceptors in dogfights." },
+  { id:'r41',         name:'R-41 Starchaser',               designation:'Medium Fighter',                     class:'starfighter', length:'14.3m',    crew:'1',                 role:['Patrol','Anti-Fighter','Escort'],                       weapons:'4 laser cannons, concussion missiles',               fighters:'N/A',                      desc:'Medium fighter used by various factions. More capable than Z-95 but less versatile than X-Wing. Used as patrol and escort craft.' },
+  { id:'twing',       name:'T-Wing Interceptor',            designation:'Light Interceptor',                  class:'starfighter', length:'Unknown',  crew:'1',                 role:['Interceptor','Patrol'],                                 weapons:'Laser cannons, missiles',                            fighters:'N/A',                      desc:'Light interceptor used by Rebel cells. Fills interceptor role where A-Wings are unavailable.' },
+  { id:'cutlass9',    name:'Cutlass-9 Patrol Fighter',      designation:'Patrol Fighter',                     class:'starfighter', length:'Unknown',  crew:'1',                 role:['Patrol','System Defense'],                              weapons:'Laser cannons',                                      fighters:'N/A',                      desc:'Patrol fighter used for system defense and perimeter patrol duties. Not a frontline combat ship.' },
+  // TRANSPORTS
+  { id:'tiberiusshuttle', name:'Lambda-class Shuttle (Captured)', designation:'Command Transport / Captured Asset', class:'transport', length:'20m', crew:'6 + 20 pax',      role:['Command Transport','Infiltration'],                     weapons:'3 turbolasers, 2 laser cannons',                     fighters:'N/A',                      desc:'Captured Imperial Lambda shuttle used for infiltration, prisoner transport, and command movement. Han Solo used one to land on Endor.' },
+  { id:'prowl',       name:'Rebel One',                     designation:'Special / Hero Ship',                class:'transport',   length:'Unknown',  crew:'Unknown',           role:['Hero Ship','Special'],                                  weapons:'Varies',                                             fighters:'N/A',                      desc:'Special hero unit available to the Rebel Alliance in AOTR. Unique ship with special capabilities tied to a hero commander.' },
+];
+
+const SECTIONS = [
+  {key:'capital',     label:'Capital Ships'},
+  {key:'frigate',     label:'Frigates & Cruisers'},
+  {key:'corvette',    label:'Corvettes & Gunships'},
+  {key:'starfighter', label:'Starfighters & Bombers'},
+  {key:'transport',   label:'Transports & Special'},
+];
+
+function buildGrid() {
+  const root = document.getElementById('ship-grid-root');
+  root.innerHTML = '';
+  SECTIONS.forEach(sec => {
+    const ships = SHIPS.filter(s => s.class === sec.key);
+    if (!ships.length) return;
+    const lbl = document.createElement('div');
+    lbl.className = 'sec-label';
+    lbl.dataset.section = sec.key;
+    lbl.textContent = sec.label;
+    root.appendChild(lbl);
+    const grid = document.createElement('div');
+    grid.className = 'ship-grid';
+    grid.dataset.section = sec.key;
+    ships.forEach(ship => {
+      const savedImg = localStorage.getItem('reb_ship_img_' + ship.id);
+      const imgContent = savedImg
+        ? `<img class="ship-img" src="${savedImg}" alt="${ship.name}">`
+        : `<div class="ship-placeholder"><div class="ph-icon">◁ ◁ ◁</div><div class="ph-text">Visual Pending</div></div>`;
+      const card = document.createElement('div');
+      card.className = 'ship-card';
+      card.dataset.class = ship.class;
+      card.dataset.id = ship.id;
+      card.innerHTML = `
+        <div class="ship-image-wrap">
+          ${imgContent}
+          <span class="class-badge ${ship.class}">${ship.class}</span>
+          <div class="upload-zone">
+            <label class="upload-btn" for="up_${ship.id}">+ Add Image</label>
+            <input class="upload-input" type="file" id="up_${ship.id}" accept="image/*" onchange="handleUpload(event,'${ship.id}')">
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-top-row">
+            <div class="ship-name">${ship.name}</div>
+            <div class="card-arrow">→</div>
+          </div>
+          <div class="ship-designation">${ship.designation}</div>
+          <div class="role-bar">${ship.role.map(r=>`<span class="role-tag">${r}</span>`).join('')}</div>
+          <div class="stats">
+            <div class="stat-row"><span class="stat-k">Length</span><span class="stat-v gold">${ship.length}</span></div>
+            <div class="stat-row"><span class="stat-k">Crew</span><span class="stat-v">${ship.crew}</span></div>
+            <div class="stat-row" style="grid-column:1/-1"><span class="stat-k">Weapons</span><span class="stat-v" style="font-size:8px">${ship.weapons}</span></div>
+            <div class="stat-row" style="grid-column:1/-1"><span class="stat-k">Fighters</span><span class="stat-v green" style="font-size:8px">${ship.fighters}</span></div>
+          </div>
+          <div class="ship-desc">${ship.desc}</div>
+        </div>`;
+      grid.appendChild(card);
+    });
+    root.appendChild(grid);
+  });
+  updateCounts();
+}
+
+function handleUpload(event, shipId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = e.target.result;
+    localStorage.setItem('reb_ship_img_' + shipId, data);
+    const card = document.querySelector(`[data-id="${shipId}"]`);
+    const wrap = card.querySelector('.ship-image-wrap');
+    const ph = wrap.querySelector('.ship-placeholder');
+    if (ph) { const img = document.createElement('img'); img.className='ship-img'; img.src=data; img.alt=shipId; ph.replaceWith(img); }
+    else { const img = wrap.querySelector('.ship-img'); if(img) img.src=data; }
+    updateCounts();
+  };
+  reader.readAsDataURL(file);
+}
+
+function filterCards(cls, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.ship-card').forEach(c => {
+    c.classList.toggle('hidden', cls !== 'all' && c.dataset.class !== cls);
+  });
+  document.querySelectorAll('.sec-label, .ship-grid').forEach(el => {
+    el.style.display = cls === 'all' ? '' : 'none';
+  });
+  if (cls !== 'all') {
+    document.querySelectorAll(`.ship-grid[data-section="${cls}"]`).forEach(g => g.style.display = '');
+  }
+}
+
+function updateCounts() {
+  document.getElementById('total-count').textContent = SHIPS.length;
+  document.getElementById('imaged-count').textContent = SHIPS.filter(s => localStorage.getItem('reb_ship_img_' + s.id)).length;
+}
+
+buildGrid();
+
+// STARFIELD
+const canvas = document.getElementById('starCanvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 200; i++) {
+    stars.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*1.2, a:Math.random(), speed:Math.random()*0.003+0.001, phase:Math.random()*Math.PI*2 });
+  }
+}
+function drawStars(t) {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s => {
+    const alpha = s.a*(0.5+0.5*Math.sin(t*s.speed+s.phase));
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(255,180,140,${alpha})`; ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+resize(); initStars();
+window.addEventListener('resize',()=>{resize();initStars();});
+requestAnimationFrame(drawStars);
+</script>
+</body>
+</html>
