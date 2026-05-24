@@ -4757,6 +4757,8 @@ Most of the galaxy runs on Status Quo. Moffs administrate. Admirals patrol. Plan
     <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s10')">10. Saw Gerrera Rogue Trigger</a>
     <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s11')">11. Commander Count Per Battle</a>
     <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s12')">12. Known Issues & Warnings</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s14')">14. Wave Scripting — Hidden Unit Method</a>
+    <a class="toc-item" href="javascript:void(0)" onclick="scrollInScreen('screen-gem','gem-s15')">15. Company Parent Tag System</a>
   </div>
 </div>
 
@@ -5521,6 +5523,144 @@ Fires when Saw's Partisans are in a joint operation AND have taken heavy casualt
 </div>
 
 </div><!-- /s13 -->
+
+<!-- ============================================================ -->
+<div class="section" id="gem-s14">
+<div class="sec-hdr">14. Wave Scripting — Hidden Unit Method</div>
+
+<div class="sec-intro">The GEM editor does not have a true spawn command for pre-placing units. The correct method for wave-based reinforcements is the <strong>hidden unit method</strong> — units are pre-placed on the map but tagged as inactive/hidden. Triggers remove the hidden state to activate each wave. This solves the memory crash problem by keeping all units loaded but only activating them in sequence as earlier units die and free memory.</div>
+
+<div class="sub-hdr">How It Works</div>
+<table>
+  <tr><th>Step</th><th>What To Do</th><th>Notes</th></tr>
+  <tr><td style="color:var(--gold);font-family:'Orbitron',monospace">1</td><td>Place ALL units for all waves on the map in F3</td><td>Place Wave 2 and Wave 3 units at the same spawn point as Wave 1 — south edge, near DX-9s.</td></tr>
+  <tr><td style="color:var(--gold);font-family:'Orbitron',monospace">2</td><td>Tag Wave 2 units with their wave tag (e.g. IMP_CPY2) AND set them as hidden/inactive</td><td>In F3 entity properties, set state to inactive. They will be invisible and non-functional until triggered.</td></tr>
+  <tr><td style="color:var(--gold);font-family:'Orbitron',monospace">3</td><td>Tag Wave 3 units similarly</td><td>Same process — inactive state, their own wave tag.</td></tr>
+  <tr><td style="color:var(--gold);font-family:'Orbitron',monospace">4</td><td>Create a trigger with an entities condition counting Wave 1 alive units</td><td>When Wave 1 drops to 10% alive, fire the trigger.</td></tr>
+  <tr><td style="color:var(--gold);font-family:'Orbitron',monospace">5</td><td>Commands: actor_state removes hidden, sets assault mode, actor_to_waypoint sends them to attack</td><td>Add a delay of 10-15 seconds before activating — simulates Gozantis landing.</td></tr>
+</table>
+
+<div class="sub-hdr">Wave 2 Spawn Trigger — Full Example</div>
+<div class="code-block">
+<span class="cmd">TRIGGER NAME:</span> <span class="tag-ex">IMP_WAVE2_SPAWN</span><br><br>
+<span class="comment">// CONDITION — fires when 1st Company drops to 10% strength</span><br>
+<span class="cmd">entities</span><br>
+&nbsp;&nbsp;<span class="param">tag:</span> <span class="tag-ex">IMP_CPY1</span>    <span class="comment">← company-wide parent tag on all Wave 1 units</span><br>
+&nbsp;&nbsp;<span class="param">state:</span> <span class="val">not dead</span><br>
+&nbsp;&nbsp;<span class="param">count:</span> <span class="val">&lt;= 16</span>    <span class="comment">← 10% of 160 men</span><br><br>
+<span class="comment">// COMMANDS — 2nd Company lands from Gozantis</span><br>
+<span class="cmd">delay</span><br>
+&nbsp;&nbsp;<span class="param">duration:</span> <span class="val">10</span>    <span class="comment">← simulate Gozantis landing — pause before troops appear</span><br><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_CPY2</span><br>
+&nbsp;&nbsp;<span class="param">state:</span> <span class="val">remove_hidden</span>    <span class="comment">← activate Wave 2, removes inactive state</span><br><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_CPY2</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">assault</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">on</span><br>
+&nbsp;&nbsp;<span class="param">fire_mod:</span> <span class="val">Open</span><br>
+&nbsp;&nbsp;<span class="param">speed:</span> <span class="val">Assault</span><br>
+&nbsp;&nbsp;<span class="param">ai_move:</span> <span class="val">on</span><br><br>
+<span class="cmd">actor_to_waypoint</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">IMP_CPY2</span><br>
+&nbsp;&nbsp;<span class="param">waypoint:</span> <span class="val">[IMP_ASSAULT link number]</span>    <span class="comment">← use link number not name</span><br>
+&nbsp;&nbsp;<span class="param">drop:</span> <span class="val">orders senseless</span><br><br>
+<span class="cmd">Trigger off:</span> <span class="tag-ex">IMP_WAVE2_SPAWN</span><br><br>
+<span class="note">// RESULT: 2nd Company activates and advances on the objective.</span><br>
+<span class="note">// Narratively: fresh Gozantis land as 1st Company is nearly wiped out.</span>
+</div>
+
+<div class="sub-hdr">Waypoint Reference — Important</div>
+<div class="alert alert-warn">
+  <div class="alert-title">Waypoints Use Link Numbers Not Names</div>
+  The actor_to_waypoint command references waypoints by their <strong>link ID number</strong>, not the text name you gave them. To find the link number: F3 mode → click the waypoint → check the Link field in the right panel. Write these down before scripting. The text name is for your reference only — the engine ignores it.
+</div>
+
+<div class="sub-hdr">Retreat Trigger — Full Example</div>
+<p class="intro-text">For rebel units routing to an extraction point after their commander dies:</p>
+<div class="code-block">
+<span class="cmd">TRIGGER NAME:</span> <span class="tag-ex">REB_CMD_KIA</span><br><br>
+<span class="comment">// CONDITION — fires when rebel cell leader is killed</span><br>
+<span class="cmd">entities</span><br>
+&nbsp;&nbsp;<span class="param">tag:</span> <span class="tag-ex">REB_CMD</span><br>
+&nbsp;&nbsp;<span class="param">state:</span> <span class="val">dead</span><br>
+&nbsp;&nbsp;<span class="param">count:</span> <span class="val">&gt;= 1</span><br><br>
+<span class="comment">// COMMANDS — all rebels route to extraction point</span><br>
+<span class="cmd">delay</span><br>
+&nbsp;&nbsp;<span class="param">duration:</span> <span class="val">2</span><br><br>
+<span class="cmd">actor_state</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">REB_ALL</span><br>
+&nbsp;&nbsp;<span class="param">control:</span> <span class="val">AI</span><br>
+&nbsp;&nbsp;<span class="param">move_mode:</span> <span class="val">free</span><br>
+&nbsp;&nbsp;<span class="param">no_retreat:</span> <span class="val">off</span><br>
+&nbsp;&nbsp;<span class="param">fire_mod:</span> <span class="val">hold_fire</span>    <span class="comment">← stop shooting entirely, just run</span><br>
+&nbsp;&nbsp;<span class="param">speed:</span> <span class="val">Bow</span>    <span class="comment">← sprint</span><br><br>
+<span class="cmd">actor_to_waypoint</span><br>
+&nbsp;&nbsp;<span class="param">selector:</span> tag <span class="tag-ex">REB_ALL</span><br>
+&nbsp;&nbsp;<span class="param">waypoint:</span> <span class="val">[REB_EXTRACT link number]</span><br>
+&nbsp;&nbsp;<span class="param">drop:</span> <span class="val">orders senseless</span>    <span class="comment">← ignore all enemies, go straight to waypoint</span><br><br>
+<span class="cmd">Trigger off:</span> <span class="tag-ex">REB_CMD_KIA</span><br><br>
+<span class="note">// RESULT: all rebel units stop firing and sprint to the extraction point.</span><br>
+<span class="note">// Cinematically: the cell collapses — survivors scatter north.</span>
+</div>
+
+<div class="sub-hdr">drop Field Values — actor_to_waypoint</div>
+<table>
+  <tr><th>Value</th><th>Effect</th><th>Use Case</th></tr>
+  <tr><td style="color:var(--gold)">orders</td><td>Drops current movement orders only — unit still uses combat sensor and will stop to fight if it sees enemies</td><td>Advancing units that should still engage opportunistically</td></tr>
+  <tr><td style="color:var(--gold)">sensor</td><td>Drops the unit's awareness — stops detecting enemies but keeps current orders</td><td>Rare use — stealth or scripted movement past enemies</td></tr>
+  <tr><td style="color:var(--gold)">orders senseless</td><td>Drops both orders AND sensor — unit ignores everything and goes straight to waypoint</td><td>Routing/retreating units, reinforcement waves spawning in</td></tr>
+</table>
+
+</div><!-- /s14 -->
+
+<!-- ============================================================ -->
+<div class="section" id="gem-s15">
+<div class="sec-hdr">15. Company Parent Tag System</div>
+
+<div class="sec-intro">When scripting wave triggers that need to count casualties across an entire company, a single tag covers all units in the company. Each unit carries multiple tags — one for its specific platoon/squad role, and one shared company-wide tag used for counting. This is required because the entities condition can only check one tag at a time — it cannot add up PLT1 + PLT2 + PLT3 + PLT4 counts automatically.</div>
+
+<div class="sub-hdr">Tag Structure — Each Unit Carries Multiple Tags</div>
+<table>
+  <tr><th>Unit</th><th>Tags Applied</th><th>Purpose</th></tr>
+  <tr><td style="color:var(--gold)">Private, 1st Platoon</td><td>IMP_CPY1 + IMP_CPY1_PLT1</td><td>Company count + platoon trigger</td></tr>
+  <tr><td style="color:var(--gold)">Sergeant, 1st Platoon</td><td>IMP_CPY1 + IMP_CPY1_PLT1 + IMP_CPY1_PLT1_SGT</td><td>Company count + platoon trigger + sergeant death trigger</td></tr>
+  <tr><td style="color:var(--gold)">Lieutenant, 1st Platoon</td><td>IMP_CPY1 + IMP_CPY1_PLT1 + IMP_CPY1_PLT1_LT</td><td>Company count + platoon trigger + LT death trigger</td></tr>
+  <tr><td style="color:var(--gold)">Captain (company CO)</td><td>IMP_CPY1 + IMP_CPY1_CMD</td><td>Company count + commander death trigger</td></tr>
+</table>
+
+<div class="sub-hdr">How the Wave Condition Uses the Parent Tag</div>
+<div class="code-block">
+<span class="comment">// CONDITION — fires when 1st Company is at 10% strength</span><br>
+<span class="cmd">entities</span><br>
+&nbsp;&nbsp;<span class="param">tag:</span> <span class="tag-ex">IMP_CPY1</span>    <span class="comment">← checks ALL units carrying this tag across all platoons</span><br>
+&nbsp;&nbsp;<span class="param">state:</span> <span class="val">not dead</span><br>
+&nbsp;&nbsp;<span class="param">count:</span> <span class="val">&lt;= 16</span>    <span class="comment">← 10% of 160 men in company</span><br><br>
+<span class="note">// This works because EVERY soldier in 1st Company carries IMP_CPY1</span><br>
+<span class="note">// regardless of which platoon they are in — the condition counts them all at once.</span>
+</div>
+
+</div>
+
+<div class="sub-hdr">Rebel Type-Level Tags — Simplified Version</div>
+<p class="intro-text">For rebel forces, use unit-type tags instead of platoon tags. Rebels are irregular forces so platoon-level structure isn't needed. One tag per unit type covers all scripting needs:</p>
+<table>
+  <tr><th>Tag</th><th>Units It Covers</th><th>Trigger Use</th></tr>
+  <tr><td style="color:var(--gold)">REB_CMD</td><td>Cell leader (1 unit)</td><td>Death fires the main rout trigger</td></tr>
+  <tr><td style="color:var(--gold)">REB_SF</td><td>All SpecForce squads</td><td>Route first — trained soldiers who recognize defeat</td></tr>
+  <tr><td style="color:var(--gold)">REB_PART</td><td>All Partisan squads</td><td>Hold longer than SpecForce, route after threshold</td></tr>
+  <tr><td style="color:var(--gold)">REB_SAB</td><td>Saboteur teams</td><td>Trigger fuel depot explosion script</td></tr>
+  <tr><td style="color:var(--gold)">REB_LOCAL</td><td>Local resistance fighters</td><td>Scatter last — least disciplined, least coordinated</td></tr>
+  <tr><td style="color:var(--gold)">REB_ALL</td><td>Every rebel unit</td><td>Mass casualty threshold trigger — full rout at 30% alive</td></tr>
+</table>
+
+<div class="alert alert-note">
+  <div class="alert-title">Tag Every Unit With REB_ALL</div>
+  Give every single rebel unit the REB_ALL tag in addition to their type tag. This lets the mass casualty trigger (count &lt;= 54, which is 30% of 180) find all rebels at once regardless of type. Without this the threshold trigger has no way to count across unit types simultaneously.
+</div>
+
+</div><!-- /s15 -->
 
 </div><!-- /container --></div></div>
 </div>
