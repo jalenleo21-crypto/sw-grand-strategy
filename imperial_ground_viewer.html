@@ -137,6 +137,17 @@ html{position:relative}body{padding-left:210px;width:100%;min-height:100vh;backg
 .footer-text{font-size:9px;color:var(--dim);letter-spacing:2px;text-transform:uppercase}
 
 @media(max-width:480px){.unit-grid{grid-template-columns:1fr}}
+
+.eximp-bar{position:relative;z-index:10;display:flex;align-items:center;gap:10px;padding:8px 24px;background:rgba(0,0,0,0.3);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.eximp-label{font-size:9px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-right:4px}
+.eximp-btn{background:transparent;border:1px solid var(--border2);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;padding:4px 14px;cursor:pointer;text-transform:uppercase;transition:all .2s}
+.eximp-btn:hover{border-color:var(--gold);color:var(--gold)}
+.eximp-btn.export{border-color:var(--green);color:var(--green)}
+.eximp-btn.export:hover{background:rgba(26,152,72,0.08)}
+.eximp-btn.import{border-color:var(--empire2, #3a77e8);color:var(--empire2, #3a77e8)}
+.eximp-btn.import:hover{background:rgba(58,119,232,0.08)}
+.eximp-status{font-size:9px;color:var(--dim);letter-spacing:1px}
+#eximp-file-input{display:none}
 </style>
 </head>
 <body>
@@ -173,6 +184,14 @@ html{position:relative}body{padding-left:210px;width:100%;min-height:100vh;backg
   <button class="filter-btn" onclick="filterCards('vehicle',this)">Vehicles</button>
   <button class="filter-btn" onclick="filterCards('heavy',this)">Heavy Walkers</button>
   <button class="filter-btn" onclick="filterCards('support',this)">Support</button>
+</div>
+
+<div class="eximp-bar">
+  <span class="eximp-label">Images //</span>
+  <button class="eximp-btn export" onclick="exportImages()">⬇ Export Images</button>
+  <button class="eximp-btn import" onclick="document.getElementById('eximp-file-input').click()">⬆ Import Images</button>
+  <input type="file" id="eximp-file-input" accept=".json" onchange="importImages(event)">
+  <span class="eximp-status" id="eximp-status"></span>
 </div>
 
 <div id="unit-grid-root"></div>
@@ -333,6 +352,44 @@ function updateCounts() {
 }
 
 buildGrid();
+
+function exportImages() {
+  const data = {};
+  for(let i=0; i<localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if(k && k.startsWith('imp_gnd_')) data[k] = localStorage.getItem(k);
+  }
+  const count = Object.keys(data).length;
+  if(count === 0) { document.getElementById('eximp-status').textContent = 'No images to export'; return; }
+  const blob = new Blob([JSON.stringify(data)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'imp_ground_images.json';
+  a.click();
+  document.getElementById('eximp-status').textContent = count + ' image(s) exported';
+}
+
+function importImages(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      let count = 0;
+      for(const [k,v] of Object.entries(data)) {
+        if(k.startsWith('imp_gnd_')) { localStorage.setItem(k,v); count++; }
+      }
+      document.getElementById('eximp-status').textContent = count + ' image(s) imported — reloading...';
+      setTimeout(() => location.reload(), 800);
+    } catch(err) {
+      document.getElementById('eximp-status').textContent = 'Import failed — invalid file';
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
 </script>
 </body>
 </html>
