@@ -15,84 +15,89 @@
   --green:#1a9848;--red:#c83838;
 }
 html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow-x:hidden}
-
-/* STARFIELD */
 .stars{position:fixed;inset:0;z-index:0;pointer-events:none}
 .stars canvas{width:100%;height:100%}
-
-/* SCAN LINE */
 body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:999}
-
-/* MAIN */
 .wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:60px 24px 80px}
 
 /* HEADER */
-.site-hdr{text-align:center;margin-bottom:64px}
+.site-hdr{text-align:center;margin-bottom:56px}
 .site-pre{font-size:11px;letter-spacing:6px;color:var(--dim);text-transform:uppercase;margin-bottom:16px}
 .site-title{font-family:'Orbitron',monospace;font-size:clamp(28px,5vw,52px);font-weight:900;color:var(--gold2);letter-spacing:4px;text-transform:uppercase;line-height:1.1;margin-bottom:8px}
 .site-sub{font-size:11px;color:var(--dim);letter-spacing:4px;text-transform:uppercase;margin-bottom:32px}
 .site-divider{width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:0 auto}
 
 /* STATUS BAR */
-.status-bar{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:56px;flex-wrap:wrap}
+.status-bar{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:48px;flex-wrap:wrap}
 .status-item{display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:2px;color:var(--dim)}
 .status-dot{width:6px;height:6px;border-radius:50%;animation:pulse 2s infinite}
 .sd-green{background:var(--green);box-shadow:0 0 8px var(--green)}
 .sd-gold{background:var(--gold);box-shadow:0 0 8px var(--gold);animation-delay:.7s}
+.sd-red{background:var(--red);box-shadow:0 0 8px var(--red);animation-delay:.4s}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ENTER BUTTON */
+.enter-btn-wrap{text-align:center;margin-bottom:48px}
+.enter-btn{display:inline-block;padding:16px 48px;border:2px solid var(--gold);background:rgba(200,168,75,0.06);cursor:pointer;transition:all .2s;font-family:'Orbitron',monospace;font-size:14px;font-weight:800;color:var(--gold2);letter-spacing:4px;text-decoration:none}
+.enter-btn:hover{background:rgba(200,168,75,0.12);border-color:var(--gold3);color:var(--gold3)}
+.enter-sub{margin-top:10px;font-size:10px;color:var(--dim);letter-spacing:2px}
 
 /* SECTION LABEL */
 .sec-label{font-size:9px;letter-spacing:4px;color:var(--dim);text-transform:uppercase;margin-bottom:16px;padding-left:2px;display:flex;align-items:center;gap:12px}
 .sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
 
-/* DOC GRID */
-.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:48px}
-
-/* DOC CARD */
-.doc-card{border:1px solid var(--border2);background:var(--panel);display:block;text-decoration:none;position:relative;overflow:hidden;transition:border-color .2s,background .2s;cursor:pointer}
-.doc-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,168,75,0.03) 0%,transparent 60%);opacity:0;transition:opacity .2s}
-.doc-card:hover{border-color:var(--gold);background:var(--panel2)}
-.doc-card:hover::before{opacity:1}
-.doc-card:hover .doc-arrow{color:var(--gold);transform:translateX(4px)}
-.doc-card:hover .doc-icon{color:var(--gold2)}
-
-.doc-card-inner{padding:20px 22px}
-.doc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
-.doc-icon{font-size:22px;line-height:1;color:var(--dim);transition:color .2s}
-.doc-arrow{font-size:14px;color:var(--dim);transition:color .2s,transform .2s;margin-top:4px}
-.doc-id{font-size:9px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:5px}
-.doc-name{font-family:'Orbitron',monospace;font-size:13px;font-weight:600;color:var(--bright);letter-spacing:2px;line-height:1.3;margin-bottom:8px}
-.doc-desc{font-size:10px;color:var(--dim);line-height:1.7}
-.doc-tags{display:flex;gap:5px;margin-top:12px;flex-wrap:wrap}
-.doc-tag{font-size:8px;padding:1px 6px;border:1px solid var(--border2);color:var(--dim);letter-spacing:1px}
-.doc-tag.live{border-color:var(--green);color:var(--green)}
-.doc-tag.sync{border-color:var(--gold);color:var(--gold)}
-
-/* FEATURED CARD */
-.doc-card.featured{grid-column:1/-1;border-color:rgba(200,168,75,0.3)}
-.doc-card.featured .doc-name{font-size:16px}
-.doc-card.featured .doc-card-inner{padding:24px 28px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
-.doc-card.featured .doc-desc{font-size:11px;max-width:600px}
-
-/* REFERENCE SECTION */
+/* REF GRID */
 .ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:48px}
-.ref-card{border:1px solid var(--border);background:var(--panel);display:block;text-decoration:none;padding:14px 16px;transition:border-color .15s,background .15s}
+.ref-card{border:1px solid var(--border);background:var(--panel);display:block;text-decoration:none;padding:14px 16px;transition:border-color .15s,background .15s;position:relative}
 .ref-card:hover{border-color:var(--border2);background:var(--panel2)}
 .ref-card:hover .ref-name{color:var(--gold)}
-.ref-name{font-family:'Orbitron',monospace;font-size:10px;color:var(--text);letter-spacing:2px;margin-bottom:4px;transition:color .15s}
-.ref-desc{font-size:9px;color:var(--dim);line-height:1.5}
+.ref-name{font-family:'Orbitron',monospace;font-size:10px;color:var(--text);letter-spacing:2px;margin-bottom:4px;transition:color .15s;line-height:1.4}
+.ref-desc{font-size:9px;color:var(--dim);line-height:1.6}
+.ref-tags{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.ref-tag{font-size:8px;padding:1px 6px;border:1px solid var(--border);color:var(--dim);letter-spacing:1px}
+.ref-tag.imp{border-color:rgba(42,94,200,0.4);color:rgba(100,150,230,0.8)}
+.ref-tag.reb{border-color:rgba(200,40,40,0.4);color:rgba(220,100,100,0.8)}
+.ref-tag.live{border-color:var(--green);color:var(--green)}
+.ref-tag.gold{border-color:rgba(200,168,75,0.4);color:var(--gold)}
+.ref-tag.sys{border-color:rgba(100,160,220,0.3);color:rgba(130,180,230,0.8)}
+
+/* QUICK REF PANELS */
+.qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.qr-panel{border:1px solid var(--border);padding:16px 18px;background:var(--panel)}
+.qr-title{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;margin-bottom:10px}
+.qr-title.imp{color:var(--empire)}
+.qr-title.reb{color:var(--rebel)}
+.qr-title.gold{color:var(--gold)}
+.qr-list{font-size:10px;color:var(--dim);line-height:2.1}
+.qr-list span{color:var(--text)}
+
+/* TURN STRUCTURE */
+.turn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.turn-step{text-align:center;padding:12px 8px;border:1px solid var(--border)}
+.turn-num{font-family:'Orbitron',monospace;font-size:16px;color:var(--gold2);margin-bottom:4px}
+.turn-name{font-size:8px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;line-height:1.4}
+.turn-desc{font-size:9px;color:var(--text)}
+
+/* MORALE TABLE */
+.morale-table{width:100%;border-collapse:collapse;font-size:9px;margin-bottom:0}
+.morale-table th{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--dim);padding:6px 10px;border-bottom:1px solid var(--border);text-align:left}
+.morale-table td{padding:6px 10px;border-bottom:1px solid var(--border);line-height:1.5}
+.morale-table tr:last-child td{border-bottom:none}
+.m-high{color:#33ff88}.m-steady{color:#88ddff}.m-shaken{color:#ffdd44}.m-battered{color:#ff9944}.m-broken{color:#ff4444}
 
 /* FOOTER */
 .footer{text-align:center;padding-top:40px;border-top:1px solid var(--border)}
 .footer-title{font-family:'Orbitron',monospace;font-size:10px;color:var(--dim);letter-spacing:3px;margin-bottom:8px}
-.footer-text{font-size:9px;color:var(--dim);line-height:1.7}
+.footer-text{font-size:9px;color:var(--dim);line-height:1.9}
 
-/* CORNER DECORATION */
+/* CORNERS */
 .corner{position:fixed;width:60px;height:60px;pointer-events:none;z-index:2}
 .corner-tl{top:20px;left:20px;border-top:1px solid var(--border2);border-left:1px solid var(--border2)}
 .corner-tr{top:20px;right:20px;border-top:1px solid var(--border2);border-right:1px solid var(--border2)}
 .corner-bl{bottom:20px;left:20px;border-bottom:1px solid var(--border2);border-left:1px solid var(--border2)}
 .corner-br{bottom:20px;right:20px;border-bottom:1px solid var(--border2);border-right:1px solid var(--border2)}
+
+@media(max-width:600px){.qr-grid{grid-template-columns:1fr}.turn-grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -117,94 +122,203 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
     <div class="status-item"><div class="status-dot sd-green"></div>SYSTEMS ONLINE</div>
     <div class="status-item"><div class="status-dot sd-gold"></div>CAMPAIGN ACTIVE — 2 BBY</div>
     <div class="status-item"><div class="status-dot sd-green"></div>SUPABASE SYNC ENABLED</div>
+    <div class="status-item"><div class="status-dot sd-red"></div>PRE-CAMPAIGN SETUP</div>
   </div>
 
-  <!-- ENTER CAMPAIGN BUTTON -->
-  <div style="text-align:center;margin-bottom:48px">
-    <a href="sw_campaign_app.html" style="text-decoration:none">
-      <div style="display:inline-block;padding:16px 48px;border:2px solid var(--gold);background:rgba(200,168,75,0.06);cursor:pointer;transition:all .2s;font-family:'Orbitron',monospace;font-size:14px;font-weight:800;color:var(--gold2);letter-spacing:4px">
-        ▶ ENTER CAMPAIGN
-      </div>
-    </a>
-    <div style="margin-top:10px;font-size:10px;color:var(--dim);letter-spacing:2px">All documents — one unified interface</div>
+  <div class="enter-btn-wrap">
+    <a class="enter-btn" href="sw_campaign_app_v20.html">▶ ENTER CAMPAIGN</a>
+    <div class="enter-sub">Sector Command — Live Supabase Sync — v20</div>
   </div>
 
-  <div class="sec-label">Reference Documents</div>
-
+  <!-- FLEET REGISTRIES -->
+  <div class="sec-label">Fleet Registries — Holographic Viewers</div>
   <div class="ref-grid">
-
-    <a class="ref-card" href="sw_sector_adjacency.html">
-      <div class="ref-name">Sector Adjacency & Hyperlanes</div>
-      <div class="ref-desc">All 29 sectors with hyperlane connections. Major, minor, and secret routes. Movement planning reference — which sectors you can reach in one jump.</div>
+    <a class="ref-card" href="imperial_navy_viewer.html">
+      <div class="ref-name">Imperial Naval Registry</div>
+      <div class="ref-desc">All Imperial ships in AOTR. Dreadnoughts through TIE variants. Holographic viewer with image upload per card.</div>
+      <div class="ref-tags"><span class="ref-tag imp">Imperial</span><span class="ref-tag sys">AOTR Ships</span><span class="ref-tag live">Image Upload</span></div>
     </a>
-
-    <a class="ref-card" href="sw_campaign_rulebook.pdf">
-      <div class="ref-name">Campaign Rulebook (PDF)</div>
-      <div class="ref-desc">Complete rulebook — 16 parts, 6 appendices. Turn structure, AP, engagement rules, morale, commanders, supply, transport, victory conditions.</div>
+    <a class="ref-card" href="rebel_navy_viewer.html">
+      <div class="ref-name">Rebel Alliance Fleet Registry</div>
+      <div class="ref-desc">All Rebel ships in AOTR. MC80s through Z-95s. Holographic viewer with image upload per card.</div>
+      <div class="ref-tags"><span class="ref-tag reb">Rebel</span><span class="ref-tag sys">AOTR Ships</span><span class="ref-tag live">Image Upload</span></div>
     </a>
-
   </div>
 
+  <!-- GROUND UNIT REGISTRIES -->
+  <div class="sec-label">Ground Unit Registries — Holographic Viewers</div>
+  <div class="ref-grid">
+    <a class="ref-card" href="imperial_ground_viewer.html">
+      <div class="ref-name">Imperial Ground Forces Registry</div>
+      <div class="ref-desc">Army infantry, Stormtrooper Corps, Dark Troopers, officers, walkers, E-Web. Threat pip rating per card. Imperial Handbook sourced.</div>
+      <div class="ref-tags"><span class="ref-tag imp">Imperial</span><span class="ref-tag imp">Handbook</span><span class="ref-tag live">Image Upload</span></div>
+    </a>
+    <a class="ref-card" href="rebel_ground_viewer.html">
+      <div class="ref-name">Rebel Alliance Ground Forces Registry</div>
+      <div class="ref-desc">SecForce, all 8 SpecForce regiments, Saw's Partisans, officers, vehicles. WEG Rules of Engagement + Rebel Files sourced.</div>
+      <div class="ref-tags"><span class="ref-tag reb">Rebel</span><span class="ref-tag reb">WEG / RF</span><span class="ref-tag live">Image Upload</span></div>
+    </a>
+  </div>
+
+  <!-- ORDER OF BATTLE -->
+  <div class="sec-label">Order of Battle Documents</div>
+  <div class="ref-grid">
+    <a class="ref-card" href="imperial_oob.pdf">
+      <div class="ref-name">Imperial Military OOB</div>
+      <div class="ref-desc">Full Imperial OOB — command structure, Navy ranks, fleet hierarchy, Army unit structure, Stormtrooper Corps, ISB, Tarkin Doctrine.</div>
+      <div class="ref-tags"><span class="ref-tag imp">PDF</span><span class="ref-tag gold">Imperial Handbook</span></div>
+    </a>
+    <a class="ref-card" href="rebel_oob.pdf">
+      <div class="ref-name">Rebel Alliance Military OOB</div>
+      <div class="ref-desc">Full Rebel OOB — High Command, SecForces, SpecForce all 8 regiments, taskforce system, weapons.</div>
+      <div class="ref-tags"><span class="ref-tag reb">PDF</span><span class="ref-tag gold">WEG / Rebel Files</span></div>
+    </a>
+  </div>
+
+  <!-- REFERENCE DOCUMENTS -->
+  <div class="sec-label">Reference Documents</div>
+  <div class="ref-grid">
+    <a class="ref-card" href="sw_gem_scripting_reference.html">
+      <div class="ref-name">GEM Scripting Reference</div>
+      <div class="ref-desc">Men of War mission editor — triggers, morale system, wave scripting, company parent tags, waypoints, Saw rogue trigger, commander counts per entry.</div>
+      <div class="ref-tags"><span class="ref-tag sys">HTML</span><span class="ref-tag sys">Men of War</span><span class="ref-tag sys">GEM Editor</span></div>
+    </a>
+    <a class="ref-card" href="sw_turn_examples.pdf">
+      <div class="ref-name">Turn Examples</div>
+      <div class="ref-desc">Five complete turn walkthroughs — all four phases, Imperial and Rebel decisions, GM resolution, battle triggers.</div>
+      <div class="ref-tags"><span class="ref-tag gold">PDF</span><span class="ref-tag sys">5 Examples</span></div>
+    </a>
+    <a class="ref-card" href="sw_campaign_rulebook.pdf">
+      <div class="ref-name">Campaign Rulebook</div>
+      <div class="ref-desc">Complete rulebook — 16 parts, 6 appendices. Turn structure, AP, engagement rules, morale, commanders, supply, transport, victory conditions.</div>
+      <div class="ref-tags"><span class="ref-tag gold">PDF</span><span class="ref-tag sys">16 Parts</span></div>
+    </a>
+  </div>
+
+  <!-- QUICK REFERENCE -->
   <div class="sec-label">Quick Reference</div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:48px">
-
-    <div style="border:1px solid var(--border);padding:16px 18px;background:var(--panel)">
-      <div style="font-family:'Orbitron',monospace;font-size:10px;color:var(--empire);letter-spacing:2px;margin-bottom:10px">IMPERIAL — 4 AP/TURN</div>
-      <div style="font-size:10px;color:var(--dim);line-height:2">
-        Move Commander — 1 AP<br>
-        Planetary Assault — 2 AP<br>
-        Fleet Deployment — 1 AP<br>
-        Orbital Bombardment — 2 AP<br>
-        ISB Crackdown — 1 AP<br>
-        Garrison Reinforcement — 1 AP<br>
-        Sector Lockdown — 1 AP<br>
-        Death Star Advance — 2 AP<br>
-        Intel Operation — 1 AP<br>
-        Blockade — 1 AP
+  <div class="qr-grid" style="margin-bottom:12px">
+    <div class="qr-panel">
+      <div class="qr-title imp">IMPERIAL — 4 AP/TURN</div>
+      <div class="qr-list">
+        Move Commander — <span>1 AP</span><br>
+        Fleet Movement — <span>1 AP</span><br>
+        Move Ground Force — <span>1 AP</span><br>
+        Garrison Reinforcement — <span>1 AP</span><br>
+        Intel Operation — <span>1 AP</span><br>
+        ISB Crackdown — <span>1 AP</span><br>
+        Blockade — <span>1 AP</span><br>
+        Sector Lockdown — <span>1 AP</span><br>
+        Full Assault — <span>2 AP</span><br>
+        Planetary Assault — <span>2 AP</span><br>
+        Death Star Advance — <span>2 AP</span><br>
+        Orbital Bombardment — <span>2 AP</span>
       </div>
     </div>
-
-    <div style="border:1px solid var(--border);padding:16px 18px;background:var(--panel)">
-      <div style="font-family:'Orbitron',monospace;font-size:10px;color:var(--rebel);letter-spacing:2px;margin-bottom:10px">REBEL ALLIANCE — 3 AP/TURN</div>
-      <div style="font-size:10px;color:var(--dim);line-height:2">
-        Move Commander — 1 AP<br>
-        Raid — 1 AP<br>
-        Full Assault — 2 AP<br>
-        Fleet Engagement — 1 AP<br>
-        Diplomatic Mission — 1 AP<br>
-        Cell Insertion — 1 AP<br>
-        Supply Run — 1 AP<br>
-        Rescue Mission — 1 AP<br>
-        Intel Operation — 1 AP<br>
-        Fortify — 1 AP
+    <div class="qr-panel">
+      <div class="qr-title reb">REBEL ALLIANCE — 3 AP/TURN</div>
+      <div class="qr-list">
+        Move Commander — <span>1 AP</span><br>
+        Fleet Movement — <span>1 AP</span><br>
+        Move Ground Force — <span>1 AP</span><br>
+        Cell Insertion — <span>1 AP</span><br>
+        Raid — <span>1 AP</span><br>
+        Supply Run — <span>1 AP</span><br>
+        Diplomatic Mission — <span>1 AP</span><br>
+        Intel Operation — <span>1 AP</span><br>
+        Rescue Mission — <span>1 AP</span><br>
+        Fortify — <span>1 AP</span><br>
+        Full Assault — <span>2 AP</span><br>
+        Saw Gerrera Deploy — <span>0 AP + 1 PW</span>
       </div>
     </div>
-
   </div>
 
-  <div style="border:1px solid var(--border);padding:16px 18px;background:var(--panel);margin-bottom:48px">
-    <div style="font-family:'Orbitron',monospace;font-size:10px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">TURN STRUCTURE</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-      <div style="text-align:center;padding:10px;border:1px solid var(--border)">
-        <div style="font-family:'Orbitron',monospace;font-size:14px;color:var(--gold2);margin-bottom:4px">01</div>
-        <div style="font-size:9px;color:var(--dim);letter-spacing:1px">STRATEGIC<br>PLANNING</div>
-        <div style="font-size:9px;color:var(--text);margin-top:4px">Declare actions secretly</div>
+  <div class="qr-panel" style="margin-bottom:12px">
+    <div class="qr-title gold">TURN STRUCTURE</div>
+    <div class="turn-grid">
+      <div class="turn-step">
+        <div class="turn-num">01</div>
+        <div class="turn-name">Strategic<br>Planning</div>
+        <div class="turn-desc">Secretly declare actions simultaneously</div>
       </div>
-      <div style="text-align:center;padding:10px;border:1px solid var(--border)">
-        <div style="font-family:'Orbitron',monospace;font-size:14px;color:var(--gold2);margin-bottom:4px">02</div>
-        <div style="font-size:9px;color:var(--dim);letter-spacing:1px">EVENT CARD</div>
-        <div style="font-size:9px;color:var(--text);margin-top:4px">Draw & resolve one card</div>
+      <div class="turn-step">
+        <div class="turn-num">02</div>
+        <div class="turn-name">Event Card</div>
+        <div class="turn-desc">Draw & resolve — W-01 Atollon is mandatory</div>
       </div>
-      <div style="text-align:center;padding:10px;border:1px solid var(--border)">
-        <div style="font-family:'Orbitron',monospace;font-size:14px;color:var(--gold2);margin-bottom:4px">03</div>
-        <div style="font-size:9px;color:var(--dim);letter-spacing:1px">ACTION<br>RESOLUTION</div>
-        <div style="font-size:9px;color:var(--text);margin-top:4px">Reveal & execute actions</div>
+      <div class="turn-step">
+        <div class="turn-num">03</div>
+        <div class="turn-name">Action<br>Resolution</div>
+        <div class="turn-desc">Reveal & execute — offensive resolves first</div>
       </div>
-      <div style="text-align:center;padding:10px;border:1px solid var(--border)">
-        <div style="font-family:'Orbitron',monospace;font-size:14px;color:var(--gold2);margin-bottom:4px">04</div>
-        <div style="font-size:9px;color:var(--dim);letter-spacing:1px">CLEANUP</div>
-        <div style="font-size:9px;color:var(--text);margin-top:4px">Supply, PW, morale updates</div>
+      <div class="turn-step">
+        <div class="turn-num">04</div>
+        <div class="turn-name">Cleanup</div>
+        <div class="turn-desc">Supply, PW, headcount, morale updates</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qr-panel" style="margin-bottom:12px">
+    <div class="qr-title gold" style="margin-bottom:10px">MORALE STATES — Three Factors: Supply · Headcount · Commander Present</div>
+    <table class="morale-table">
+      <thead>
+        <tr><th>State</th><th>Conditions</th><th>GEM Script</th><th>Commander Effect</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="m-high">HIGH</td><td>Nominal supply + 75%+ strength + commander present</td><td>STEADY — hold on LT death</td><td>Already factored in</td></tr>
+        <tr><td class="m-steady">STEADY</td><td>Nominal supply + 75%+ strength, no commander</td><td>STEADY — hold on LT death</td><td>+Commander = HIGH</td></tr>
+        <tr><td class="m-shaken">SHAKEN</td><td>Reduced supply OR 50–75% strength</td><td>BROKEN — rout on LT death</td><td>+Commander = STEADY</td></tr>
+        <tr><td class="m-battered">BATTERED</td><td>Critical supply OR below 50% strength</td><td>BROKEN — rout on commander death</td><td>+Commander = SHAKEN</td></tr>
+        <tr><td class="m-broken">BROKEN</td><td>Below 25% strength OR Critical supply + no commander</td><td>Auto-retreat when engaged</td><td>+Commander = BATTERED</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="qr-grid" style="margin-bottom:12px">
+    <div class="qr-panel">
+      <div class="qr-title gold">RETREAT CASUALTIES</div>
+      <div class="qr-list">
+        Clean Retreat — <span>10% lost</span><br>
+        Fighting Retreat — <span>25–40% lost</span><br>
+        Desperate Retreat — <span>50%+ lost</span><br>
+        Encircled (Interdictor) — <span>Cannot retreat</span><br>
+        Meeting Engagement T1 — <span>No retreat available</span>
+      </div>
+    </div>
+    <div class="qr-panel">
+      <div class="qr-title gold">COMMANDER CASUALTY ROLL (1d6)</div>
+      <div class="qr-list">
+        1 — <span style="color:#ff4444">Killed in Action</span><br>
+        2 — <span style="color:#ff9944">Captured (+PW to enemy)</span><br>
+        3 — <span style="color:#ffdd44">Wounded (out 2 turns)</span><br>
+        4–5 — <span>Shaken (–1 rating next battle)</span><br>
+        6 — <span style="color:#33ff88">Unharmed</span><br>
+        <span style="color:var(--dim)">Total Loss battle: roll disadvantage</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="qr-panel" style="margin-bottom:48px">
+    <div class="qr-title gold">TRANSPORT RULES</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:4px">
+      <div>
+        <div style="font-size:9px;color:var(--empire);letter-spacing:2px;margin-bottom:6px">IMPERIAL — GOZANTI-CLASS</div>
+        <div class="qr-list">
+          Capacity — <span>1 Platoon + 2 AT-AT or 4 AT-ST</span><br>
+          Cannot combine AT-AT and AT-ST loads<br>
+          Placed at fleet rear in AotR
+        </div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--rebel);letter-spacing:2px;margin-bottom:6px">REBEL — GR-75 MEDIUM TRANSPORT</div>
+        <div class="qr-list">
+          Capacity — <span>1 Platoon infantry only</span><br>
+          No vehicles — infantry only<br>
+          Sensor-resistant hull
+        </div>
       </div>
     </div>
   </div>
@@ -221,45 +335,27 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 </div>
 
 <script>
-// Starfield
 const canvas = document.getElementById('starCanvas');
 const ctx = canvas.getContext('2d');
 let stars = [];
-
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 function initStars() {
   stars = [];
   for (let i = 0; i < 200; i++) {
-    stars.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.2,
-      a: Math.random(),
-      speed: Math.random() * 0.003 + 0.001,
-      phase: Math.random() * Math.PI * 2
-    });
+    stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.2, a: Math.random(), speed: Math.random()*0.003+0.001, phase: Math.random()*Math.PI*2 });
   }
 }
-
 function drawStars(t) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
   stars.forEach(s => {
-    const alpha = s.a * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(180,210,255,${alpha})`;
-    ctx.fill();
+    const alpha = s.a*(0.5+0.5*Math.sin(t*s.speed+s.phase));
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(180,210,255,${alpha})`; ctx.fill();
   });
   requestAnimationFrame(drawStars);
 }
-
-resize();
-initStars();
-window.addEventListener('resize', () => { resize(); initStars(); });
+resize(); initStars();
+window.addEventListener('resize',()=>{resize();initStars();});
 requestAnimationFrame(drawStars);
 </script>
 </body>
