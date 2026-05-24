@@ -29,6 +29,15 @@ body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monosp
 .app-nav-icon{font-size:12px;width:16px;text-align:center;flex-shrink:0}
 .app-nav-danger{color:var(--red)!important}
 .app-nav-danger:hover{background:rgba(232,72,72,0.06)!important}
+.app-nav-accordion{user-select:none}
+.app-nav-accordion.open{color:var(--text)}
+.app-nav-chevron{font-size:8px;color:var(--dim);transition:transform .2s;flex-shrink:0}
+.app-nav-accordion.open .app-nav-chevron{transform:rotate(90deg);color:var(--gold)}
+.app-nav-sub{background:rgba(0,0,0,0.2);border-left:2px solid var(--border2)}
+.app-nav-subitem{padding:7px 14px 7px 30px;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:10px;color:var(--dim);transition:background .12s;border-left:2px solid transparent}
+.app-nav-subitem:hover{background:rgba(255,255,255,0.03);color:var(--text)}
+.app-nav-subitem.active{background:rgba(200,168,75,0.06);border-left-color:var(--gold);color:var(--gold2)}
+.app-nav-subicon{font-size:10px;width:14px;text-align:center;flex-shrink:0}
 .app-hdr{position:fixed;top:0;left:210px;right:0;height:54px;background:var(--panel);border-bottom:2px solid var(--border2);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200}
 .app-hdr-left{display:flex;align-items:center;gap:14px;overflow:hidden}
 .app-screen-title{font-family:'Orbitron',monospace;font-size:11px;font-weight:800;color:var(--gold);letter-spacing:3px;white-space:nowrap}
@@ -965,6 +974,26 @@ tr:hover td{background:rgba(255,255,255,0.015)}
     <div class="app-nav-item" id="nav-commanders" onclick="showScreen('commanders');setTimeout(refreshCmdStatusUI,300)"><span class="app-nav-icon">★</span>Named Commanders</div>
     <div class="app-nav-item" id="nav-ground" onclick="showScreen('ground')"><span class="app-nav-icon">⚔</span>Ground OOB</div>
     <div class="app-nav-item" id="nav-naval" onclick="showScreen('naval')"><span class="app-nav-icon">◈</span>Naval OOB</div>
+    <!-- Imperial Military accordion -->
+    <div class="app-nav-item app-nav-accordion" id="nav-imp-mil" onclick="toggleNavAccordion('imp-mil')">
+      <span class="app-nav-icon">◈</span>
+      <span style="flex:1">Imperial Military</span>
+      <span class="app-nav-chevron" id="chev-imp-mil">▶</span>
+    </div>
+    <div class="app-nav-sub" id="sub-imp-mil" style="display:none">
+      <div class="app-nav-subitem" id="nav-imp-ground" onclick="showViewer('imp-ground','imperial_ground_viewer.html')"><span class="app-nav-subicon">⚔</span>Ground Forces</div>
+      <div class="app-nav-subitem" id="nav-imp-naval" onclick="showViewer('imp-naval','imperial_navy_viewer.html')"><span class="app-nav-subicon">◈</span>Navy</div>
+    </div>
+    <!-- Rebel Military accordion -->
+    <div class="app-nav-item app-nav-accordion" id="nav-reb-mil" onclick="toggleNavAccordion('reb-mil')">
+      <span class="app-nav-icon">◈</span>
+      <span style="flex:1">Rebel Military</span>
+      <span class="app-nav-chevron" id="chev-reb-mil">▶</span>
+    </div>
+    <div class="app-nav-sub" id="sub-reb-mil" style="display:none">
+      <div class="app-nav-subitem" id="nav-reb-ground" onclick="showViewer('reb-ground','rebel_ground_viewer.html')"><span class="app-nav-subicon">⚔</span>Ground Forces</div>
+      <div class="app-nav-subitem" id="nav-reb-naval" onclick="showViewer('reb-naval','rebel_navy_viewer.html')"><span class="app-nav-subicon">◈</span>Navy</div>
+    </div>
     <div class="app-nav-item" id="nav-engagement" onclick="showScreen('engagement')"><span class="app-nav-icon">📖</span>Engagement Rules</div>
     <div class="app-nav-item" id="nav-gem" onclick="showScreen('gem')"><span class="app-nav-icon">🔧</span>GEM Scripting</div>
   </div>
@@ -5866,16 +5895,61 @@ Fires when Saw's Partisans are in a joint operation AND have taken heavy casualt
     </div>
   </div>
 </div>
+<!-- Viewer iframe screens -->
+<div class="app-screen" id="screen-imp-ground" style="padding:0;overflow:auto">
+  <iframe id="iframe-imp-ground" src="" scrolling="yes" style="width:100%;height:100%;border:none;display:block;overflow:auto"></iframe>
+</div>
+<div class="app-screen" id="screen-imp-naval" style="padding:0;overflow:auto">
+  <iframe id="iframe-imp-naval" src="" scrolling="yes" style="width:100%;height:100%;border:none;display:block;overflow:auto"></iframe>
+</div>
+<div class="app-screen" id="screen-reb-ground" style="padding:0;overflow:auto">
+  <iframe id="iframe-reb-ground" src="" scrolling="yes" style="width:100%;height:100%;border:none;display:block;overflow:auto"></iframe>
+</div>
+<div class="app-screen" id="screen-reb-naval" style="padding:0;overflow:auto">
+  <iframe id="iframe-reb-naval" src="" scrolling="yes" style="width:100%;height:100%;border:none;display:block;overflow:auto"></iframe>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SCREEN_TITLES={sector:'STRATEGIC COMMAND',tracker:'TURN TRACKER',events:'EVENT CARDS',commanders:'NAMED COMMANDERS',ground:'GROUND ORDER OF BATTLE',naval:'NAVAL ORDER OF BATTLE',engagement:'ENGAGEMENT RULES',gem:'GEM SCRIPTING'};
+const SCREEN_TITLES={sector:'STRATEGIC COMMAND',tracker:'TURN TRACKER',events:'EVENT CARDS',commanders:'NAMED COMMANDERS',ground:'ORDER OF BATTLE — GROUND',naval:'ORDER OF BATTLE — NAVAL',engagement:'ENGAGEMENT RULES',gem:'GEM SCRIPTING','imp-ground':'IMPERIAL GROUND FORCES','imp-naval':'IMPERIAL NAVY','reb-ground':'REBEL GROUND FORCES','reb-naval':'REBEL NAVY'};
+
+function toggleNavAccordion(id) {
+  const sub = document.getElementById('sub-' + id);
+  const hdr = document.getElementById('nav-' + id);
+  const isOpen = sub.style.display !== 'none';
+  sub.style.display = isOpen ? 'none' : 'block';
+  hdr.classList.toggle('open', !isOpen);
+}
+
+function showViewer(name, file) {
+  // Switch all screens off, clear nav active states
+  document.querySelectorAll('.app-screen').forEach(s=>{s.classList.remove('active');});
+  document.querySelectorAll('.app-nav-item[id^="nav-"]').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.app-nav-subitem').forEach(n=>n.classList.remove('active'));
+  // Force reload every time so updated files are picked up
+  const iframe = document.getElementById('iframe-' + name);
+  if(iframe) iframe.src = file + '?t=' + Date.now();
+  // Show screen
+  const screen = document.getElementById('screen-' + name);
+  if(screen) screen.classList.add('active');
+  // Mark sub-item active and open accordion
+  const subItem = document.getElementById('nav-' + name);
+  if(subItem) subItem.classList.add('active');
+  const accordionId = name.startsWith('imp') ? 'imp-mil' : 'reb-mil';
+  document.getElementById('sub-' + accordionId).style.display = 'block';
+  document.getElementById('nav-' + accordionId).classList.add('open');
+  document.getElementById('appTitle').textContent = SCREEN_TITLES[name] || name.toUpperCase();
+}
+
 function showScreen(name){
   document.querySelectorAll('.app-screen').forEach(s=>{s.classList.remove('active');s.scrollTop=0;});
   document.querySelectorAll('.app-nav-item[id^="nav-"]').forEach(n=>n.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
-  const nav=document.getElementById('nav-'+name);
-  if(nav)nav.classList.add('active');
-  document.getElementById('appTitle').textContent=SCREEN_TITLES[name]||name.toUpperCase();
+  document.querySelectorAll('.app-nav-subitem').forEach(n=>n.classList.remove('active'));
+  const screenEl = document.getElementById('screen-' + name);
+  if(screenEl) screenEl.classList.add('active');
+  const nav = document.getElementById('nav-' + name);
+  if(nav) nav.classList.add('active');
+  document.getElementById('appTitle').textContent = SCREEN_TITLES[name] || name.toUpperCase();
 }
 function scrollInScreen(screenId,anchorId){
   const screen=document.getElementById(screenId);
@@ -7876,7 +7950,8 @@ function getCmdStatusBadge(commanderName) {
       const {data}=await supa.from('campaign_state').select('data').eq('id',1).single();
       if(!data||!data.data)return;
       const remote=JSON.parse(data.data);
-      const changed=remote.turn!==GS.turn||remote.ePW!==GS.ePW||remote.rPW!==GS.rPW||remote.dsStep!==GS.dsStep||JSON.stringify(remote.sectors)!==JSON.stringify(GS.sectors);
+      const cmdChanged=JSON.stringify(remote.cmdStatus||{})!==JSON.stringify(GS.cmdStatus||{});
+      const changed=remote.turn!==GS.turn||remote.ePW!==GS.ePW||remote.rPW!==GS.rPW||remote.dsStep!==GS.dsStep||JSON.stringify(remote.sectors)!==JSON.stringify(GS.sectors)||cmdChanged;
       if(changed){
         GS=remote;
         updateTurnDisplay();
@@ -7885,7 +7960,19 @@ function getCmdStatusBadge(commanderName) {
         buildDS();
         buildNav();
         if(activeSec)renderSector(activeSec);
-              console.log('Synced from remote');
+        // Refresh commander status dropdowns and force-card badges
+        if(cmdChanged){
+          refreshCmdStatusUI();
+          // Re-render all visible force cards so badges update everywhere
+          document.querySelectorAll('.force-card').forEach(card=>{
+            const cmdEl=card.querySelector('.force-val.gold');
+            if(cmdEl){
+              const name=cmdEl.textContent.replace(/\s*(KIA|WOUNDED|SHAKEN|CAPTURED).*/i,'').trim();
+              if(name) cmdEl.innerHTML=name+getCmdStatusBadge(name);
+            }
+          });
+        }
+        console.log('Synced from remote');
       }
     }catch(e){}
   },5000);

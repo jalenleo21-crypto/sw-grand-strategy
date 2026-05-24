@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imperial Naval Registry — 2 BBY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#03050c;--panel:#06090f;--panel2:#080d18;--border:#111e30;--border2:#1a2e45;
+  --text:#8aacca;--dim:#3a5570;--bright:#c8e4ff;
+  --gold:#c8a84b;--gold2:#e8c86b;--gold3:#f8d87b;
+  --empire:#2a5ec8;--empire2:#3a77e8;--empire-dim:#0d1f42;
+  --green:#1a9848;--red:#c83838;--orange:#c87028;
+}
+html{position:relative}body{padding-left:210px;min-height:100vh;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;}
+
+.stars{position:absolute;inset:0;z-index:0;pointer-events:none}
+.stars canvas{width:100%;height:100%}
+
+
+.corner{position:absolute;width:60px;height:60px;pointer-events:none;z-index:2}
+.corner-tl{top:20px;left:20px;border-top:1px solid var(--border2);border-left:1px solid var(--border2)}
+.corner-tr{top:20px;right:20px;border-top:1px solid var(--border2);border-right:1px solid var(--border2)}
+.corner-bl{bottom:20px;left:20px;border-bottom:1px solid var(--border2);border-left:1px solid var(--border2)}
+.corner-br{bottom:20px;right:20px;border-bottom:1px solid var(--border2);border-right:1px solid var(--border2)}
+
+/* HEADER */
+.site-hdr{position:relative;z-index:10;text-align:center;padding:52px 24px 32px;border-bottom:1px solid var(--border)}
+.site-pre{font-size:11px;letter-spacing:6px;color:var(--dim);text-transform:uppercase;margin-bottom:12px}
+.site-title{font-family:'Orbitron',monospace;font-size:clamp(22px,4vw,42px);font-weight:900;color:var(--gold2);letter-spacing:4px;text-transform:uppercase;line-height:1.1;margin-bottom:6px}
+.site-sub{font-size:11px;color:var(--dim);letter-spacing:4px;text-transform:uppercase;margin-bottom:24px}
+.site-divider{width:160px;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:0 auto 24px}
+
+.hdr-stats{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
+.hdr-stat{display:flex;flex-direction:column;align-items:center;gap:3px}
+.hdr-stat-val{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;color:var(--gold2)}
+.hdr-stat-label{font-size:9px;letter-spacing:3px;color:var(--dim);text-transform:uppercase}
+
+/* STATUS DOTS */
+.status-bar{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:20px;flex-wrap:wrap}
+.status-item{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:2px;color:var(--dim)}
+.status-dot{width:6px;height:6px;border-radius:50%;animation:pulse 2s infinite}
+.sd-green{background:var(--green);box-shadow:0 0 8px var(--green)}
+.sd-empire{background:var(--empire2);box-shadow:0 0 8px var(--empire2);animation-delay:.5s}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* FILTER BAR */
+.filter-bar{position:relative;z-index:10;display:flex;flex-wrap:wrap;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(3,5,12,0.9);align-items:center}
+.filter-label{font-size:9px;letter-spacing:4px;color:var(--dim);text-transform:uppercase;margin-right:4px}
+.filter-btn{background:transparent;border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:5px 14px;cursor:pointer;text-transform:uppercase;transition:all .2s}
+.filter-btn:hover,.filter-btn.active{color:var(--gold2);border-color:var(--gold);background:rgba(200,168,75,0.05)}
+
+/* SECTION LABEL */
+.sec-label{position:relative;z-index:10;font-size:9px;letter-spacing:4px;color:var(--dim);text-transform:uppercase;padding:20px 24px 10px;display:flex;align-items:center;gap:12px;background:var(--bg)}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* SHIP GRID */
+.ship-grid{position:relative;z-index:10;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:transparent;margin:0 0 1px}
+
+/* SHIP CARD */
+.ship-card{background:var(--panel);position:relative;overflow:hidden;cursor:pointer;transition:background .2s,border-color .2s}
+.ship-card:hover{background:var(--panel2)}
+.ship-card:hover .card-arrow{color:var(--gold);transform:translateX(3px)}
+.ship-card:hover .ship-name{color:var(--gold2)}
+.ship-card.hidden{display:none}
+
+/* top accent bar on hover */
+.ship-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--empire2),transparent);opacity:0;transition:opacity .2s}
+.ship-card:hover::before{opacity:1}
+
+/* IMAGE */
+.ship-image-wrap{position:relative;width:100%;height:170px;overflow:hidden;background:#010508;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+.ship-image-wrap::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--panel) 0%,transparent 30%,transparent 70%,var(--panel) 100%);pointer-events:none}
+.ship-img{width:100%;height:100%;object-fit:contain;padding:12px;filter:brightness(0.88) saturate(0.6) hue-rotate(180deg) sepia(0.2);transition:filter .3s,transform .3s}
+.ship-card:hover .ship-img{filter:brightness(1) saturate(0.8) hue-rotate(180deg) sepia(0.1);transform:scale(1.03)}
+.ship-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--dim);opacity:0.4;position:relative}
+.ph-icon{font-size:36px;line-height:1}
+.ph-text{font-size:9px;letter-spacing:3px;text-transform:uppercase}
+.ship-placeholder::before{content:'';position:absolute;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--empire2),transparent);animation:scan 3s ease-in-out infinite;opacity:.2}
+@keyframes scan{0%{top:0}100%{top:100%}}
+
+/* CLASS BADGE */
+.class-badge{position:absolute;top:8px;left:8px;background:rgba(3,5,12,.9);border:1px solid var(--border);padding:2px 8px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);z-index:5}
+.class-badge.dreadnought{border-color:rgba(200,40,40,.4);color:rgba(220,100,100,.9)}
+.class-badge.capital{border-color:rgba(200,168,75,.3);color:var(--gold)}
+.class-badge.frigate{border-color:rgba(42,94,200,.35);color:rgba(130,170,255,.9)}
+.class-badge.corvette{border-color:rgba(26,152,72,.3);color:rgba(80,210,120,.9)}
+.class-badge.starfighter{border-color:rgba(160,100,220,.3);color:rgba(190,140,255,.9)}
+.class-badge.transport{border-color:rgba(200,112,40,.3);color:rgba(220,160,80,.9)}
+
+/* UPLOAD */
+.upload-zone{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;z-index:10}
+.ship-card:hover .upload-zone{opacity:1}
+.upload-btn{background:rgba(3,5,12,.95);border:1px solid var(--gold);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;padding:6px 16px;cursor:pointer;text-transform:uppercase;transition:all .2s}
+.upload-btn:hover{background:rgba(200,168,75,.1);color:var(--gold2)}
+.upload-input{display:none}
+
+/* CARD BODY */
+.card-body{padding:14px 16px 16px;position:relative}
+.card-top-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.ship-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--bright);letter-spacing:2px;line-height:1.35;transition:color .2s;flex:1;margin-right:8px}
+.card-arrow{font-size:12px;color:var(--dim);transition:color .2s,transform .2s;margin-top:2px;flex-shrink:0}
+.ship-designation{font-size:9px;color:var(--dim);letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}
+
+.role-bar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.role-tag{font-size:8px;padding:1px 6px;border:1px solid var(--border);color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;margin-bottom:10px}
+.stat-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(17,30,48,.8)}
+.stat-row:last-child{border-bottom:none}
+.stat-k{font-size:8px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+.stat-v{font-size:9px;color:var(--text);text-align:right}
+.stat-v.gold{color:var(--gold)}
+.stat-v.green{color:#33dd77}
+.stat-v.red{color:#dd4444}
+
+.ship-desc{font-size:9px;line-height:1.7;color:var(--dim);border-top:1px solid var(--border);padding-top:8px}
+
+/* FOOTER */
+.footer{position:relative;z-index:10;text-align:center;padding:20px;border-top:1px solid var(--border);margin-top:1px}
+.footer-title{font-family:'Orbitron',monospace;font-size:10px;color:var(--dim);letter-spacing:3px;margin-bottom:6px}
+.footer-text{font-size:9px;color:var(--dim);line-height:1.8}
+
+@media(max-width:480px){.ship-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+
+
+
+
+
+
+<div class="site-hdr">
+  <div class="site-pre">Galactic Empire — Classified Level Alpha</div>
+  <div class="site-title">Imperial Naval Registry</div>
+  <div class="site-sub">Fleet Assets — Awakening of the Rebellion Mod</div>
+  <div class="site-divider"></div>
+  <div class="hdr-stats">
+    <div class="hdr-stat"><span class="hdr-stat-val" id="total-count">0</span><span class="hdr-stat-label">Registered Vessels</span></div>
+    <div class="hdr-stat"><span class="hdr-stat-val" id="imaged-count">0</span><span class="hdr-stat-label">Confirmed Visual</span></div>
+    <div class="hdr-stat"><span class="hdr-stat-val">AOTR</span><span class="hdr-stat-label">Source Mod</span></div>
+  </div>
+  <div class="status-bar">
+    <div class="status-item"><div class="status-dot sd-green"></div>REGISTRY ONLINE</div>
+    <div class="status-item"><div class="status-dot sd-empire"></div>IMPERIAL FLEET — 2 BBY</div>
+    <div class="status-item"><div class="status-dot sd-green"></div>LOCAL STORAGE ACTIVE</div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">Class //</span>
+  <button class="filter-btn active" onclick="filterCards('all',this)">All</button>
+  <button class="filter-btn" onclick="filterCards('dreadnought',this)">Dreadnought</button>
+  <button class="filter-btn" onclick="filterCards('capital',this)">Capital Ship</button>
+  <button class="filter-btn" onclick="filterCards('frigate',this)">Frigate / Cruiser</button>
+  <button class="filter-btn" onclick="filterCards('corvette',this)">Corvette / Gunship</button>
+  <button class="filter-btn" onclick="filterCards('starfighter',this)">Starfighter</button>
+  <button class="filter-btn" onclick="filterCards('transport',this)">Transport</button>
+</div>
+
+<div id="ship-grid-root"></div>
+
+<div class="footer">
+  <div class="footer-title">Imperial Naval Registry — AotR Campaign Reference</div>
+  <div class="footer-text">Star Wars Grand Strategy — 2 BBY · Visual assets pending field confirmation<br><a href="index.html" style="color:var(--dim);text-decoration:none;letter-spacing:2px">← Return to Command Interface</a></div>
+</div>
+
+<script>
+const SHIPS = [
+  // DREADNOUGHTS
+  { id:'executor',   name:'Executor-class Star Dreadnought',      designation:'SSD / Command Dreadnought',         class:'dreadnought', length:'19,000m',  crew:'279,144',          role:['Command Ship','Flagship','Force Projection'],          weapons:'5,000+ turbolasers & ion cannons',                           fighters:'144 TIE fighters',         desc:"Vader's personal flagship. The Executor is the most powerful warship in the Imperial fleet. One vessel constitutes a credible threat to an entire Rebel fleet." },
+  { id:'bellator',   name:'Bellator-class Dreadnought',           designation:'Heavy Dreadnought',                 class:'dreadnought', length:'7,200m',   crew:'Unknown',           role:['Line Breaker','Heavy Assault'],                         weapons:'Heavy turbolasers, ion cannons',                              fighters:'Large complement',         desc:'Massive heavy dreadnought. Not yet widely deployed but represents the extreme end of Imperial capital ship doctrine.' },
+  // CAPITAL SHIPS
+  { id:'isd1',       name:'Imperial I-class Star Destroyer',      designation:'ISD-I / Ship of the Line',          class:'capital',     length:'1,600m',   crew:'37,085',            role:['Ship of the Line','Fleet Command','Planetary Assault'],  weapons:'60 turbolasers, 60 ion cannons',                             fighters:'72 TIE fighters',          desc:'The primary warship of the Imperial fleet. A single ISD-I is equivalent to a full naval line. The face of Imperial military power.' },
+  { id:'isd2',       name:'Imperial II-class Star Destroyer',     designation:'ISD-II / Upgraded Line Ship',       class:'capital',     length:'1,600m',   crew:'37,085',            role:['Ship of the Line','Heavy Assault'],                      weapons:'Enhanced turbolasers, heavier ion array',                    fighters:'72 TIE fighters',          desc:'Upgraded variant of the ISD-I with enhanced weapons and shields. The preferred capital ship for late-war Imperial operations.' },
+  { id:'isd3',       name:'Imperial III-class Star Destroyer',    designation:'ISD-III / Advanced Line Ship',      class:'capital',     length:'1,600m+',  crew:'38,000+',           role:['Ship of the Line','Carrier'],                           weapons:'Enhanced weapons suite',                                      fighters:'Large TIE complement',     desc:'Advanced Star Destroyer variant. Represents the cutting edge of Imperial naval engineering.' },
+  { id:'tector',     name:'Tector-class Star Destroyer',          designation:'Heavy Capital / Battleship',        class:'capital',     length:'1,600m',   crew:'~35,000',           role:['Battleship','Anti-Capital'],                            weapons:'Heavier turbolasers than standard ISD',                      fighters:'Minimal — no lower hangar',desc:'Battleship variant of the ISD with no lower hangar bay. All tonnage dedicated to armor and weapons. Pure combat ship.' },
+  { id:'harrow',     name:'Harrow-class Star Destroyer',          designation:'Capital Ship',                      class:'capital',     length:'~1,400m',  crew:'Unknown',           role:['Ship of the Line','Fleet Support'],                      weapons:'Standard turbolaser array',                                  fighters:'TIE complement',           desc:'Specialized capital ship variant used in Imperial fleet operations. Available in AOTR as a buildable fleet asset.' },
+  { id:'venator',    name:'Venator-class Star Destroyer',         designation:'Carrier / Legacy Capital',          class:'capital',     length:'1,137m',   crew:'7,400',             role:['Fleet Carrier','Strike Ship'],                          weapons:'8 heavy turbolasers, 2 medium turbolasers',                  fighters:'192 fighters/bombers',     desc:'Clone Wars-era carrier repurposed for Imperial service. Primary role is fighter deployment. Available via Requisition HQ.' },
+  { id:'acclamator', name:'Acclamator Assault Ship',              designation:'Assault Transport / Legacy',        class:'capital',     length:'752m',     crew:'700 + 16,000 troops',role:['Assault Transport','Troop Carrier'],                     weapons:'4 quad turbolasers, 6 turbolaser batteries',                 fighters:'80 aircraft',              desc:'Primary troop carrier. Can breach orbital blockades and land troops directly. Available via Requisition HQ. Can carry AT-TE walkers.' },
+  { id:'tagge',      name:'Tagge BattleCruiser',                  designation:'Heavy Battle Cruiser',              class:'capital',     length:'Unknown',  crew:'Unknown',           role:['Heavy Combat','Line Support'],                          weapons:'Heavy battery complement',                                   fighters:'Small complement',         desc:"TaggeCo heavy battle cruiser. Named for the TaggeCo family's contributions to Imperial shipbuilding. Capable combatant at capital ship level." },
+  { id:'allegiance', name:'Allegiance-class Battlecruiser',       designation:'Battlecruiser',                     class:'capital',     length:'2,200m',   crew:'Large',             role:['Battlecruiser','Fleet Flagship'],                        weapons:'Heavy dual battery',                                         fighters:'TIE complement',           desc:'Larger than a standard ISD, smaller than a Super Star Destroyer. Bridges the gap between standard capital ships and dreadnoughts.' },
+  // FRIGATES
+  { id:'vsd1',       name:'Victory I-class Star Destroyer',       designation:'Heavy Frigate / Legacy Capital',    class:'frigate',     length:'900m',     crew:'5,765',             role:['Heavy Frigate','Atmospheric Support'],                   weapons:'10 heavy turbolasers, 40 double turbolasers',               fighters:'Limited',                  desc:'Older design, operates well inside planetary atmospheres. Can make strafing runs in support of ground forces. Available via Requisition HQ.' },
+  { id:'vsd2',       name:'Victory II-class Star Destroyer',      designation:'Heavy Frigate / Upgraded Legacy',   class:'frigate',     length:'900m',     crew:'6,000',             role:['Heavy Frigate','Anti-Fighter'],                          weapons:'Enhanced turbolasers + proton torpedoes',                    fighters:'Limited',                  desc:'Upgraded Victory-class with proton torpedoes. Better suited for anti-capital engagement than the VSD-I.' },
+  { id:'vindicator', name:'Vindicator-class Heavy Cruiser',       designation:'Heavy Cruiser',                     class:'frigate',     length:'600m',     crew:'Medium',            role:['Heavy Cruiser','Line Support'],                          weapons:'Turbolasers, ion cannons',                                   fighters:'Small complement',         desc:'Heavy cruiser filling the gap between Star Destroyers and frigates. Solid line combatant.' },
+  { id:'gladiator',  name:'Gladiator-class Star Destroyer',       designation:'Strike Carrier / Picket',           class:'frigate',     length:'500m',     crew:'~1,000',            role:['Strike Carrier','Bomber Screen','Picket'],                weapons:'Turbolasers, concussion missiles',                            fighters:'Strike complement',        desc:'Strike carrier that deploys fighters rapidly then joins the front line. Excellent at screening ISDs from bombers. Key anti-fighter asset.' },
+  { id:'interdictor',name:'Interdictor Cruiser (Immobilizer 418)',designation:'Interdictor / Gravity Well Cruiser', class:'frigate',     length:'600m',     crew:'2,807',             role:['Interdictor','Hyperspace Denial'],                       weapons:'4 gravity well projectors, 20 turbolasers',                 fighters:'None',                     desc:'Projects gravity wells preventing hyperspace escape. Critical for trapping Rebel fleets. No Rebel fleet can safely withdraw while an Interdictor is present.' },
+  { id:'dreadnaught',name:'Dreadnaught Heavy Cruiser',            designation:'Heavy Cruiser / Legacy',            class:'frigate',     length:'600m',     crew:'16,000 (full) / 2,200 (auto)',role:['Heavy Cruiser','Fire Support'],                   weapons:'10 turbolasers, 20 quad laser cannons',                      fighters:'None',                     desc:'Older design, massively crew-intensive at full manning. Imperial version uses automated systems. Available via Requisition HQ.' },
+  { id:'strike',     name:'Strike-class Medium Cruiser',          designation:'Medium Cruiser',                    class:'frigate',     length:'450m',     crew:'2,400',             role:['Medium Cruiser','Multi-Role'],                           weapons:'Turbolasers, ion cannons, concussion missiles',               fighters:'Small complement',         desc:'Versatile medium cruiser. Can be configured for different roles with modular weapons systems.' },
+  { id:'lancer',     name:'Lancer-class Frigate',                 designation:'Anti-Fighter Frigate',              class:'frigate',     length:'250m',     crew:'850',               role:['Anti-Fighter','Escort','Picket'],                        weapons:'20 AG-2G quad laser cannons',                                fighters:'None',                     desc:'Pure anti-starfighter platform. Quad laser cannons designed specifically to shred fighter formations. Essential screen for capital ships against Rebel bomber spam.' },
+  { id:'broadside',  name:'Broadside Cruiser',                    designation:'Artillery Cruiser',                 class:'frigate',     length:'~280m',    crew:'Medium',            role:['Artillery','Bombardment'],                              weapons:'Long-range missile launchers',                               fighters:'None',                     desc:'Orbital bombardment platform. Armed with long-range missile batteries for standoff bombardment. Fires from extreme range.' },
+  // CORVETTES
+  { id:'carrack',    name:'Carrack-class Light Cruiser',          designation:'Light Cruiser / Corvette',          class:'corvette',    length:'350m',     crew:'1,092',             role:['Patrol','Escort','Light Cruiser'],                       weapons:'10 heavy turbolasers',                                       fighters:'5 TIE fighters',           desc:'Fast, well-armed light cruiser. Standard patrol and escort vessel for the Imperial outer rim. Good balance of speed and firepower for its size.' },
+  { id:'arquitens',  name:'Arquitens-class Light Cruiser',        designation:'Light Cruiser / Command Cruiser',   class:'corvette',    length:'325m',     crew:'700',               role:['Patrol','Command Cruiser','Sector Picket'],               weapons:'4 turbolasers, 4 point defense',                             fighters:'None',                     desc:"Modern replacement for the aging Carrack. Command Cruiser variant provides bonus to ground forces production. Available via Requisition HQ." },
+  { id:'gozanti',    name:'Gozanti-class Cruiser',                designation:'Assault Cruiser / TIE Carrier',     class:'corvette',    length:'63m',      crew:'10',                role:['TIE Carrier','Troop Transport','Patrol'],                weapons:'2 twin turbolasers',                                         fighters:'4 TIE (docked externally)',desc:'Campaign transport — carries 1 Platoon + 2 AT-AT or 4 AT-ST. Multiple loadouts. Essential for all planetary assault operations.' },
+  { id:'ipv',        name:'IPV-1 System Patrol Craft',            designation:'Patrol Gunship',                    class:'corvette',    length:'120m',     crew:'195',               role:['System Patrol','Anti-Fighter','Police'],                 weapons:'6 laser cannons',                                            fighters:'None',                     desc:'Standard patrol gunship for system-level security. Fast and maneuverable. Used by sector forces for routine patrol of Imperial-controlled systems.' },
+  { id:'ye4',        name:'Ye-4 Gunship',                         designation:'Light Gunship',                     class:'corvette',    length:'Unknown',  crew:'Small',             role:['Anti-Fighter','Patrol'],                                weapons:'Laser cannons',                                              fighters:'None',                     desc:'Light gunship providing anti-starfighter coverage and patrol duties in systems not warranting a larger vessel.' },
+  { id:'escort_carrier',name:'Imperial Escort Carrier (Ton Falk)',designation:'Escort Carrier',                    class:'corvette',    length:'500m',     crew:'~2,400',            role:['Carrier','Fighter Deployment','Screen'],                 weapons:'Light turbolasers',                                          fighters:'72 TIE fighters (3 wings)', desc:'Dedicated TIE carrier providing fighter support to fleet formations. Critical for providing sustained TIE coverage when capital ships are occupied.' },
+  // STARFIGHTERS
+  { id:'tiefighter',   name:'TIE/ln Fighter',                     designation:'Standard Space Superiority Fighter',class:'starfighter', length:'6.3m',     crew:'1',                 role:['Space Superiority','Interceptor','Patrol'],              weapons:'2 laser cannons',                                            fighters:'N/A',                      desc:'Twin Ion Engine fighter. Fast, agile, no shields, no hyperdrive. Wins through numbers and aggression. The ubiquitous face of Imperial air power.' },
+  { id:'tiebomber',    name:'TIE/sa Bomber',                      designation:'Bomber',                            class:'starfighter', length:'7.8m',     crew:'1',                 role:['Bomber','Anti-Capital','Bombardment'],                    weapons:'2 laser cannons + ordnance bay (16 concussion missiles / 12 proton torpedoes)', fighters:'N/A', desc:'Twin-pod bomber. Slower than TIE fighter but carries heavy ordnance. Primary anti-capital and planetary bombardment fighter.' },
+  { id:'tieinterceptor',name:'TIE/in Interceptor',                designation:'Interceptor',                       class:'starfighter', length:'9.6m',     crew:'1',                 role:['Interceptor','Superiority'],                              weapons:'4 laser cannons',                                            fighters:'N/A',                      desc:'Faster than standard TIE fighter with four cannons. Dagger-shaped solar arrays. One of the fastest fighters in existence. Replaces TIE/ln in high-priority assignments.' },
+  { id:'tieavenger',   name:'TIE Avenger',                        designation:'Advanced Fighter',                  class:'starfighter', length:'Unknown',  crew:'1',                 role:['Strike Fighter','Multi-Role'],                            weapons:'Laser cannons, missiles',                                    fighters:'N/A',                      desc:'Advanced TIE variant with shields and missiles. Bridges the gap between standard TIE and the elite TIE Advanced.' },
+  { id:'tiebrute',     name:'TIE Brute',                          designation:'Heavy Fighter',                     class:'starfighter', length:'Unknown',  crew:'1-2',               role:['Heavy Fighter','Anti-Capital'],                           weapons:'Heavy cannons',                                              fighters:'N/A',                      desc:'Heavy TIE variant designed for sustained combat against capital ship hardpoints and bomber-class targets.' },
+  { id:'tiehunter',    name:'TIE Hunter',                         designation:'Strike Fighter',                    class:'starfighter', length:'Unknown',  crew:'1',                 role:['Strike Fighter','Interceptor'],                           weapons:'Laser cannons, concussion missiles',                         fighters:'N/A',                      desc:'Multi-role strike fighter with enhanced weapons systems over standard TIE.' },
+  { id:'tiepunisher',  name:'TIE Punisher',                       designation:'Heavy Bomber',                      class:'starfighter', length:'Unknown',  crew:'1',                 role:['Heavy Bomber','Anti-Capital'],                            weapons:'Laser cannons + heavy ordnance',                             fighters:'N/A',                      desc:'Heavy bomber variant with expanded ordnance capacity. For missions requiring maximum warhead delivery.' },
+  { id:'xg1',          name:'Alpha-class XG-1 Star Wing',         designation:'Assault Gunboat',                   class:'starfighter', length:'10.5m',    crew:'1',                 role:['Assault Gunboat','Multi-Role','Anti-Capital'],            weapons:'2 laser cannons, 2 ion cannons, missile launchers',          fighters:'N/A',                      desc:'Assault gunboat with shields, hyperdrive, and heavy ordnance. The most capable single-fighter platform in the Imperial inventory.' },
+  { id:'atr6',         name:'Gamma-class ATR-6 Assault Transport', designation:'Assault Transport',                class:'starfighter', length:'31m',      crew:'6 + 10 troops',     role:['Assault Transport','Boarding'],                           weapons:'4 laser cannons, 2 ion cannons',                             fighters:'N/A',                      desc:'Armed assault transport for boarding operations and troop insertion. Operates in conjunction with TIE fighter escorts.' },
+  // TRANSPORTS
+  { id:'sentinel',    name:'Sentinel-class Landing Craft',        designation:'Heavy Troop Transport',             class:'transport',   length:'38m',      crew:'5 (+ 54 troops)',   role:['Troop Deployment','Heavy Transport'],                    weapons:'8 laser cannons, 2 concussion missile launchers',            fighters:'N/A',                      desc:'Standard heavy landing craft. Can carry 54 Stormtroopers with speeder bikes and heavy equipment, or up to 12 AT-ST walkers reconfigured.' },
+  { id:'lambda',      name:'Lambda-class T-4a Shuttle',           designation:'Command Shuttle / Transport',       class:'transport',   length:'20m',      crew:'6 (+ 20 passengers)',role:['Command Transport','VIP Transfer'],                      weapons:'3 turbolasers, 2 laser cannons',                             fighters:'N/A',                      desc:"The iconic tri-wing shuttle used for command transport and VIP movement. Vader's personal shuttle. Well-armed for a vessel its size." },
+  { id:'tieadvanced', name:'TIE Advanced v1',                     designation:'Prototype Advanced Fighter',        class:'transport',   length:'9.2m',     crew:'1',                 role:['Elite Fighter','Prototype'],                            weapons:'2 laser cannons, 2 missiles',                                fighters:'N/A',                      desc:"Vader's personal fighter and prototype for the TIE Advanced program. Shields and hyperdrive make it far superior to standard TIE fighters." },
+  { id:'bff1',        name:'BFF-1 Bulk Freighter',                designation:'Logistics Freighter',               class:'transport',   length:'120m',     crew:'Small',             role:['Logistics','Supply'],                                   weapons:'Minimal',                                                    fighters:'None',                     desc:'Standard bulk freighter used for supply and logistics operations. Not a combat vessel but essential for sustained fleet operations.' },
+];
+
+const SECTIONS = [
+  {key:'dreadnought', label:'Dreadnoughts'},
+  {key:'capital',     label:'Capital Ships'},
+  {key:'frigate',     label:'Frigates & Cruisers'},
+  {key:'corvette',    label:'Corvettes & Gunships'},
+  {key:'starfighter', label:'Starfighters & Bombers'},
+  {key:'transport',   label:'Transports & Special'},
+];
+
+function buildGrid() {
+  const root = document.getElementById('ship-grid-root');
+  root.innerHTML = '';
+  SECTIONS.forEach(sec => {
+    const ships = SHIPS.filter(s => s.class === sec.key);
+    if (!ships.length) return;
+    // section label
+    const lbl = document.createElement('div');
+    lbl.className = 'sec-label';
+    lbl.dataset.section = sec.key;
+    lbl.textContent = sec.label;
+    root.appendChild(lbl);
+    // grid
+    const grid = document.createElement('div');
+    grid.className = 'ship-grid';
+    grid.dataset.section = sec.key;
+    ships.forEach(ship => {
+      const savedImg = localStorage.getItem('ship_img_' + ship.id);
+      const imgContent = savedImg
+        ? `<img class="ship-img" src="${savedImg}" alt="${ship.name}">`
+        : `<div class="ship-placeholder"><div class="ph-icon">▲ ▲ ▲</div><div class="ph-text">Visual Pending</div></div>`;
+      const card = document.createElement('div');
+      card.className = 'ship-card';
+      card.dataset.class = ship.class;
+      card.dataset.id = ship.id;
+      card.innerHTML = `
+        <div class="ship-image-wrap">
+          ${imgContent}
+          <span class="class-badge ${ship.class}">${ship.class}</span>
+          <div class="upload-zone">
+            <label class="upload-btn" for="up_${ship.id}">+ Add Image</label>
+            <input class="upload-input" type="file" id="up_${ship.id}" accept="image/*" onchange="handleUpload(event,'${ship.id}')">
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-top-row">
+            <div class="ship-name">${ship.name}</div>
+            <div class="card-arrow">→</div>
+          </div>
+          <div class="ship-designation">${ship.designation}</div>
+          <div class="role-bar">${ship.role.map(r=>`<span class="role-tag">${r}</span>`).join('')}</div>
+          <div class="stats">
+            <div class="stat-row"><span class="stat-k">Length</span><span class="stat-v gold">${ship.length}</span></div>
+            <div class="stat-row"><span class="stat-k">Crew</span><span class="stat-v">${ship.crew}</span></div>
+            <div class="stat-row" style="grid-column:1/-1"><span class="stat-k">Weapons</span><span class="stat-v" style="font-size:8px">${ship.weapons}</span></div>
+            <div class="stat-row" style="grid-column:1/-1"><span class="stat-k">Fighters</span><span class="stat-v green" style="font-size:8px">${ship.fighters}</span></div>
+          </div>
+          <div class="ship-desc">${ship.desc}</div>
+        </div>`;
+      grid.appendChild(card);
+    });
+    root.appendChild(grid);
+  });
+  updateCounts();
+}
+
+function handleUpload(event, shipId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = e.target.result;
+    localStorage.setItem('ship_img_' + shipId, data);
+    const card = document.querySelector(`[data-id="${shipId}"]`);
+    const wrap = card.querySelector('.ship-image-wrap');
+    const ph = wrap.querySelector('.ship-placeholder');
+    if (ph) {
+      const img = document.createElement('img');
+      img.className = 'ship-img'; img.src = data; img.alt = shipId;
+      ph.replaceWith(img);
+    } else {
+      const img = wrap.querySelector('.ship-img');
+      if (img) img.src = data;
+    }
+    updateCounts();
+  };
+  reader.readAsDataURL(file);
+}
+
+function filterCards(cls, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.ship-card').forEach(c => {
+    c.classList.toggle('hidden', cls !== 'all' && c.dataset.class !== cls);
+  });
+  document.querySelectorAll('.sec-label, .ship-grid').forEach(el => {
+    el.style.display = cls === 'all' ? '' : 'none';
+  });
+  if (cls !== 'all') {
+    document.querySelectorAll(`.ship-grid[data-section="${cls}"]`).forEach(g => g.style.display = '');
+  }
+}
+
+function updateCounts() {
+  document.getElementById('total-count').textContent = SHIPS.length;
+  document.getElementById('imaged-count').textContent = SHIPS.filter(s => localStorage.getItem('ship_img_' + s.id)).length;
+}
+
+buildGrid();
+</script>
+</body>
+</html>
